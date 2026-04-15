@@ -26,3 +26,5 @@ Rcpp
 brms
 tidygraph
 ggraph
+lavaan
+tidySEM
