@@ -1,0 +1,2752 @@
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#| label: packages
+#| cache: false
+#| warning: false
+#| message: false
+
+# Uncached: knitr does not re-attach packages when cached chunks are loaded
+library(tidyverse)
+library(easystats)
+library(patchwork)
+library(ggside)
+library(ggdist)
+library(ggraph)
+library(tidygraph)
+library(brms)
+#
+#
+#
+#| warning: false
+#| code-fold: true
+#| error: false
+#| message: false
+
+question_labels <- readxl::read_xlsx("../data/MapResPrac_correspondance.xlsx")
+# names(question_labels)  # Question long names
+
+df <- read.csv("../data/MapResPrac-130726-N682.csv")
+names(df) <- as.character(as.vector(question_labels[1,])) |>
+  str_replace_all(fixed(".  "), "_") |>
+  str_replace_all(fixed(". "), "_") |>
+  str_replace_all(fixed("."), "_") |>
+  str_replace_all(fixed(" "), "_") |>
+  str_replace_all(fixed("/"), "_")
+dictionary <- data.frame(Variable = names(df), Question = names(question_labels))
+
+format_binary <- function(x) {
+  case_when(x == "Yes" ~ 1, x == "No" ~ 0, .default = NA)
+}
+# Engagement with an open science practice: not knowing it is the lowest level,
+# below knowing it and not planning to use it (those answering "not familiar"
+# are the least familiar with, and trained in, open science overall)
+format_use <- function(x) {
+  case_when(x == "I know it and I used it" ~ 3/3,
+            x == "I haven't used it yet, but I plan to do it in the future" ~ 2/3,
+            x == "I haven't used it yet, and I don't plan to do it in the future" ~ 1/3,
+            x == "I am not familiar with it" ~ 0,
+            .default = NA)
+}
+
+
+df <- df |>
+  select(-contains(" time: ")) |>
+  mutate(Dem_Gender = ifelse(Dem_Gender == "Non-binary", "Other", Dem_Gender),
+         Dem_Age = ifelse(Dem_Age < 18, NA, Dem_Age),
+         OS_Familiar = OS_Familiar / 100,
+         OS_Importance = OS_Importance / 100,
+         OS_Workshops = format_binary(OS_Workshops),
+         OS_Study_Preregistration = format_use(OS_Study_Preregistration),
+         OS_Registered_Reports = format_use(OS_Registered_Reports),
+         OS_Open_Materials = format_use(OS_Open_Materials),
+         OS_Open_Data = format_use(OS_Open_Data),
+         OS_Open_Peer_Review = format_use(OS_Open_Peer_Review),
+         OS_Open_Access_Publication = format_use(OS_Open_Access_Publication),
+         OS_Replication_Studies = format_use(OS_Replication_Studies),
+         OS_Participatory_Research = format_use(OS_Participatory_Research),
+         OS_Help_More_Information = format_binary(OS_Help_More_information),
+         OS_Help_Training = format_binary(OS_Help__training),
+         OS_Help_Ethical_Issues = format_binary(OS_Help_ethical_issues),
+         OS_Help_Infrastructure = format_binary(OS_Help_infrastructure),
+         OS_Help_Time = format_binary(OS_Help_time),
+         OS_Help_Workload = format_binary(OS_Help_Workload),
+         OS_Help_Funding = format_binary(OS_Help_Funding),
+         OS_Help_Incentives_Fund_Institutions = format_binary(OS_Help_Incentives_fund_institutions),
+         OS_Help_Recognition_Promotion_Recruitment = format_binary(OS_Help_Recognition_promotion_recruitment),
+         OS_Help_Support_Seniors = format_binary(OS_Help_Support_seniors),
+         OS_Help_Support_Juniors = format_binary(OS_Help_Support_juniors),
+         OS_Help_Positive_Beliefs = format_binary(OS_Help_Positive_beliefs),
+         OS_Help_No_Plan_Use_OS = format_binary(OS_Help_No_plan_Use_OS),
+         OS_Help_Nothing = format_binary(OS_Help_Nothing),
+         # Slow Science
+         SS_Familiar = SS_Familiar / 100,
+         SS_Importance = SS_Importance / 100,
+         SS_Workshops = format_binary(SS_Workshops),
+         SS_Definition_Quality_over_quantity = format_binary(SS_Definition_Quality_over_quantity),
+         SS_Definition_Slow_Process = format_binary(`SS_Definition__slow_process_over_short-term`),
+         SS_Definition_Changing_Metrics = format_binary(SS_Definition_Changing_metrics),
+         SS_Definition_Increase_Research_Time = format_binary(SS_Definition_Increase_research_time),
+         SS_Definition_Diminishing_Publications = format_binary(SS_Definition_Diminishing_publications),
+         SS_Definition_Work_Life_Balance = format_binary(`SS_Definition_work-life_balance`),
+         across(starts_with("SS_") & matches("Feasible|Not_Feasible"), ~replace_na(.x, 0)),
+         # Green Science
+         GS_Importance_conducting = GS_Importance_conducting / 100,
+         GS_Importance_topic = GS_Importance_topic / 100,
+         GS_Changes_practices = GS_Changes_practices / 100,
+         GS_Changes_communication_practices = GS_Changes_communication_practices / 100,
+         GS_Relation_Research_Sustainability = GS_Relation_research_sustanability / 100,
+         GS_Change_practices_agreeing = GS_Change_practices_agreeing / 100,
+         # Ethical Science
+         ES_Importance_research_team = ES_Importance_research_team / 100,
+         ES_Consequences_society = ES_Consequences_society / 100,
+         # Well-being (0-100 sliders → 0-1)
+         WB_Fulfilled              = WB_Fulfilled / 100,
+         WB_Alignment              = WB_Alignment / 100,
+         WB_Time_research          = WB_Time_research / 100,
+         WB_Satisfaction_work_personal = WB_Satisfaction_work_personal / 100,
+         WB_Carrer_worry           = WB_Carrer_worry / 100,
+         # Career stage (ordered: PhD/Student < Non-permanent < Permanent)
+         Work_Career_Stage = fct_relevel(case_when(
+           Work_Position %in% c("Master student/Research assistant",
+                                "PhD candidate (scholarship, other funding)") ~ "PhD / Student",
+           Work_Position %in% c("Postdoc (fixed term)",
+                                "Researcher/lecturer (fixed term)",
+                                "Engineer (fixed term)")                      ~ "Non-permanent",
+           Work_Position == "Permanent position"                              ~ "Permanent",
+           .default = NA_character_
+         ), "PhD / Student", "Non-permanent", "Permanent"),
+         # Does the researcher value impact-factor journals as a quality criterion?
+         Work_IF_Values = as.numeric(`Work_Criteria_quality_science_high-IF` == "Yes"),
+         Work_Time_Research = Work_Time_Research / 100,
+         Work_Time_Teaching = Work_Time_Teaching / 100,
+         Work_Time_Administration = Work_Time_Administration / 100,
+         Work_Time_Popularization = Work_Time_Popularization / 100,
+         Work_Time_Other = Work_Time_Other / 100,
+         Work_Satisfaction_numb_publications = Work_Satisfaction_numb_publications / 100,
+         Work_Satisfaction_quality_publications = Work_Satisfaction_quality_publications / 100,
+         Work_Probability_permanent_position = Work_Probability_permanent_position / 100
+         ) |>
+  select(-OS_Help__training,
+         -OS_Help_More_information,
+         -OS_Help_ethical_issues,
+         -OS_Help_infrastructure,
+         -OS_Help_time,
+         -OS_Help_Incentives_fund_institutions,
+         -OS_Help_Recognition_promotion_recruitment,
+         -OS_Help_Support_seniors,
+         -OS_Help_Support_juniors,
+         -OS_Help_Positive_beliefs,
+         -OS_Help_No_plan_Use_OS,
+         -`SS_Definition__slow_process_over_short-term`,
+         -`SS_Definition_work-life_balance`,
+         -SS_Definition_Changing_metrics,
+         -SS_Definition_Increase_research_time,
+         -SS_Definition_Diminishing_publications,
+         -GS_Relation_research_sustanability)
+
+
+# head(df)
+# names(df)
+#
+#
+#
+#| message: false
+
+plot_graph <- function(fa_res, 
+                       threshold = 0.3, 
+                       loading_text_size = 2.8,
+                       arrow_end_gap = 0.10,         
+                       factor_node_size = c(22, 35),
+                       expand = c(0.5, 0.5),
+                       names_factors = NULL,
+                       color_variables = "#95A5A6",
+                       color_factors = "#2C3E50"
+) {
+  
+  meta_cols <- c("Complexity", "Uniqueness", "MSA", "Mean", "SD")
+  
+  # Helper function to process colors and reorder nodes
+  process_colors_and_order <- function(items, color_input, default_color) {
+    if (is.null(color_input)) {
+      return(list(items = items, colors = rep(default_color, length(items))))
+    }
+    
+    if (is.list(color_input)) color_input <- unlist(color_input)
+    
+    # 1. Handle named list/vector (e.g., c("Var3" = "red", "Var1" = "blue"))
+    if (!is.null(names(color_input))) {
+      input_names <- names(color_input)
+      
+      # Match against existing nodes
+      valid_names <- input_names[input_names %in% items]
+      missing_items <- setdiff(items, valid_names)
+      
+      # Reorder: Listed items first, missing items follow
+      ordered_items <- c(valid_names, missing_items)
+      
+      # Assign colors based on new order
+      mapped_colors <- color_input[ordered_items]
+      mapped_colors[is.na(mapped_colors)] <- default_color # Fallback for missing
+      
+      return(list(items = ordered_items, colors = unname(mapped_colors)))
+    }
+    
+    # 2. Handle single color value
+    if (length(color_input) == 1) {
+      return(list(items = items, colors = rep(color_input, length(items))))
+    }
+    
+    # 3. Handle unnamed vector of matching length
+    if (length(color_input) == length(items)) {
+      return(list(items = items, colors = color_input))
+    }
+    
+    # Fallback
+    warning("Color vector length does not match number of nodes. Using default color.")
+    return(list(items = items, colors = rep(default_color, length(items))))
+  }
+  
+  
+  # 1. Extract ALL loadings first
+  df_all <- fa_res |>
+    as.data.frame() |>
+    data_remove(meta_cols) |>
+    data_to_long(
+      select = -Variable,
+      names_to = "Factor",
+      values_to = "Loading"
+    )
+  
+  # Process Variables (Color & Order)
+  var_processed <- process_colors_and_order(unique(df_all$Variable), color_variables, "#95A5A6")
+  variables <- var_processed$items
+  var_colors <- var_processed$colors
+  n_var <- length(variables)
+  
+  # Process Factors (Color & Order)
+  fac_processed <- process_colors_and_order(unique(df_all$Factor), color_factors, "#2C3E50")
+  original_factors <- fac_processed$items
+  fac_colors <- fac_processed$colors
+  n_fac <- length(original_factors)
+  
+  # Process Custom Factor Names for Labels
+  display_factors <- original_factors
+  
+  if (!is.null(names_factors)) {
+    if (!is.null(names(names_factors))) {
+      if (any(unlist(names_factors) %in% original_factors)) {
+        lookup <- setNames(names(names_factors), unlist(names_factors))
+      } else {
+        lookup <- setNames(unlist(names_factors), names(names_factors))
+      }
+      matched <- original_factors %in% names(lookup)
+      display_factors[matched] <- lookup[original_factors[matched]]
+      
+    } else if (length(names_factors) == n_fac) {
+      display_factors <- unlist(names_factors)
+    } else {
+      warning("`names_factors` must be named, or match the exact number of factors. Ignoring custom names.")
+    }
+  }
+  
+  # 2. Extract Variance Explained
+  var_attr <- attributes(fa_res)$variance
+  
+  if (!is.null(var_attr)) {
+    if (is.numeric(var_attr)) {
+      prop_var <- var_attr
+    } else if (is.data.frame(var_attr) && "Variance" %in% names(var_attr)) {
+      prop_var <- var_attr$Variance
+    }
+    
+    if (is.null(names(prop_var)) && length(prop_var) >= n_fac) {
+      # Names map to the reordered list
+      names(prop_var) <- original_factors 
+    }
+  } else {
+    ss_loadings <- tapply(df_all$Loading^2, df_all$Factor, sum)
+    prop_var <- as.numeric(ss_loadings / n_var)
+    names(prop_var) <- names(ss_loadings)
+  }
+  
+  if (max(prop_var, na.rm = TRUE) > 1) {
+    prop_var <- prop_var / 100
+  }
+  
+  # 3. Filter by threshold and reshape
+  edges <- df_all |>
+    subset(abs(Loading) >= threshold) |>
+    data_rename(
+      pattern = c("Variable", "Factor", "Loading"),
+      replacement = c("from", "to", "weight")
+    )
+  
+  # 4. Build a Manual Layout
+  # Variables map to coordinates decreasing from n_var -> 1 (Places first item at the top)
+  y_var <- seq(n_var, 1)
+  
+  y_fac <- seq(
+    from = n_var - 0.5, 
+    to = 1.5, 
+    length.out = n_fac
+  )
+  
+  nodes <- data.frame(
+    name = c(original_factors, variables),
+    type = c(rep("Factor", n_fac), rep("Variable", n_var)),
+    x = c(rep(1, n_fac), rep(0, n_var)),
+    y = c(y_fac, y_var),
+    variance = c(prop_var[original_factors], rep(NA, n_var)),
+    label_text = c(
+      sprintf("%s\n(%.1f%%)", display_factors, prop_var[original_factors] * 100), 
+      variables
+    ),
+    node_color = c(fac_colors, var_colors) # Append our mapped colors
+  )
+  
+  # 5. Build the tidygraph object
+  graph <- tbl_graph(nodes = nodes, edges = edges, directed = TRUE)
+  
+  # 6. Plot using ggraph
+  ggraph(graph, layout = "manual", x = x, y = y) + 
+    
+    # -- EDGES --
+    geom_edge_link(
+      aes(
+        edge_width = abs(weight),
+        edge_alpha = abs(weight),
+        color = weight,
+        label = sub("^(-?)0\\.", "\\1.", sprintf("%.2f", weight))
+      ),
+      arrow = arrow(length = unit(4, 'mm'), type = "closed"),
+      start_cap = circle(0, 'mm'),    
+      end_cap = circle(arrow_end_gap, 'snpc'), 
+      angle_calc = 'along',
+      label_dodge = unit(2.5, 'mm'),  
+      label_size = loading_text_size
+    ) +
+    
+    # -- FACTOR NODES --
+    geom_node_point(
+      aes(filter = type == "Factor", size = variance, fill = node_color),
+      shape = 21,
+      color = "white",
+      stroke = 1.5,
+      show.legend = FALSE
+    ) +
+    
+    # -- FACTOR TEXT --
+    geom_node_text(
+      aes(filter = type == "Factor", label = label_text),
+      color = "white",
+      fontface = "bold",
+      size = 3.5,
+      lineheight = 0.9 
+    ) +
+    
+    # -- VARIABLE NODES --
+    geom_node_label(
+      aes(filter = type == "Variable", label = label_text, fill = node_color),
+      color = "white",
+      fontface = "bold",
+      size = 3.5,
+      hjust = 1, 
+      label.padding = unit(0.5, "lines"),
+      show.legend = FALSE
+    ) +
+    
+    # -- SCALES & AESTHETICS --
+    scale_fill_identity() + # Evaluates our hex colors natively
+    scale_size_continuous(range = factor_node_size, guide = "none") +
+    scale_edge_color_gradient2(
+      low = "#E74C3C", mid = "grey85", high = "#2ECC71",
+      midpoint = 0, guide = "none" 
+    ) +
+    scale_edge_width_continuous(range = c(0.5, 2.5), guide = "none") +
+    scale_edge_alpha_continuous(range = c(0.4, 1), guide = "none") +
+    
+    # -- CANVAS EXPANSION & THEME --
+    scale_x_continuous(expand = expansion(add = expand)) +
+    coord_cartesian(clip = "off") + 
+    
+    theme_graph(base_family = "sans") +  # Default "Arial Narrow" is often not installed
+    theme(
+      plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+      plot.margin = margin(20, 20, 20, 20) 
+    ) +
+    labs(title = "Factor Analysis Loadings")
+}
+#
+#
+#
+#| label: md_helpers
+#| echo: false
+#| cache: false
+
+# Markdown twins: each figure is followed by a folded callout with the numbers it
+# shows, for text readers of analysis.html.md (md_* chunks, uncached)
+
+make_asis <- function(...) knitr::asis_output(paste(unlist(list(...)), collapse = "\n"))
+
+# A folded callout with one table, or several (a named list: names = captions)
+make_markdown <- function(tables, title) {
+  if (is.data.frame(tables)) tables <- list(tables)
+  body <- purrr::imap_chr(tables, \(t, caption) {
+    t <- as.data.frame(t)
+    t[] <- lapply(t, \(x) if (is.character(x) || is.factor(x)) str_replace_all(x, "\n", " ") else x)
+    names(t) <- str_replace_all(names(t), "\n", " ")
+    caption <- if (is.character(caption)) caption else NULL
+    knitr::kable(t, format = "pipe", caption = caption, digits = 2, row.names = FALSE) |>
+      str_replace_all(c(" {2,}\\|" = " |", "\\| {2,}" = "| ")) |>  # Drop the alignment padding
+      paste(collapse = "\n")
+  })
+  make_asis(
+    sprintf('::: {.callout-note collapse="true" title="%s (Markdown table, for text readers)"}', title),
+    "", paste(body, collapse = "\n\n"), "", ":::", ""
+  )
+}
+
+# N and % of each answer (missing and empty answers left out)
+count_levels <- function(data, vars) {
+  purrr::map_dfr(vars, \(v) {
+    tibble(Variable = v, Level = as.character(data[[v]])) |>
+      filter(!is.na(Level), Level != "") |>
+      count(Variable, Level, name = "N", sort = TRUE) |>
+      mutate(Percentage = format_percent(N / sum(N)))
+  })
+}
+
+describe_vars <- function(data) {
+  describe_distribution(data) |>
+    as.data.frame() |>
+    select(Variable, Mean, SD, Min, Max, n, n_Missing)
+}
+
+# The pairs labelled in a correlation heatmap (Holm-adjusted p < .001), strongest first
+cor_pairs <- function(data, method = "pearson") {
+  correlation(data, method = method) |>
+    as.data.frame() |>
+    filter(p < .001) |>
+    arrange(desc(abs(r))) |>
+    transmute(Variable1 = Parameter1, Variable2 = Parameter2, r, `95% CI` = format_ci(CI_low, CI_high, ci = NULL))
+}
+
+# Loadings, explained variance and (oblique rotations) factor correlations;
+# `names_factors` = c("MR1" = "Green Science", ...) relabels the factors
+loadings_tables <- function(x, names_factors = NULL) {
+  relabel <- \(n) if (is.null(names_factors)) n else str_replace_all(n, names_factors)
+  loadings <- as.data.frame(x)
+  variance <- as.data.frame(summary(x))
+  names(loadings) <- relabel(names(loadings))
+  names(variance) <- relabel(names(variance))
+  out <- list("Loadings" = loadings, "Explained variance" = variance)
+  phi <- attributes(x)$model$Phi
+  if (!is.null(phi)) {
+    out[["Factor correlations"]] <- data.frame(Factor = relabel(rownames(phi)), phi, check.names = FALSE) |>
+      rename_with(relabel)
+  }
+  out
+}
+
+# "Median [95% CI]" in one cell
+format_estimate <- function(est, low, high) {
+  paste(format_value(est, zap_small = TRUE), format_ci(low, high, ci = NULL, zap_small = TRUE))
+}
+
+# Pathfinder can collapse onto a handful of distinct draws, making CIs unreliable
+draws_info <- function(m) {
+  draws <- as.data.frame(m)
+  data.frame(Draws = nrow(draws), `Unique draws` = nrow(unique(draws)), check.names = FALSE)
+}
+
+# MCMC diagnostics
+mcmc_info <- function(m) {
+  np <- nuts_params(m)
+  data.frame(Chains = nchains(m), Draws = ndraws(m), Divergent = sum(np$Value[np$Parameter == "divergent__"]),
+             `Max Rhat` = format_value(max(rhat(m), na.rm = TRUE), digits = 3), `Min ESS` = round(min(neff_ratio(m), na.rm = TRUE) * ndraws(m)),
+             check.names = FALSE)
+}
+
+# Predictions at a few values of `x` (columns), one row per group (and Outcome / Response)
+predictions_wide <- function(pred, x) {
+  as.data.frame(pred) |>
+    mutate(Estimate = format_estimate(Predicted, CI_low, CI_high),
+           across(all_of(x), \(v) paste0(x, " = ", v))) |>
+    select(-any_of(c("Row", "Predicted", "SE", "CI_low", "CI_high"))) |>
+    pivot_wider(names_from = all_of(x), values_from = Estimate)
+}
+
+# Everything the Markdown twin of a brms model needs, computed once (and cached
+# with the model's chunk) so that the fit itself need not be kept. `group` = the
+# factor compared, `at` = values of the continuous predictor ("Dem_Age=c(25, 45)")
+summarize_model <- function(m, group, at, outcome) {
+  list(
+    draws = draws_info(m),
+    means = estimate_means(m, by = group),
+    contrasts = estimate_contrasts(m, contrast = group),
+    predictions = estimate_relation(m, by = c(at, group)),
+    parameters = model_parameters(m, component = "conditional")
+  ) |>
+    lapply(\(x) cbind(Outcome = outcome, as.data.frame(x))) |>
+    c(list(group = group, x = sub("=.*", "", at)))
+}
+
+# Display tables from a list of summarize_model() outputs (one per outcome)
+model_tables <- function(summaries) {
+  get <- \(what) bind_rows(lapply(summaries, `[[`, what))
+  list(
+    "Posterior draws" = get("draws"),
+    "Marginal means (continuous predictor at its mean)" = get("means") |>
+      transmute(Outcome, pick(all_of(summaries[[1]]$group)),
+                `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
+    "Contrasts between groups (continuous predictor at its mean)" = get("contrasts") |>
+      transmute(Outcome, Contrast = paste(Level1, "-", Level2),
+                `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
+    "Predictions (Median [95% CI])" = predictions_wide(get("predictions"), summaries[[1]]$x),
+    "Parameters" = get("parameters") |>
+      transmute(Outcome, Parameter = str_remove(Parameter, "^b_"),
+                `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd))
+  )
+}
+#
+#
+#
+#
+#
+#| label: md_dictionary
+#| echo: false
+#| cache: false
+
+dictionary |>
+  filter(!str_detect(Variable, ":"), !Variable %in% c("Consent", "Consent2")) |>  # Timing and consent columns
+  mutate(Question = str_replace_all(Question, "\\[\\|([^|\\]]*)\\|([^|\\]]*)\\]", "[0-100 slider: \\1 to \\2]") |>
+           str_squish()) |>
+  make_markdown("Data dictionary")
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+gender_colors <- c("Female" = "#E91E63", "Male" = "#1976D2", "Other" = "#4CAF50")
+
+df_age <- df |> filter(!is.na(Dem_Age), !is.na(Dem_Gender))
+age_breaks <- seq(min(df_age$Dem_Age), max(df_age$Dem_Age), length.out = 51)
+box_widths <- df_age |>
+  group_by(Dem_Gender) |>
+  summarise(max_count = max(hist(Dem_Age, breaks = age_breaks, plot = FALSE)$counts),
+            .groups = "drop") |>
+  mutate(box_width = max_count * 0.15)
+
+p_age <- df_age |>
+  left_join(box_widths, by = "Dem_Gender") |>
+  ggplot(aes(y = after_stat(count), x = Dem_Age, fill = Dem_Gender, color = Dem_Gender)) +
+  geom_histogram(aes(y = after_stat(count)), bins = 50, alpha = 0.4, color = NA) +
+  geom_density(linewidth = 0.9, alpha = 0) +
+  geom_boxplot(aes(y = 0, width = box_width), alpha = 0.5, outlier.size = 0, position = "identity") +
+  facet_wrap(~Dem_Gender, ncol = 1, scales = "free_y") +
+  scale_fill_manual(values = gender_colors, guide = "none") +
+  scale_color_manual(values = gender_colors, guide = "none") +
+  theme_minimal() +
+  theme(strip.text = element_text(face = "bold", size = 11, hjust = 1),
+        panel.grid.minor = element_blank()) +
+  labs(title = "Age Distribution", x = "Age", y = "Count")
+p_age
+#
+#
+#
+#
+#
+# Number of children
+p_children <- df |>
+  filter(!is.na(Dem_Child_numb), Dem_Child_numb != "") |>
+  count(Dem_Child_numb) |>
+  mutate(Dem_Child_numb = factor(Dem_Child_numb,
+    levels = c("I have no children", "1", "2", "3", "More than 3"))) |>
+  ggplot(aes(x = Dem_Child_numb, y = n, fill = Dem_Child_numb)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  scale_fill_brewer(palette = "Greens") +
+  theme_minimal() +
+  labs(title = "Number of Children", x = "", y = "Count")
+
+# Parental leave
+leave_levels <- c("Less than 2 weeks", "Between 2 weeks and 1 month",
+                  "Between 1 month and 3 months", "Between 3 months and 6 months",
+                  "Between 6 months and 1 year", "Between 1 year and 2 years",
+                  "More than 2 years", "I did not take any parental leave")
+p_parental <- df |>
+  filter(!is.na(Dem_Parental_leave), Dem_Parental_leave != "") |>
+  count(Dem_Parental_leave) |>
+  mutate(Dem_Parental_leave = factor(Dem_Parental_leave, levels = leave_levels)) |>
+  ggplot(aes(x = Dem_Parental_leave, y = n, fill = Dem_Parental_leave)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  scale_fill_brewer(palette = "Blues") +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Parental Leave", x = "", y = "Count")
+
+p_children + p_parental
+#
+#
+#
+#
+#
+# Research discipline — pie chart
+p_discipline <- df |>
+  filter(!is.na(Work_Discipline), Work_Discipline != "") |>
+  count(Work_Discipline) |>
+  mutate(pct = n / sum(n),
+         label = str_replace(Work_Discipline, " & ", "\n&"),
+         label = paste0(label, "\n\n", n, " (", round(pct * 100), "%)")) |>
+  ggplot(aes(x = "", y = n, fill = Work_Discipline)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5),
+            size = 2.5, color = "white", fontface = "bold") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_void() +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5)) +
+  labs(title = "Research Discipline")
+
+# Highest diploma
+p_diploma <- df |>
+  filter(!is.na(Work_Diploma), Work_Diploma != "") |>
+  count(Work_Diploma) |>
+  mutate(Work_Diploma = factor(Work_Diploma,
+    levels = c("Bachelor", "Master", "PhD", "Other"))) |>
+  ggplot(aes(x = Work_Diploma, y = n, fill = Work_Diploma)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  scale_fill_brewer(palette = "Purples") +
+  theme_minimal() +
+  labs(title = "Highest Diploma", x = "", y = "Count")
+
+p_discipline + p_diploma
+#
+#
+#
+#
+#
+# Academic position
+p_position <- df |>
+  filter(!is.na(Work_Position), Work_Position != "") |>
+  count(Work_Position) |>
+  mutate(pct = n / sum(n) * 100) |>
+  ggplot(aes(x = reorder(Work_Position, pct), y = n, fill = pct)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  geom_text(aes(label = sprintf("%.1f%%", pct)), hjust = -0.15, size = 3, color = "grey30") +
+  scale_y_continuous(expand = expansion(add = c(0, 50))) +
+  scale_fill_gradient(low = "#b3cde3", high = "#084594") +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 8)) +
+  labs(title = "Academic Position", x = "", y = "Count")
+
+# Country of work + specific affiliations (dodged)
+clean_country <- function(x) {
+  x <- str_to_title(str_trim(x))
+  case_when(
+    x %in% c("Uk", "United Kingdom", "England", "Wales (Uk)", "Uk - England") ~ "United Kingdom",
+    x %in% c("Be", "Belgique", "Belgium") ~ "Belgium",
+    x %in% c("Nl", "The Netherlands") ~ "Netherlands",
+    x %in% c("Usa", "United States") ~ "United States",
+    x %in% c("Italia") ~ "Italy",
+    x %in% c("Suisse") ~ "Switzerland",
+    x %in% c("Feance", "Frabce", "France ", "France/Canada",
+             "Germany And France", "Dijon", "Grenoble") ~ "France",
+    .default = x
+  )
+}
+
+normalize_affil <- function(x) {
+  x <- stringr::str_squish(x)
+
+  dplyr::case_when(
+    is.na(x) | x == "" ~ "Missing",
+
+    # National research organisations
+    stringr::str_detect(x, stringr::regex("^c\\.?n\\.?r\\.?s\\.?", ignore_case = TRUE)) ~ "CNRS",
+    stringr::str_detect(x, stringr::regex("^inserm", ignore_case = TRUE)) ~ "INSERM",
+    stringr::str_detect(x, stringr::regex("inrae", ignore_case = TRUE)) ~ "INRAE",
+    stringr::str_detect(x, stringr::regex("^cea\\b", ignore_case = TRUE)) ~ "CEA",
+    stringr::str_detect(x, stringr::regex("^inria\\b", ignore_case = TRUE)) ~ "Inria",
+    stringr::str_detect(x, stringr::regex("^igbmc", ignore_case = TRUE)) ~ "IGBMC",
+
+    # Grandes écoles / institutes
+    stringr::str_detect(x, stringr::regex("^ens\\b|ecole normale sup|école normale sup", ignore_case = TRUE)) ~ "ENS",
+    stringr::str_detect(x, stringr::regex("^psl\\b|psl research|psl univ", ignore_case = TRUE)) ~ "PSL",
+
+    # UK
+    stringr::str_detect(x, stringr::regex("^ucl$|university college london", ignore_case = TRUE)) ~ "UCL",
+    stringr::str_detect(x, stringr::regex("university of sussex|^sussex$", ignore_case = TRUE)) ~ "Univ. of Sussex",
+
+    # Belgium / Netherlands / Switzerland
+    stringr::str_detect(x, stringr::regex("^ghent|universiteit gent", ignore_case = TRUE)) ~ "Ghent University",
+    stringr::str_detect(x, stringr::regex("^ulb$|ulb,|libre de bruxelles", ignore_case = TRUE)) ~ "ULB",
+    stringr::str_detect(x, stringr::regex("leiden", ignore_case = TRUE)) ~ "Leiden University",
+    stringr::str_detect(x, stringr::regex("groningen", ignore_case = TRUE)) ~ "University of Groningen",
+    stringr::str_detect(x, stringr::regex("eth zurich|eth zürich|^eth$", ignore_case = TRUE)) ~ "ETH Zurich",
+
+    # France
+    stringr::str_detect(x, stringr::regex("sorbonne univ|sorbonne universit|sorbone", ignore_case = TRUE)) ~ "Sorbonne Univ.",
+    stringr::str_detect(x, stringr::regex("paris cit|upcit", ignore_case = TRUE)) ~ "Univ. Paris Cité",
+    stringr::str_detect(x, stringr::regex("paris nanterre", ignore_case = TRUE)) ~ "Univ. Paris Nanterre",
+    stringr::str_detect(x, stringr::regex("paris.?saclay", ignore_case = TRUE)) ~ "Univ. Paris-Saclay",
+    stringr::str_detect(x, stringr::regex("paris 8", ignore_case = TRUE)) ~ "Univ. Paris 8",
+
+    stringr::str_detect(x, stringr::regex("aix.?marseille|^amu$", ignore_case = TRUE)) ~ "Aix-Marseille Univ.",
+    stringr::str_detect(x, stringr::regex("bordeaux", ignore_case = TRUE)) ~ "Univ. de Bordeaux",
+    stringr::str_detect(x, stringr::regex("grenoble|^uga$", ignore_case = TRUE)) ~ "Univ. Grenoble Alpes",
+    stringr::str_detect(x, stringr::regex("lyon", ignore_case = TRUE)) ~ "Univ. de Lyon",
+    stringr::str_detect(x, stringr::regex("strasbourg|louis pasteur", ignore_case = TRUE)) ~ "Univ. de Strasbourg",
+    stringr::str_detect(x, stringr::regex("toulouse", ignore_case = TRUE)) ~ "Univ. de Toulouse",
+    stringr::str_detect(x, stringr::regex("lille", ignore_case = TRUE)) ~ "Univ. de Lille",
+    stringr::str_detect(x, stringr::regex("clermont", ignore_case = TRUE)) ~ "Univ. Clermont",
+    stringr::str_detect(x, stringr::regex("montpellier", ignore_case = TRUE)) ~ "Univ. de Montpellier",
+    stringr::str_detect(x, stringr::regex("picardie|^upjv$", ignore_case = TRUE)) ~ "Univ. Picardie",
+    stringr::str_detect(x, stringr::regex("côte d.?azur|cote d.?azur", ignore_case = TRUE)) ~ "Univ. Côte d'Azur",
+    stringr::str_detect(x, stringr::regex("rennes", ignore_case = TRUE)) ~ "Univ. de Rennes",
+    stringr::str_detect(x, stringr::regex("caen", ignore_case = TRUE)) ~ "Univ. de Caen",
+    stringr::str_detect(x, stringr::regex("poitiers", ignore_case = TRUE)) ~ "Univ. de Poitiers",
+    stringr::str_detect(x, stringr::regex("reims", ignore_case = TRUE)) ~ "Univ. de Reims",
+    stringr::str_detect(x, stringr::regex("rouen", ignore_case = TRUE)) ~ "Univ. de Rouen",
+    stringr::str_detect(x, stringr::regex("tours", ignore_case = TRUE)) ~ "Univ. de Tours",
+    stringr::str_detect(x, stringr::regex("nantes", ignore_case = TRUE)) ~ "Université de Nantes",
+
+    # Germany
+    stringr::str_detect(x, stringr::regex("darmstadt|tuda", ignore_case = TRUE)) ~ "TU Darmstadt",
+    stringr::str_detect(x, stringr::regex("jena", ignore_case = TRUE)) ~ "Friedrich Schiller University Jena",
+
+    # Italy
+    stringr::str_detect(x, stringr::regex("sapienza", ignore_case = TRUE)) ~ "La Sapienza",
+    stringr::str_detect(x, stringr::regex("tor vergata", ignore_case = TRUE)) ~ "Tor Vergata",
+    stringr::str_detect(x, stringr::regex("genoa|genova", ignore_case = TRUE)) ~ "University of Genoa",
+    stringr::str_detect(x, stringr::regex("turin", ignore_case = TRUE)) ~ "University of Turin",
+    stringr::str_detect(x, stringr::regex("milano.?bicocca", ignore_case = TRUE)) ~ "University of Milano-Bicocca",
+
+    # Portugal
+    stringr::str_detect(x, stringr::regex("minho", ignore_case = TRUE)) ~ "University of Minho",
+
+    # Austria
+    stringr::str_detect(x, stringr::regex("vienna", ignore_case = TRUE)) ~ "University of Vienna",
+
+    # Spain
+    stringr::str_detect(x, stringr::regex("^bcbl$|basque center on cognition", ignore_case = TRUE)) ~ "BCBL",
+
+    .default = x
+  )
+}
+
+# Include ALL rows; normalize_affil returns "Missing" for empty/NA
+df_country_aff_all <- df |>
+  filter(!is.na(Work_Country), Work_Country != "") |>
+  mutate(
+    Country = clean_country(Work_Country),
+    Affiliation = normalize_affil(Work_Affiliation)
+  )
+
+country_palette_ext <- c(
+  "France"         = "#1976D2",
+  "United Kingdom" = "#E91E63",
+  "Germany"        = "#FF9800",
+  "Spain"          = "#8BC34A",
+  "Belgium"        = "#9C27B0",
+  "Italy"          = "#00BCD4",
+  "Netherlands"    = "#F44336",
+  "Switzerland"    = "#795548",
+  "United States"  = "#607D8B",
+  "Other country"  = "#C8E6C9",
+  "—"              = "#BDBDBD"   # for Missing / Other affiliation buckets
+)
+
+# Named affiliations = those with n >= 3 after normalisation
+named_affils <- df_country_aff_all |>
+  filter(Affiliation != "Missing") |>
+  count(Affiliation, sort = TRUE) |>
+  filter(n >= 3) |>
+  pull(Affiliation)
+
+df_plot_affil <- df_country_aff_all |>
+  mutate(
+    Affiliation_cat = case_when(
+      Affiliation == "Missing"          ~ "Missing",
+      Affiliation %in% named_affils     ~ Affiliation,
+      .default                          = "Other"
+    ),
+    Country_fill = case_when(
+  Affiliation_cat == "Missing" ~ "—",
+  Country %in% names(country_palette_ext) ~ Country,
+  .default = "Other country"
+)
+  ) |>
+  count(Affiliation_cat, Country_fill)
+
+# Order: by total count, with Other/Missing pinned at the bottom
+affil_totals <- df_plot_affil |>
+  group_by(Affiliation_cat) |>
+  summarise(total = sum(n), .groups = "drop") |>
+  mutate(rank = case_when(
+    Affiliation_cat == "Missing" ~ -2L,
+    Affiliation_cat == "Other"   ~ -1L,
+    .default = as.integer(total)
+  )) |>
+  arrange(rank)
+
+affil_level_order <- affil_totals$Affiliation_cat
+
+affil_label_df <- affil_totals |>
+  mutate(Affiliation_cat = factor(Affiliation_cat, levels = rev(affil_level_order)))
+
+p_country <- df_plot_affil |>
+  mutate(Affiliation_cat = factor(Affiliation_cat, levels = affil_level_order)) |>
+  ggplot(aes(x = Affiliation_cat, y = n, fill = Country_fill)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.7) +
+  geom_text(data = affil_label_df,
+            aes(x = Affiliation_cat, y = total, label = total),
+            inherit.aes = FALSE,
+            hjust = -0.2, size = 3, color = "grey30") +
+  scale_fill_manual(values = country_palette_ext, name = "Country") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = "right",
+        legend.text = element_text(size = 7.5),
+        legend.key.size = unit(0.4, "cm"),
+        axis.text.y = element_text(size = 8)) +
+  labs(title = "Affiliations",
+       x = "", y = "Count")
+
+p_position + p_country
+#
+#
+#
+#| fig-width: 9
+#| fig-height: 6
+
+p_map <- df_plot_affil |>
+  mutate(region = Country_fill) |>
+  group_by(region) |>
+  summarize(N = sum(n)) |>
+  filter(!region %in% c("—", "Other country")) |>
+  mutate(region = ifelse(region == "United Kingdom", "UK", region)) |>
+  right_join(map_data("world"), by = "region") 
+
+p_map |>
+  # mutate(n = replace_na(n, 0)) |>
+  ggplot(aes(long, lat)) +
+  geom_polygon(aes(fill = N, group = group)) +
+  geom_text(data = p_map |>
+              summarize(lat = mean(lat, na.rm = TRUE),
+                 long = mean(long, na.rm = TRUE),
+                 label = paste0("N=", mean(N, na.rm = TRUE), " (", format_percent(mean(N, na.rm = TRUE) / nrow(df)), ")"), 
+                 .by = "region") |> 
+              mutate(label = str_replace(label, fixed("N=NaN ()"), "")), aes(label = label), size = 2) +
+  scale_fill_gradientn(colors = c("#FFF8E1", "#FFB74D", "#FF9800", "#FF5722", "#F44336", "#E91E63", "#C2185B", "#cc66cc")) +
+  labs(fill = "N") +
+  theme_void() +
+  labs(title = "Number of participants by country")  +
+  theme(
+    plot.title = element_text(size = rel(1.2), face = "bold", hjust = 0),
+    plot.subtitle = element_text(size = rel(1.2))
+  ) + 
+  coord_fixed(xlim = c(-9, 60), ylim = c(35, 69)) # Focus on Europe
+#
+#
+#
+#
+#
+#
+#
+# Time allocation across research activities
+p_activities <- df |>
+  select(Work_Time_Research, Work_Time_Teaching, Work_Time_Administration,
+         Work_Time_Popularization, Work_Time_Other) |>
+  rename(Research = Work_Time_Research,
+         Teaching = Work_Time_Teaching,
+         Administration = Work_Time_Administration,
+         Popularization = Work_Time_Popularization,
+         Other = Work_Time_Other) |>
+  pivot_longer(everything(), names_to = "Activity", values_to = "Percentage") |>
+  filter(!is.na(Percentage)) |>
+  mutate(Activity = factor(Activity,
+    levels = c("Research", "Teaching", "Administration", "Popularization", "Other"))) |>
+  ggplot(aes(x = Activity, y = Percentage, fill = Activity)) +
+  geom_violin(alpha = 0.6, trim = TRUE) +
+  geom_boxplot(width = 0.1, fill = "white", outlier.size = 0.5) +
+  scale_fill_brewer(palette = "Set1") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "Time Allocation Across Activities", x = "", y = "Proportion of Work Time")
+p_activities
+#
+#
+#
+#
+#
+# Career perceptions: scatterplot matrix with ggside marginals
+pub_colors <- c("Yes" = "#1976D2", "No" = "#E91E63")
+
+df_career <- df |>
+  filter(!is.na(Work_Publication)) |>
+  transmute(
+    Published = Work_Publication,
+    Prob_Perm = Work_Probability_permanent_position,
+    Sat_Numb  = Work_Satisfaction_numb_publications,
+    Sat_Qual  = Work_Satisfaction_quality_publications
+  )
+
+make_scatter_side <- function(data, xv, yv, xl, yl) {
+  ggplot(data |> filter(!is.na(.data[[xv]]), !is.na(.data[[yv]])),
+         aes(x = .data[[xv]], y = .data[[yv]])) +
+    geom_point(alpha = 0.3, size = 2, color = "#1976D2") +
+    geom_smooth(method = "lm", se = TRUE, alpha = 0.12, linewidth = 0.8,
+                color = "#1976D2", fill = "#1976D2") +
+    geom_xsidehistogram(bins = 15, alpha = 0.5, fill = "#1976D2") +
+    geom_ysidehistogram(bins = 15, alpha = 0.5, fill = "#1976D2") +
+    scale_x_continuous(labels = scales::percent_format()) +
+    scale_y_continuous(labels = scales::percent_format()) +
+    theme_bw() +
+    theme(ggside.panel.scale = 0.25,
+          ggside.panel.border = element_blank(),
+          ggside.panel.background = element_blank(),
+          ggside.axis.ticks.x = element_blank(),
+          ggside.axis.ticks.y = element_blank()) +
+    labs(x = xl, y = yl)
+}
+
+p_ab <- make_scatter_side(df_career, "Prob_Perm", "Sat_Numb",
+                          "P(Permanent Position)", "Sat. No. Publications")
+p_ac <- make_scatter_side(df_career, "Prob_Perm", "Sat_Qual",
+                          "P(Permanent Position)", "Sat. Quality Publications")
+p_bc <- make_scatter_side(df_career, "Sat_Numb", "Sat_Qual",
+                          "Sat. No. Publications", "Sat. Quality Publications")
+
+p_pub_bar <- df |>
+  filter(!is.na(Work_Publication), Work_Publication != "") |>
+  count(Work_Publication) |>
+  ggplot(aes(x = Work_Publication, y = n, fill = Work_Publication)) +
+  geom_bar(stat = "identity", width = 0.5, show.legend = FALSE) +
+  scale_fill_manual(values = pub_colors) +
+  theme_bw() +
+  labs(title = "Has Published?", x = "", y = "Count")
+
+(p_ab | p_ac) / (p_bc | p_pub_bar) +
+  plot_annotation(
+    title = "Career Perceptions — Pairwise Relationships",
+    theme = theme(plot.title = element_text(size = 13, face = "bold", hjust = 0.5))
+  )
+#
+#
+#
+# Committee/service involvement and clinical activity
+p_commit <- df |>
+  filter(!is.na(Work_Committees), Work_Committees != "") |>
+  count(Work_Committees) |>
+  ggplot(aes(x = Work_Committees, y = n, fill = Work_Committees)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  scale_fill_manual(values = c("Yes" = "#4dac26", "No" = "#d01c8b")) +
+  theme_minimal() +
+  labs(title = "Member of Committees", x = "", y = "Count")
+
+p_clinical <- df |>
+  filter(!is.na(Work_Clinical_activity), Work_Clinical_activity != "") |>
+  count(Work_Clinical_activity) |>
+  ggplot(aes(x = Work_Clinical_activity, y = n, fill = Work_Clinical_activity)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  scale_fill_manual(values = c("Yes" = "#4dac26", "No" = "#d01c8b")) +
+  theme_minimal() +
+  labs(title = "Clinical Activity", x = "", y = "Count")
+
+
+(p_commit + p_clinical)
+#
+#
+#
+#| label: md_sample
+#| echo: false
+#| cache: false
+
+career_vars <- c("Prob_Perm", "Sat_Numb", "Sat_Qual")
+make_markdown(list(
+  "Categorical variables" = count_levels(df, c("Dem_Gender", "Dem_Child_numb", "Dem_Parental_leave", "Work_Discipline",
+                                                "Work_Diploma", "Work_Position", "Work_Career_Stage", "Work_Publication",
+                                                "Work_Committees", "Work_Clinical_activity")),
+  "Age by gender" = df |>
+    filter(!is.na(Dem_Age)) |>
+    summarise(n = n(), Mean = mean(Dem_Age), SD = sd(Dem_Age), Median = median(Dem_Age),
+              Min = min(Dem_Age), Max = max(Dem_Age), .by = Dem_Gender),
+  "Country of workplace (fewer than 3 pooled into Other)" = df_country_aff_all |>
+    mutate(Country = fct_lump_min(Country, min = 3)) |>
+    count_levels("Country"),
+  "Affiliations" = affil_totals |>
+    arrange(desc(rank)) |>
+    select(Affiliation = Affiliation_cat, N = total),
+  "Time allocation" = p_activities$data |>
+    summarise(n = n(), Mean = mean(Percentage), SD = sd(Percentage), Median = median(Percentage), .by = Activity),
+  "Career perceptions" =
+    describe_vars(df_career[career_vars]),
+  "Career perceptions: correlations" = correlation(df_career[career_vars]) |>
+    as.data.frame() |>
+    transmute(Variable1 = Parameter1, Variable2 = Parameter2, r,
+              `95% CI` = format_ci(CI_low, CI_high, ci = NULL), p = format_p(p), n = n_Obs)
+), "Sample")
+#
+#
+#
+#
+#
+#
+#
+# Quality criteria importance (binary endorsement rates)
+df_quality <- df |>
+  select(starts_with("Work_Criteria_quality_science_")) |>
+  rename_with(~str_remove(., "Work_Criteria_quality_science_")) |>
+  rename_with(~recode(.,
+    "Originality"               = "Originality / Innovation",
+    "Significance"              = "Significance / Impact",
+    "Rigorous_meth"             = "Rigorous Methodology",
+    "Relevance-data-analyses"   = "Appropriate Statistics",
+    "high-IF"                   = "High Impact Factor Journal",
+    "Transparence"              = "Transparency / Open Science",
+    "Replication"               = "Replication",
+    "Environmental-impact"      = "Environmental Impact",
+    "Inclusivity"               = "Inclusivity / Diversity"
+  ))
+
+p_criteria <- df_quality |>
+  pivot_longer(everything(), names_to = "Criterion", values_to = "Endorsed") |>
+  filter(!is.na(Endorsed)) |>
+  group_by(Criterion) |>
+  summarise(pct = mean(Endorsed == "Yes"), .groups = "drop") |>
+  ggplot(aes(x = reorder(Criterion, pct), y = pct, fill = pct)) +
+  geom_bar(stat = "identity") +
+  scale_fill_gradient(low = "#fee8c8", high = "#b30000", guide = "none") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Endorsement of Quality Criteria for Science",
+       x = "", y = "% endorsing")
+
+p_criteria
+#
+#
+#
+#| label: md_criteria
+#| echo: false
+#| cache: false
+
+p_criteria$data |>
+  arrange(desc(pct)) |>
+  transmute(Criterion, Endorsed = format_percent(pct)) |>
+  make_markdown("Endorsement of quality criteria")
+#
+#
+#
+df_quality_num <- df_quality |>
+  mutate(across(everything(), ~as.numeric(. == "Yes")))
+
+p_criteria_cor <- correlation(df_quality_num, method = "pearson", redundant = TRUE) |>
+  correlation::cor_sort() |>
+  as.data.frame() |>
+  mutate(label = ifelse(p < .001, format_value(r, digits = 2), "")) |>
+  ggplot(aes(x = Parameter1, y = Parameter2, fill = r)) +
+  geom_tile() +
+  geom_text(aes(label = label), color = "black", size = 3) +
+  scale_fill_gradientn(colours = c("darkblue", "blue", "#2196F3", "white", "#FFC107", "#F44336", "darkred"), limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(title = "Co-endorsement of Science Quality Criteria",
+       x = "", y = "") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
+p_criteria_cor
+
+rez_criteria <- n_components(df_quality_num)
+plot(rez_criteria)
+
+pca_criteria <- principal_components(df_quality_num, n = 2)
+plot(pca_criteria)
+
+# Extract loadings
+as.data.frame(pca_criteria) |> 
+  select(Variable, PC1, PC2) |> 
+  data_rename(c("Novel and Impactful vs. Rigourous and Transparent" = "PC1", 
+                "Rigorous and Innovative vs. Virtuous" = "PC2")) |> 
+  pivot_longer(-Variable, names_to = "Component", values_to = "Loading") 
+ # TODO: Make loading plot
+
+
+#
+#
+#
+#| label: md_criteria_structure
+#| echo: false
+#| cache: false
+
+make_markdown(c(
+  list("Co-endorsement (phi correlations)" = cor_pairs(df_quality_num),
+       "Number of components: agreement between methods" = as.data.frame(summary(rez_criteria))),
+  loadings_tables(pca_criteria)
+), "Structure of quality criteria")
+#
+#
+#
+#
+#
+df_quality2 <- predict(pca_criteria, names = c("Criteria1", "Criteria2")) |> 
+  cbind(df)
+
+
+m_criteria1 <- brms::brm(Criteria1 ~ Dem_Gender * poly(Dem_Age, 2), 
+                     data = df_quality2 |> 
+                       mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |> 
+                       filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 70),
+                     backend = "cmdstanr",
+                     algorithm = "pathfinder",
+                     seed = 123)
+m_criteria2 <- brms::brm(Criteria2 ~ Dem_Gender * poly(Dem_Age, 2), 
+                     data = df_quality2 |> 
+                       mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |> 
+                       filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 70),
+                     backend = "cmdstanr",
+                     algorithm = "pathfinder",
+                     seed = 123)
+
+
+p_criteria_pred1 <- rbind(
+  mutate(estimate_relation(m_criteria1, length = 40), Outcome = "Novel and Impactful vs. Rigourous and Transparent"),
+  mutate(estimate_relation(m_criteria2, length = 40), Outcome = "Rigorous and Innovative vs. Virtuous")
+) |>
+  ggplot(aes(x = Dem_Age, y = Predicted)) +
+  geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill=Outcome, 
+                  group = interaction(Dem_Gender, Outcome)), alpha = 0.1) +
+  geom_line(aes(color=Outcome, linetype = Dem_Gender), linewidth = 1) +
+  scale_linetype_manual(values = c("longdash", "solid")) +
+  scale_colour_discrete(palette="Set1") +
+  scale_fill_discrete(palette="Set1") +
+  guides(linetype = guide_legend(override.aes = list(linewidth = 0.3))) +
+  labs(y = "Score", x = "Age",
+       fill = "Outcome", color = "Outcome", linetype = "Gender",
+       title = "Research Quality Criteria") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5))
+p_criteria_pred1
+#
+#
+#
+#| label: md_criteria_models
+#| echo: false
+#| cache: false
+
+list(
+  summarize_model(m_criteria1, "Dem_Gender", "Dem_Age=c(25, 35, 45, 55, 65)",
+                  "Criteria1: Novel and Impactful vs. Rigourous and Transparent"),
+  summarize_model(m_criteria2, "Dem_Gender", "Dem_Age=c(25, 35, 45, 55, 65)",
+                  "Criteria2: Rigorous and Innovative vs. Virtuous")
+) |>
+  model_tables() |>
+  make_markdown("Quality criteria by gender and age")
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+df_os_practices <- select(df, starts_with("OS_"), -starts_with("OS_Help")) |>
+  rename(
+    "OS Familiarity" = OS_Familiar,
+    "OS Importance" = OS_Importance,
+    "OS Training" = OS_Workshops,
+    "View on Preregistration" = OS_Study_Preregistration,
+    "View on Registered Reports" = OS_Registered_Reports,
+    "View on Open Materials" = OS_Open_Materials,
+    "View on Open Data" = OS_Open_Data,
+    "View on Open Peer Review" = OS_Open_Peer_Review,
+    "View on Open Access" = OS_Open_Access_Publication,
+    "View on Replication Studies" = OS_Replication_Studies,
+    "View on Participatory Research" = OS_Participatory_Research
+  )
+
+p_os_prac1 <- correlation(df_os_practices, redundant = TRUE) |>
+  correlation::cor_sort() |>
+  as.data.frame() |>
+  mutate(label = ifelse(p < .001, format_value(r, digits = 2), "")) |>
+  ggplot(aes(x=Parameter1, y=Parameter2, fill=r)) +
+  geom_tile() +
+  geom_text(aes(label=label), color="black", size=3) +
+  scale_fill_gradientn(colours = c("darkblue", "blue", "#2196F3","white", "#FFC107", "#F44336", "darkred"), limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(title = "Co-occurrence of Open Science Practice Engagement",
+       x = "",
+       y = "") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 12, face = "bold", hjust = 0.5))
+p_os_prac1
+
+rez <- n_factors(df_os_practices)
+plot(rez)
+
+f <- factor_analysis(df_os_practices, n=3)
+plot(f)
+p_os_prac2 <- plot_graph(f, threshold = 0.2, arrow_end_gap = 0.12, expand = c(1.5, 0.5))
+p_os_prac2
+#
+#
+#
+#| label: md_os_practices
+#| echo: false
+#| cache: false
+
+make_markdown(c(
+  list("Descriptive statistics" = describe_vars(df_os_practices),
+       "Correlations" = cor_pairs(df_os_practices),
+       "Number of factors: agreement between methods" = as.data.frame(summary(rez))),
+  loadings_tables(f)
+), "Open science practices")
+#
+#
+#
+#
+#
+#| label: os_adoption
+
+# The four answers, in the order of the 0-1 engagement score (format_use())
+os_use_levels <- c("Used" = 3, "Plan to use" = 2, "Do not plan to use" = 1, "Not familiar" = 0)
+os_use_colors <- c("Used" = "#1565C0", "Plan to use" = "#90CAF9", "Do not plan to use" = "#E57373", "Not familiar" = "#BDBDBD")
+
+df_os_adoption <- df |>
+  select(Preregistration = OS_Study_Preregistration, `Registered reports` = OS_Registered_Reports,
+         `Open materials` = OS_Open_Materials, `Open data` = OS_Open_Data,
+         `Open peer review` = OS_Open_Peer_Review, `Open access` = OS_Open_Access_Publication,
+         `Replication studies` = OS_Replication_Studies, `Participatory research` = OS_Participatory_Research) |>
+  pivot_longer(everything(), names_to = "Practice", values_to = "Use") |>
+  filter(!is.na(Use)) |>
+  mutate(Response = factor(names(os_use_levels)[match(round(Use * 3), os_use_levels)], levels = names(os_use_levels))) |>
+  count(Practice, Response, .drop = FALSE) |>
+  mutate(Proportion = n / sum(n), .by = Practice) |>
+  mutate(Practice = fct_reorder(Practice, ifelse(Response == "Used", Proportion, 0), .fun = sum))
+
+p_os_adoption <- df_os_adoption |>
+  ggplot(aes(x = Proportion, y = Practice, fill = Response)) +
+  geom_col(position = position_stack(reverse = TRUE), width = 0.75, color = "white", linewidth = 0.5) +
+  geom_text(aes(label = ifelse(Proportion >= 0.08, scales::percent(Proportion, accuracy = 1), ""),
+                color = Response == "Used", group = Response),
+            position = position_stack(vjust = 0.5, reverse = TRUE), size = 2.8, show.legend = FALSE) +
+  scale_x_continuous(labels = scales::percent_format(), expand = c(0, 0)) +
+  scale_fill_manual(values = os_use_colors) +
+  scale_color_manual(values = c("TRUE" = "white", "FALSE" = "grey15"), guide = "none") +
+  theme_minimal() +
+  theme(legend.position = "bottom", panel.grid = element_blank()) +
+  labs(title = "Adoption of Open Science Practices", x = NULL, y = NULL, fill = NULL)
+p_os_adoption
+#
+#
+#
+#| label: md_os_adoption
+#| echo: false
+#| cache: false
+
+df_os_adoption |>
+  mutate(Proportion = format_percent(Proportion)) |>
+  select(-n) |>
+  pivot_wider(names_from = Response, values_from = Proportion) |>
+  arrange(desc(Practice)) |>
+  make_markdown("Adoption of open science practices")
+#
+#
+#
+#
+#
+#
+# TODO: Add subtitlte "Select up to 5" 
+df_os_help <- select(df, starts_with("OS_Help"), -OS_Help_Other)
+names(df_os_help) <- str_replace(names(df_os_help), "OS_Help_", "") |>
+  str_replace_all(fixed("_"), " ") |>
+  recode(
+    "Data sharing"                  = "Data sharing\nethics",   # Knowledge about ethical considerations
+    "Workload"                         = "Dedicated OS\nworkload",
+    "Infrastructure"                   = "Technical\ninfrastructure",
+    "Funding"                          = "Dedicated\nfunding",
+    "Incentives Fund Institutions"     = "Institutional\nincentives",  
+    "Recognition Promotion Recruitment" = "Career\nrecognition",
+    "Support Seniors"                  = "Senior researcher\nsupport",
+    "Support Juniors"                  = "Junior researcher\nsupport",
+    "Training"                         = "OS training"
+  )
+
+correlation(df_os_help, redundant = TRUE) |>
+  correlation::cor_sort() |>
+  as.data.frame() |>
+  mutate(label = ifelse(p < .001, format_value(r, digits = 2), "")) |>
+  ggplot(aes(x=Parameter1, y=Parameter2, fill=r)) +
+  geom_tile() +
+  geom_text(aes(label=label), color="black", size=3) +
+  scale_fill_gradientn(colours = c("darkblue", "blue", "#2196F3","white", "#FFC107", "#F44336", "darkred"), limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(title = "Correlation Matrix of Open Science Help Avenues",
+       x = "",
+       y = "") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+p_os_help <- df_os_help |>
+  mutate(participant = paste0("S", 1:nrow(df_os_help))) |>
+  pivot_longer(-participant) |>
+  summarize(Total = sum(value) / nrow(df_os_help), .by="name") |>
+  mutate(Type = case_when(
+           name %in% c("Career\nrecognition") ~ "Recognition",
+           name %in% c("Institutional\nincentives", "Dedicated\nfunding") ~ "Money",
+           name %in% c("Time", "Dedicated OS\nworkload") ~ "Time",
+           name %in% c("Technical\ninfrastructure", "Senior researcher\nsupport", "OS training", "Junior researcher\nsupport", "More Information") ~ "Support",
+           .default = "Other"),
+         Type = fct_relevel(Type, "Recognition", "Money", "Time", "Support"),
+         name = fct_reorder(name, desc(Total))) |>
+  ggplot(aes(x = name, y = Total, fill = Type)) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_fill_manual(values = c("Recognition" = "#E91E63", "Money" = "gold", "Time" = "#4CAF50", "Support" = "#1E88E5", "Other" = "grey")) +
+  theme_minimal() +
+  labs(title = "What would you need to further adopt open science practices?",
+       x = "",
+       y = "") +
+  theme(axis.text.x = element_text(angle = 50, hjust = 1),
+        plot.title = element_text(size = 12, face = "bold", hjust = 0))
+p_os_help
+#
+#
+#
+#| label: md_os_help
+#| echo: false
+#| cache: false
+
+make_markdown(list(
+  "Proportion selecting each avenue" = p_os_help$data |>
+    arrange(desc(Total)) |>
+    transmute(Avenue = name, Type, Selected = format_percent(Total)),
+  "Co-selection (phi correlations)" = cor_pairs(df_os_help)
+), "Open science help")
+#
+#
+#
+#
+#
+#
+df_ss_scales <- select(df, SS_Familiar, SS_Importance, SS_Workshops)
+
+df_ss_scales |>
+  rename(
+    "SS Familiarity" = SS_Familiar,
+    "SS Importance" = SS_Importance,
+    "SS Training\n(Workshops)" = SS_Workshops
+  ) |>
+  correlation(redundant = TRUE) |>
+  correlation::cor_sort() |>
+  as.data.frame() |>
+  mutate(label = ifelse(p < .001, format_value(r, digits = 2), "")) |>
+  ggplot(aes(x=Parameter1, y=Parameter2, fill=r)) +
+  geom_tile() +
+  geom_text(aes(label=label), color="black", size=3) +
+  scale_fill_gradientn(colours = c("darkblue", "blue", "#2196F3","white", "#FFC107", "#F44336", "darkred"), limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(title = "Correlation Matrix of Slow Science Scales",
+       x = "",
+       y = "") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#
+#
+#
+#| label: md_ss_scales
+#| echo: false
+#| cache: false
+
+make_markdown(list("Descriptive statistics" = describe_vars(df_ss_scales),
+                   "Correlations" = cor_pairs(df_ss_scales)), "Slow science scales")
+#
+#
+#
+#
+#
+# TODO: Add subtitle: "Select up to 3" 
+df_ss_def <- select(df, starts_with("SS_Definition_"), -SS_Definition_Other)
+names(df_ss_def) <- str_replace(names(df_ss_def), "SS_Definition_", "") |>
+  str_replace_all(fixed("_"), " ")
+
+ss_def <- df_ss_def |>
+  mutate(participant = paste0("S", 1:nrow(df_ss_def))) |>
+  pivot_longer(-participant) |>
+  mutate(name = recode(name,
+    "Quality over quantity"    = "Quality over\nquantity",
+    "Slow Process"             = "Slow process over\nshort-term goals",
+    "Work Life Balance"        = "Better work/life\nbalance",
+    "Changing Metrics"         = "Changing assessment\nmetrics",
+    "Increase Research Time"   = "Increase time\nfor research",
+    "Diminishing Publications" = "Fewer\npublications"
+  )) |>
+  summarize(Total = sum(value, na.rm = TRUE) / nrow(df_ss_def), .by = "name") |>
+  mutate(name = fct_reorder(name, desc(Total))) |>
+  ggplot(aes(x = name, y = Total, fill=Total)) +
+  geom_bar(stat = "identity") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_fill_gradient(low = "lightblue", high = "steelblue", guide = "none") +
+  theme_minimal() +
+  labs(title = "Which of these best describes Slow Science for you?",
+       x = "",
+       y = "") +
+  theme(axis.text.x = element_text(angle = 40, hjust = 1),
+        plot.title = element_text(size = 12, face = "bold", hjust = 0))
+ss_def
+#
+#
+#
+#| label: md_ss_definition
+#| echo: false
+#| cache: false
+
+ss_def$data |>
+  arrange(desc(Total)) |>
+  transmute(Definition = name, Selected = format_percent(Total)) |>
+  make_markdown("Slow science definition")
+#
+#
+#
+#
+#
+# TODO: If Not_Feasible, then remove "Feasible_individual" and "Feasible_institution" for that practice for that participant
+# TODO: Add "Both" column for joint Individual & Institutional
+ss_feas <- select(df, matches("^SS_.*Feasible_individual$|^SS_.*Feasible_institution$|^SS_.*Not_Feasible$")) |>
+  mutate(participant = paste0("S", seq_len(n()))) |>
+  pivot_longer(-participant, names_to = "Variable", values_to = "value") |>
+  mutate(
+    Practice = case_when(
+      str_detect(Variable, "_Limit_publication_") ~ "Limit nr. of articles\nsubmitted for publication",
+      str_detect(Variable, "_Replicate_")         ~ "Replicate before\npublishing",
+      str_detect(Variable, "_Longertime_")        ~ "Think in longer\ntimescales",
+      str_detect(Variable, "_Models_")            ~ "Provide models for\nthe next generation",
+      str_detect(Variable, "_Quality_")           ~ "Assess quality,\nnot quantity",
+      str_detect(Variable, "_Teamwork_")          ~ "Value teamwork over\nindividual work",
+      str_detect(Variable, "_Onepublication_")    ~ "Publish only 1\narticle per year",
+      str_detect(Variable, "_Onegrant_")          ~ "Only 1 grant\nper year"
+    ),
+    Level = case_when(
+      str_detect(Variable, "_Feasible_individual$") ~ "Individual",
+      str_detect(Variable, "_Feasible_institution$") ~ "Institution",
+      str_detect(Variable, "_Not_Feasible$") ~ "Not Feasible"
+    ),
+    Level = fct_relevel(Level, "Individual", "Institution", "Not Feasible")
+  ) |>
+  summarize(Proportion = sum(value, na.rm = TRUE) / n_distinct(participant),
+            .by = c(Practice, Level)) |> 
+  mutate(Practice = fct_reorder(Practice, ifelse(Level == "Institution", Proportion, 0), .fun = \(x) sum(x, na.rm = TRUE), .desc = TRUE)) |>
+  ggplot(aes(x = Practice, y = Proportion, fill = Level)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_fill_manual(values = c("Individual" = "#4CAF50", "Institution" = "#1E88E5", "Not Feasible" = "#E53935")) +
+  theme_minimal() +
+  labs(title = "What Can Help Slow Science and Who's Responsability is it?",
+       x = "", y = "", fill = NULL) +
+  theme(axis.text.x = element_text(angle = 40, hjust = 1),
+        plot.title = element_text(size = 12, face = "bold", hjust = 0))
+ss_feas
+#
+#
+#
+#| label: md_ss_feasibility
+#| echo: false
+#| cache: false
+
+ss_feas$data |>
+  mutate(Proportion = format_percent(Proportion)) |>
+  pivot_wider(names_from = Level, values_from = Proportion) |>
+  arrange(Practice) |>
+  make_markdown("Slow science feasibility")
+#
+#
+#
+#
+#
+#| label: sliders
+
+domain_colors <- c("Open Science" = "#2196F3", "Slow Science" = "#FF9800",
+                   "Green Science" = "#4CAF50", "Ethical Science" = "#9C27B0")
+slider_items <- c(
+  "OS_Familiar"                         = "Familiarity with the movement",
+  "OS_Importance"                       = "Importance of the movement",
+  "SS_Familiar"                         = "Familiarity with the movement",
+  "SS_Importance"                       = "Importance of the movement",
+  "GS_Importance_conducting"            = "Importance in conducting research",
+  "GS_Importance_topic"                 = "Importance in choosing topics",
+  "GS_Relation_Research_Sustainability" = "Link between research and environment",
+  "GS_Change_practices_agreeing"        = "Willing to change practices",
+  "GS_Changes_communication_practices"  = "Changed communication (e.g., travel)",
+  "GS_Changes_practices"                = "Changed research practices",
+  "ES_Consequences_society"             = "Care for societal consequences",
+  "ES_Importance_research_team"         = "Importance of team diversity"
+)
+
+df_sliders <- df |>
+  select(all_of(names(slider_items))) |>
+  pivot_longer(everything(), names_to = "Variable", values_to = "Score") |>
+  filter(!is.na(Score)) |>
+  mutate(Domain = case_when(str_starts(Variable, "OS_") ~ "Open Science", str_starts(Variable, "SS_") ~ "Slow Science",
+                            str_starts(Variable, "GS_") ~ "Green Science", str_starts(Variable, "ES_") ~ "Ethical Science"),
+         Domain = factor(Domain, levels = names(domain_colors)),
+         Domain_label = fct_relabel(Domain, \(x) str_replace(x, " ", "\n")),
+         Item = factor(slider_items[Variable], levels = rev(unique(slider_items))))
+
+p_sliders <- df_sliders |>
+  ggplot(aes(x = Score, y = Item, fill = Domain)) +
+  ggdist::stat_histinterval(breaks = ggdist::breaks_fixed(width = 0.05), align = ggdist::align_boundary(at = 0),
+                            outline_bars = FALSE, slab_alpha = 0.6, height = 0.9, normalize = "xy",
+                            point_interval = "mean_qi", .width = 0.5, point_size = 1.5,
+                            interval_size_range = c(0.8, 0.8), justification = -0.05, show.legend = FALSE) +
+  scale_x_continuous(limits = c(0, 1), labels = \(x) x * 100, expand = c(0.01, 0)) +
+  scale_fill_manual(values = domain_colors) +
+  facet_grid(Domain_label ~ ., scales = "free_y", space = "free_y", switch = "y") +
+  theme_minimal() +
+  theme(strip.placement = "outside", strip.text.y.left = element_text(angle = 0, face = "bold", hjust = 1),
+        panel.grid.minor = element_blank(), panel.grid.major.y = element_blank()) +
+  labs(title = "Familiarity, Importance and Engagement", x = "Rating (0-100)", y = NULL)
+p_sliders
+#
+#
+#
+#| label: md_sliders
+#| echo: false
+#| cache: false
+
+df_sliders |>
+  summarise(Mean = mean(Score) * 100, SD = sd(Score) * 100, Median = median(Score) * 100,
+            `At 0` = format_percent(mean(Score == 0)), `At 100` = format_percent(mean(Score == 1)),
+            n = n(), .by = c(Domain, Item)) |>
+  make_markdown("Ratings across movements (0-100 sliders)")
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+df_resprac <- select(df, starts_with("OS_"), starts_with("GS_"), -starts_with("OS_Help"),
+                     -OS_Workshops,
+                     -OS_Familiar,
+                     SS_Importance, SS_Familiar,
+                     ES_Importance_research_team, ES_Consequences_society) |> 
+  rename("Open Science - Importance" = OS_Importance,
+         # "Open Science - Familiarity" = OS_Familiar,
+         "Slow Science - Importance" = SS_Importance,
+         "Slow Science - Familiarity" = SS_Familiar,
+         # How important do you consider the diversity of the research team (in terms 
+         # of neurodiversity, disability, ethnicity, gender, etc.)?
+         "Ethical Science - Team Diversity" = ES_Importance_research_team,
+         # How important is it to be careful regarding the direct consequences (e.g.
+         # benefits or harms) for the participants or society of your research?
+         "Ethical Science - Societal Consequences" = ES_Consequences_society,
+         # Green Science
+         # How important is environmental sustainability in how you conduct your research?
+         "Green Science - Ecofriendly Practices" = GS_Importance_conducting,
+         # How important is environmental sustainability in choosing research topics?
+         "Green Science - Ecofriendly Topics" = GS_Importance_topic,
+         # Have you changed your research practices (e.g., experimental design, topic, material)
+         # for environmental sustainability reasons?
+         "Green Science - Changed Practices" = GS_Changes_practices,
+         # Have you changed your research communication practices (e.g., professional travels)
+         # for environmental sustainability reasons?
+         "Green Science - Changed Communication" = GS_Changes_communication_practices,
+         # Do you think there is a link between scientific production and environmental sustainability? 
+         "Green Science - Belief Relation" = GS_Relation_Research_Sustainability,
+         # Would you agree to change your research practices for environmental reasons?
+         "Green Science - Change Willingness" = GS_Change_practices_agreeing,
+         "Endorsement - Participatory Research" = OS_Participatory_Research,
+         "Endorsement - Replication Studies" = OS_Replication_Studies,
+         "Endorsement - Open Access" = OS_Open_Access_Publication,
+         "Endorsement - Open Peer Review" = OS_Open_Peer_Review,
+         "Endorsement - Open Data" = OS_Open_Data,
+         "Endorsement - Open Materials" = OS_Open_Materials,
+         "Endorsement - Registered Reports" = OS_Registered_Reports,
+         "Endorsement - Preregistration" = OS_Study_Preregistration)
+
+
+p_cor <- df_resprac |>
+  correlation(redundant = TRUE) |>
+  correlation::cor_sort() |>
+  as.data.frame() |>
+  mutate(label = ifelse(p < .001, format_value(r, digits = 2), "")) |>
+  ggplot(aes(x=Parameter1, y=Parameter2, fill=r)) +
+  geom_tile() +
+  geom_text(aes(label=label), color="black", size=1.5) +
+  annotate(geom="rect", xmin=0.5, xmax=8.5, ymin=0.5, ymax=8.5, alpha=0, color="#9C27B0", linewidth = 2) +
+  annotate(geom="rect", xmin=0.55, xmax=4.5, ymin=0.55, ymax=4.5, alpha=0, color="#4CAF50", linewidth = 2) +
+  annotate(geom="rect", xmin=9.5, xmax=12.5, ymin=9.5, ymax=12.5, alpha=0, color="#3F51B5", linewidth = 2) +
+  annotate(geom="rect", xmin=13.5, xmax=15.5, ymin=13.5, ymax=15.5, alpha=0, color="#FF9800", linewidth = 2) +
+  annotate(geom="rect", xmin=12.5, xmax=19.5, ymin=12.5, ymax=19.5, alpha=0, color="#2196F3", linewidth = 2) +
+  scale_fill_gradientn(colours = c("darkblue", "blue", "#2196F3","white", "#FFC107", "#F44336", "darkred"), limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(title = "Correlation Matrix of Research Values",
+       x = "",
+       y = "") +
+  theme(axis.text.x = element_text(angle = 35, hjust = 1),
+        plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+        legend.position = "none")
+p_cor
+#
+#
+#
+#| label: md_resprac_cor
+#| echo: false
+#| cache: false
+
+make_markdown(list("Descriptive statistics" = describe_vars(df_resprac),
+                   "Correlations" = cor_pairs(df_resprac)), "Research values")
+#
+#
+#
+#
+#
+#
+rez_resprac <- n_factors(df_resprac)
+plot(rez_resprac)
+
+f <- factor_analysis(df_resprac, n=5, rotation = "oblimin")
+plot(f)
+
+color_vars_resprac <- c(
+  # GS variables (green)
+  "Green Science - Ecofriendly Practices"                  = "#4CAF50",
+  "Green Science - Ecofriendly Practices" = "#4CAF50",
+  "Green Science - Ecofriendly Topics" = "#4CAF50",
+  "Green Science - Changed Practices" = "#4CAF50",
+  "Green Science - Changed Communication" = "#4CAF50",
+  "Green Science - Belief Relation" = "#4CAF50",
+  "Green Science - Change Willingness" =  "#4CAF50",
+  
+  # ES variables (purple)
+  "Ethical Science - Team Diversity"        = "#9C27B0",
+  "Ethical Science - Societal Consequences" = "#9C27B0",
+  
+  # OS variables (blue)
+  "Endorsement - Open Data"                 = "#2196F3",
+  "Endorsement - Open Materials"            = "#2196F3",
+  "Endorsement - Open Access"               = "#2196F3",
+  "Open Science - Importance"               = "#2196F3",
+  
+  "Endorsement - Open Peer Review"          = "#3F51B5",
+  "Endorsement - Preregistration"           = "#3F51B5",
+  "Endorsement - Registered Reports"        = "#3F51B5",
+  "Endorsement - Replication Studies"       = "#3F51B5",
+  "Endorsement - Participatory Research"    = "#3F51B5",
+  
+  
+  # SS variable (teal)
+  "Slow Science - Importance"               = "#FF9800",
+  "Slow Science - Familiarity"              = "#FF9800"
+  
+  
+)
+
+# Each factor is named after its marker item (psych's MR numbering changes with the data)
+efa_markers <- c("Green Science" = "Green Science - Ecofriendly Practices",
+                 "Ethical\nScience" = "Ethical Science - Team Diversity",
+                 "Open\nScience" = "Endorsement - Open Data",
+                 "Rigorous\nScience" = "Endorsement - Registered Reports",
+                 "Slow Science" = "Slow Science - Familiarity")
+efa_loadings <- as.data.frame(f) |> select(Variable, starts_with("MR"))
+efa_ids <- sapply(efa_markers, \(v) {
+  l <- unlist(efa_loadings[efa_loadings$Variable == v, -1])
+  names(l)[which.max(abs(l))]
+})
+stopifnot(!anyDuplicated(efa_ids))  # One marker per factor
+
+p_resprac <- plot_graph(f, threshold = 0.2, arrow_end_gap = 0.12, expand = c(1, 0.5),
+                        names_factors = as.list(efa_ids),
+                        color_factors = setNames(c("#4CAF50", "#9C27B0", "#2196F3", "#3F51B5", "#FF9800"), efa_ids),
+                        color_variables = color_vars_resprac)
+p_resprac
+#
+#
+#
+#| label: md_resprac_efa
+#| echo: false
+#| cache: false
+
+# Factor names as shown in the figure (e.g., MR1 -> "Green Science")
+names_resprac <- p_resprac$data |>
+  filter(type == "Factor") |>
+  mutate(label = str_remove(label_text, "\n\\(.*\\)$") |> str_replace_all("\n", " "))
+make_markdown(c(
+  list("Number of factors: agreement between methods" = as.data.frame(summary(rez_resprac))),
+  loadings_tables(f, names_factors = setNames(names_resprac$label, paste0("\\b", names_resprac$name, "\\b")))
+), "EFA of research values")
+#
+#
+#
+#
+#
+# Raw-name to display-name mapping (matches df_resprac rename calls)
+cfa_labels <- c(
+  "Open_Science"                  = "Open\nScience",
+  "Rigorous_Science"              = "Rigorous\nScience",
+  "Green_Science"                 = "Green\nScience",
+  "Slow_Science"                  = "Slow\nScience",
+  "Ethical_Science"               = "Ethical\nScience",
+  "OS_Importance"                 = "OS\nImportance",
+  "OS_Open_Data"                  = "Open\nData",
+  "OS_Open_Materials"             = "Open\nMaterials",
+  "OS_Open_Access_Publication"    = "Open\nAccess",
+  "OS_Open_Peer_Review"           = "Open\nPeer Review",
+  "OS_Study_Preregistration"      = "Prereg.",
+  "OS_Registered_Reports"         = "Reg.\nReports",
+  "OS_Replication_Studies"        = "Replication\nStudies",
+  "OS_Participatory_Research"     = "Participatory\nResearch",
+  "GS_Importance_conducting"       = "Importance\n(Conducting)",
+  "GS_Importance_topic"            = "Importance\n(Topic)",
+  "GS_Changes_practices"           = "Changed\nPractices",
+  "GS_Changes_communication_practices" = "Changed\nCommunication",
+  "GS_Relation_Research_Sustainability" = "Belief\nin Link",
+  "GS_Change_practices_agreeing"  = "Change\nWillingness",
+  "SS_Importance"                 = "SS\nImportance",
+  "SS_Familiar"                   = "SS\nFamiliarity",
+  "ES_Importance_research_team"   = "Team\nDiversity",
+  "ES_Consequences_society"       = "Societal\nConseq."
+)
+
+cfa_node_colors <- c(
+  "Open_Science"               = "#2196F3",
+  "Rigorous_Science"           = "#3F51B5",
+  "Green_Science"              = "#4CAF50",
+  "Slow_Science"               = "#FF9800",
+  "Ethical_Science"            = "#9C27B0",
+  "OS_Importance"              = "#2196F3",
+  "OS_Open_Data"               = "#2196F3",
+  "OS_Open_Materials"          = "#2196F3",
+  "OS_Open_Access_Publication" = "#2196F3",
+  "OS_Open_Peer_Review"        = "#3F51B5",
+  "OS_Study_Preregistration"   = "#3F51B5",
+  "OS_Registered_Reports"      = "#3F51B5",
+  "OS_Replication_Studies"     = "#3F51B5",
+  "OS_Participatory_Research"  = "#3F51B5",
+  "GS_Importance_conducting"   = "#4CAF50",
+  "GS_Importance_topic"        = "#4CAF50",
+  "GS_Changes_practices"       = "#4CAF50",
+  "GS_Changes_communication_practices" = "#4CAF50",
+  "GS_Relation_Research_Sustainability" = "#4CAF50",
+  "GS_Change_practices_agreeing" = "#4CAF50",
+  "SS_Importance"              = "#FF9800",
+  "SS_Familiar"                = "#FF9800",
+  "ES_Importance_research_team"= "#9C27B0",
+  "ES_Consequences_society"    = "#9C27B0"
+)
+
+# Manual CFA model using raw df column names
+cfa_model <- "
+  Open_Science     =~ OS_Importance +
+                      OS_Open_Data +
+                      OS_Open_Materials +
+                      OS_Open_Access_Publication 
+  Rigorous_Science =~ OS_Study_Preregistration +
+                      OS_Registered_Reports +
+                      OS_Replication_Studies +
+                      OS_Participatory_Research +
+                      OS_Open_Peer_Review
+  Green_Science    =~ GS_Importance_conducting +
+                      GS_Importance_topic +
+                      GS_Changes_practices +
+                      GS_Changes_communication_practices +
+                      GS_Relation_Research_Sustainability +
+                      GS_Change_practices_agreeing
+  Slow_Science     =~ SS_Importance +
+                      SS_Familiar
+  Ethical_Science  =~ ES_Importance_research_team +
+                      ES_Consequences_society
+"
+
+library(lavaan)
+library(tidySEM)
+
+fit_cfa <- cfa(cfa_model, data = df, std.lv = TRUE)
+
+# modificationIndices(fit_cfa, standardized = TRUE, sort = TRUE) |>
+#   dplyr::filter(mi > 10) |>
+#   dplyr::arrange(desc(mi))
+
+model_parameters(fit_cfa, standardize = TRUE) 
+model_performance(fit_cfa)
+
+# ── Manual ggraph/tidygraph CFA plot ─────────────────────────────────────────
+
+# 1. Node positions (manual x/y grid matching the layout intent)
+cfa_pos <- tribble(
+  ~name,                        ~x,   ~y,
+  # Rigorous Science factor + vars (left, top half)
+  "OS_Study_Preregistration",    0,   9,
+  "OS_Registered_Reports",       1,   10,
+  "OS_Replication_Studies",      2,   10,
+  "OS_Participatory_Research",   3,   9,
+  "Rigorous_Science",            1,   8,
+  "OS_Open_Peer_Review",         3.3,    8,
+  # Open Science factor + vars (left, bottom half)
+  "Open_Science",                1,    2.5,
+  "OS_Open_Materials",           0,    1,
+  "OS_Open_Data",                1,    0,
+  "OS_Open_Access_Publication",  2,    0,
+  "OS_Importance",               3,    1,
+  # Slow Science factor + vars (centre)
+  "SS_Importance",               6,   10,
+  "Slow_Science",                6,    5,
+  "SS_Familiar",                 6,    0,
+  # Green Science factor + vars (right, top half)
+  "Green_Science",              11,    7.5,
+  "GS_Importance_conducting",              12,   9,
+  "GS_Importance_topic",                  11.5,   10,
+  "GS_Change_practices_agreeing",         10.5,   10,
+  "GS_Changes_practices",                 9.65,    9.75,
+  "GS_Changes_communication_practices",   9,   9,
+  "GS_Relation_Research_Sustainability",  8.75,   7.75,
+  
+  # Ethical Science factor + vars (right, bottom half)
+  "Ethical_Science",            11,    2.5,
+  "ES_Importance_research_team",10,    0,
+  "ES_Consequences_society",    12,    0
+)
+
+# 2. Extract edges from lavaan (loadings + significant factor correlations)
+cfa_params <- lavaan::parameterEstimates(fit_cfa, standardized = TRUE) |>
+  filter(op %in% c("=~", "~~"),
+         !(op == "~~" & lhs == rhs),          # drop self-variances
+         !(op == "~~" & pvalue >= 0.05)) |>   # drop non-sig correlations
+  mutate(est_std = ifelse(is.na(std.all), est, std.all))
+
+# 3. Build tidygraph object
+all_nodes <- cfa_pos |>
+  mutate(
+    fill       = cfa_node_colors[name],
+    node_label = cfa_labels[name],
+    shape      = ifelse(name %in% c("Open_Science","Rigorous_Science",
+                                    "Green_Science","Slow_Science","Ethical_Science"),
+                        "factor", "indicator")
+  )
+
+edge_df <- cfa_params |>
+  transmute(
+    from      = lhs,
+    to        = rhs,
+    op        = op,
+    est_std   = est_std,
+    edge_col  = ifelse(op == "~~", "#4CAF50", "grey50"),
+    edge_lwd  = ifelse(op == "~~", abs(est_std) * 3, 0.6),
+    edge_type = ifelse(op == "~~", "dashed", "solid"),
+    edge_label = sub("^0\\.", ".", sub("^-0\\.", "-.", sprintf("%.2f", est_std)))
+  )
+
+g_tidy <- tbl_graph(nodes = all_nodes, edges = edge_df, directed = TRUE,
+                    node_key = "name")
+
+# 4. Plot
+p_cfa <- ggraph(g_tidy, layout = "manual", x = x, y = y) +
+  # Loading arrows (=~)
+  geom_edge_link(
+    aes(filter = op == "=~", label = edge_label, edge_colour = edge_col, edge_width = edge_lwd),
+    arrow = arrow(length = unit(2.5, "mm"), type = "closed"),
+    label_size = 2.5, label_colour = "grey30", angle_calc = "along", label_dodge = unit(2, "mm"),
+    end_cap = circle(5, "mm"),
+    show.legend = FALSE
+  ) +
+  # Factor-correlation arcs (~~)
+  geom_edge_bend(
+    aes(filter = op == "~~", edge_colour = edge_col, edge_width = edge_lwd, label = edge_label),
+    strength = 0.3,
+    # arrow = arrow(length = unit(2.5, "mm"), ends = "both", type = "open"),
+    label_size = 2.5, label_colour = "grey30", angle_calc = "along", label_dodge = unit(2.5, "mm"),
+    show.legend = FALSE
+  ) +
+  scale_edge_colour_identity() +
+  scale_edge_width_continuous(range = c(0.6, 2.5)) +
+  # Indicator nodes (rectangles → points with shape 22)
+  geom_node_point(
+    aes(filter = shape == "indicator", fill = fill),
+    shape = 22, size = 12, colour = "white", show.legend = FALSE, stroke = NA
+  ) +
+  # Factor nodes (circles)
+  geom_node_point(
+    aes(filter = shape == "factor", fill = fill),
+    shape = 21, size = 30, show.legend = FALSE, stroke = NA
+  ) +
+  scale_fill_identity() +
+  geom_node_text(aes(filter = shape == "factor", label = node_label), size = 3, lineheight = 0.85, color = "white", fontface = "bold") +
+  geom_node_text(aes(filter = shape == "indicator", label = node_label), size = 2.8, lineheight = 0.85) +
+  labs(title = "Structural Model") +
+  theme_void() +
+  theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
+
+p_cfa
+#
+#
+#
+#
+#
+#| label: cfa_alternatives
+
+# The EFA puts two green items (link between research and sustainability,
+# willingness to change) on the Ethical factor rather than the Green one: the
+# model used above assigns them to Green (their movement); these alternatives
+# move them to Ethical, or let them load on both (as in the EFA)
+green_core <- "GS_Importance_conducting + GS_Importance_topic + GS_Changes_practices + GS_Changes_communication_practices"
+green_beliefs <- "GS_Relation_Research_Sustainability + GS_Change_practices_agreeing"
+# The Open, Rigorous and Slow factors of cfa_model (each factor's definition runs to the next one)
+cfa_common <- str_extract_all(cfa_model, "(?s)(Open|Rigorous|Slow)_Science\\s*=~.*?(?=\\n\\s*\\w+_Science\\s*=~|\\s*$)")[[1]] |>
+  paste(collapse = "\n") |>
+  paste0("\n")
+cfa_models <- list(
+  "Movement-based (used)" = cfa_model,
+  "Green beliefs on Ethical" = paste0(cfa_common, "Green_Science =~ ", green_core, "\n",
+                       "Ethical_Science =~ ES_Importance_research_team + ES_Consequences_society + ", green_beliefs),
+  "Cross-loadings" = paste0(cfa_common, "Green_Science =~ ", green_core, " + ", green_beliefs, "\n",
+                            "Ethical_Science =~ ES_Importance_research_team + ES_Consequences_society + ", green_beliefs)
+)
+cfa_comparison <- imap_dfr(cfa_models, \(model, name) {
+  fit <- cfa(model, data = df, std.lv = TRUE)
+  tibble(Model = name, r_Green_Ethical = lavInspect(fit, "cor.lv")["Green_Science", "Ethical_Science"],
+         !!!as.list(unclass(fitMeasures(fit, c("cfi", "tli", "rmsea", "srmr", "aic", "bic")))))
+})
+knitr::kable(cfa_comparison, format = "pipe", digits = 3, caption = "Alternative CFA specifications")
+#
+#
+#
+#
+#
+df_resprac_fac <- as.data.frame(predict(fit_cfa))
+
+rez_nclust <- n_clusters(df_resprac_fac, package = c("NbClust"))
+plot(rez_nclust)
+
+rez <- cluster_analysis(df_resprac_fac, n=5, method="hkmeans")
+plot(rez)
+rez
+
+# Cluster numbers (and so hand-given names) change with the sample: profiles are
+# lettered by size and labelled by the factors on which their mean is above (+)
+# or below (-) 0.3 SD
+profile_labels <- df_resprac_fac |>
+  mutate(Cluster = predict(rez)) |>
+  summarise(across(everything(), mean), n = n(), .by = Cluster) |>
+  arrange(desc(n)) |>
+  pivot_longer(-c(Cluster, n), names_to = "Factor", values_to = "Mean") |>
+  mutate(Factor = str_remove(Factor, "_Science"),
+         Sign = case_when(Mean > 0.3 ~ "+", Mean < -0.3 ~ "-", .default = NA)) |>
+  summarise(Pattern = paste0(Sign[!is.na(Sign)], Factor[!is.na(Sign)], collapse = " "), .by = c(Cluster, n)) |>
+  mutate(Label = paste0("Profile ", LETTERS[row_number()], "\n", ifelse(Pattern == "", "Average", Pattern)))
+df_resprac_fac$Profile <- profile_labels$Label[match(predict(rez), profile_labels$Cluster)]
+#
+#
+#
+#| label: md_nclusters
+#| echo: false
+#| cache: false
+
+make_markdown(as.data.frame(summary(rez_nclust)), "Number of clusters: agreement between methods")
+#
+#
+#
+# cluster_vars <- names(as.data.frame(predict(fit_cfa)))
+cluster_vars <- c("Rigorous_Science", "Open_Science", "Slow_Science", "Green_Science", "Ethical_Science")
+labels <- tibble(Variable = cluster_vars, label = str_replace(cluster_vars, "_", "\n")) 
+
+
+
+n_vars  <- length(cluster_vars)
+angles  <- seq(0, 2 * pi, length.out = n_vars + 1)[seq_len(n_vars)]
+
+# Cluster means, normalised to [0,1] using full-data range per variable
+var_mins <- sapply(cluster_vars, \(v) min(df_resprac_fac[[v]], na.rm = TRUE))
+var_maxs <- sapply(cluster_vars, \(v) max(df_resprac_fac[[v]], na.rm = TRUE))
+
+radar_means <- df_resprac_fac |>
+  group_by(Profile) |>
+  summarise(across(all_of(cluster_vars), \(x) mean(x, na.rm = TRUE)), .groups = "drop")
+
+for (v in cluster_vars) {
+  radar_means[[v]] <- (radar_means[[v]] - var_mins[v]) / (var_maxs[v] - var_mins[v])
+}
+
+# Long format with (x, y) cartesian coords
+radar_long <- radar_means |>
+  pivot_longer(-Profile, names_to = "Variable", values_to = "r") |>
+  left_join(tibble(Variable = cluster_vars, angle = angles), by = "Variable") |>
+  mutate(x = r * sin(angle), y = r * cos(angle))
+
+# Close each polygon by appending the first point again
+radar_closed <- radar_long |>
+  group_by(Profile) |>
+  group_modify(\(d, .y) bind_rows(d, d[1, ])) |>
+  ungroup()
+
+# Background grid (concentric circles + spokes)
+grid_circles <- expand.grid(r = c(.25, .5, .75, 1), theta = seq(0, 2 * pi, length.out = 200)) |>
+  mutate(x = r * sin(theta), y = r * cos(theta), r = factor(r))
+
+spokes <- tibble(Variable = cluster_vars, angle = angles) |>
+  mutate(x1 = sin(angle), y1 = cos(angle))
+
+# Use left_join instead of named-vector indexing to avoid NA from tibble column lookup
+axis_labels <- spokes |>
+  left_join(labels, by = "Variable") |>
+  mutate(lx = 1.25 * sin(angle), ly = 1.25 * cos(angle))  
+
+# Profile counts and percentages for annotation
+profile_counts <- df_resprac_fac |>
+  count(Profile) |>
+  mutate(pct   = n / sum(n) * 100,
+         label = paste0("N = ", n, " (", round(pct), "%)"))
+
+all_profiles <- unique(radar_closed$Profile)
+
+# Retrieve the Set1 colours for profile labelling
+set1_cols <- RColorBrewer::brewer.pal(max(3, length(all_profiles)), "Set1")[seq_along(all_profiles)]
+profile_col_map <- setNames(set1_cols, all_profiles)
+
+# Build one radar panel per profile using facet_wrap on a "Facet" column
+# Each panel: all profiles with their own colour; focal = bold+filled, others = thin+faint
+radar_closed_facets <- purrr::map_dfr(all_profiles, \(focal) {
+  radar_closed |>
+    mutate(Facet     = focal,
+           is_focal  = Profile == focal,
+           lwd       = ifelse(is_focal, 1.2, 0.3),
+           line_col  = profile_col_map[Profile],
+           fill_col  = ifelse(is_focal, profile_col_map[Profile], NA_character_),
+           poly_alpha = ifelse(is_focal, 0.18, 0.0))
+})
+
+radar_long_facets <- purrr::map_dfr(all_profiles, \(focal) {
+  radar_long |>
+    mutate(Facet    = focal,
+           is_focal = Profile == focal,
+           pt_col   = profile_col_map[Profile],
+           pt_size  = ifelse(is_focal, 2.5, 0.8))
+})
+
+# Annotation label placed at centre-bottom of each facet
+label_df <- profile_counts |>
+  left_join(tibble(Profile = all_profiles, col = set1_cols), by = "Profile") |>
+  rename(Facet = Profile)
+
+p_radar <- ggplot() +
+  # Grid circles
+  geom_path(data = mutate(grid_circles, Facet = list(all_profiles)) |> tidyr::unnest(Facet),
+            aes(x = x, y = y, group = r),
+            colour = "grey88", linewidth = 0.25) +
+  # Spokes
+  geom_segment(data = mutate(spokes, Facet = list(all_profiles)) |> tidyr::unnest(Facet),
+               aes(x = 0, y = 0, xend = x1, yend = y1),
+               colour = "grey80", linewidth = 0.3) +
+  # Axis labels
+  geom_text(data = mutate(axis_labels, Facet = list(all_profiles)) |> tidyr::unnest(Facet),
+            aes(x = lx, y = ly, label = label),
+            size = 2.5, lineheight = 0.85, fontface = "bold", colour = "grey30") +
+  # Background profiles (thin, own colour, no fill)
+  geom_polygon(data = filter(radar_closed_facets, !is_focal),
+               aes(x = x, y = y, group = Profile, colour = line_col),
+               fill = NA, linewidth = 0.3, alpha = 0.5, show.legend = FALSE) +
+  # Focal profile (coloured, filled)
+  geom_polygon(data = filter(radar_closed_facets, is_focal),
+               aes(x = x, y = y, group = Profile, colour = line_col, fill = fill_col),
+               alpha = 0.18, linewidth = 1.2, show.legend = FALSE) +
+  # Points — background
+  geom_point(data = filter(radar_long_facets, !is_focal),
+             aes(x = x, y = y, colour = pt_col), size = 0.8, alpha = 0.5, show.legend = FALSE) +
+  # Points — focal
+  geom_point(data = filter(radar_long_facets, is_focal),
+             aes(x = x, y = y, colour = pt_col), size = 2.5, show.legend = FALSE) +
+  # N (%) label per facet
+  geom_text(data = label_df,
+            aes(x = 0, y = -1.5, label = label, colour = col),
+            size = 3, fontface = "bold", show.legend = FALSE) +
+  scale_colour_identity() +
+  scale_x_continuous(expand = expansion(mult = 0.15)) +
+  scale_fill_identity() +
+  facet_wrap(~Facet, ncol = 5) +
+  # coord_equal(xlim = c(-1.75, 1.75), ylim = c(-1.75, 1.75)) +
+  theme_void() +
+  theme(plot.margin = margin(10, 10, 10, 10),
+        plot.title  = element_text(size = 14, face = "bold", hjust = 0.5),
+        strip.text  = element_text(face = "bold", size = 9, colour = "grey20")) +
+  labs(title = "Researcher Profiles")
+
+p_radar
+#
+#
+#
+#| label: md_profiles
+#| echo: false
+#| cache: false
+
+df_resprac_fac |>
+  summarise(N = n(), across(all_of(cluster_vars), mean), .by = Profile) |>
+  mutate(Percentage = format_percent(N / sum(N)), .after = N) |>
+  arrange(Profile) |>
+  list() |>
+  setNames("Mean CFA factor score per profile") |>
+  make_markdown("Researcher profiles")
+#
+#
+#
+#
+#
+#| label: cluster_stability
+
+# Bootstrap: cluster resampled respondents, assign everyone to the nearest
+# resampled centroid, and compare with the full-sample solution (adjusted Rand
+# index; 1 = same partition)
+cluster_data <- select(df_resprac_fac, -Profile)
+z <- as.matrix(standardize(cluster_data))  # The space cluster_analysis() clusters in
+nearest <- \(x, centers) apply(x, 1, \(r) which.min(colSums((t(centers) - r)^2)))
+
+set.seed(123)
+cluster_stability <- map_dfr(2:6, \(k) {
+  full <- predict(cluster_analysis(cluster_data, n = k, method = "hkmeans"))
+  ari <- replicate(100, {
+    boot <- factoextra::hkmeans(z[sample(nrow(z), replace = TRUE), ], k, hc.method = "complete", iter.max = 100)
+    mclust::adjustedRandIndex(full, nearest(z, boot$centers))
+  })
+  tibble(Clusters = k, `Median ARI` = median(ari), `2.5%` = quantile(ari, 0.025), `97.5%` = quantile(ari, 0.975))
+})
+knitr::kable(cluster_stability, format = "pipe", digits = 2,
+             caption = "Bootstrap stability of the hkmeans solutions (100 resamples each)")
+#
+#
+#
+#
+#
+#| cache: false
+
+data <- cbind(df, df_resprac_fac)
+
+# Fitted with MCMC on the cluster (model "Profile" in server/models.R): this chunk
+# writes its data; `./hpc push && ./hpc fit Profile`, then `./hpc pull`, in
+# analysis/server/ bring back the fit
+data_profile <- data |>
+  mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |>
+  filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 65) |>
+  select(Profile, Dem_Age, Dem_Gender)
+dir.create("models", showWarnings = FALSE)
+write.csv(data_profile, "models/data_Profile.csv", row.names = FALSE)
+
+m <- if (file.exists("models/Profile.rds")) readRDS("models/Profile.rds")
+if (!is.null(m)) attr(m$data, "data_name") <- NULL  # Else insight takes this notebook's `data` for the fit's
+as_compared <- \(d) mutate(as.data.frame(d)[names(data_profile)], across(!Dem_Age, as.character))
+if (!is.null(m) && !isTRUE(all.equal(as_compared(m$data), as_compared(data_profile), check.attributes = FALSE))) {
+  m <- NULL  # Fitted on other data
+}
+
+if (is.null(m)) {
+  knitr::asis_output("**Profile model pending**: not fitted on the current data.")
+} else {
+p_archetypes_pred1 <- estimate_relation(m, length = 40) |>
+  ggplot(aes(x = Dem_Age, y = Predicted)) +
+  geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill=Response,
+                  group = interaction(Dem_Gender, Response)), alpha = 0.1) +
+  geom_line(aes(color=Response, linetype = Dem_Gender), linewidth = 1) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_linetype_manual(values = c("longdash", "solid")) +
+  scale_colour_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set1") +
+  guides(linetype = guide_legend(override.aes = list(linewidth = 0.3))) +
+  labs(y = "Probability of Belonging to Each Profile", x = "Age",
+       fill = "Profile", color = "Profile", linetype = "Gender",
+       title = "Proportion of Profiles as a function of Gender and Age") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5)) +
+  facet_wrap(~Response)
+p_archetypes_pred1
+}
+#
+#
+#
+#| label: md_profiles_models
+#| echo: false
+#| cache: false
+
+if (!is.null(m)) {
+  make_markdown(list(
+    "MCMC diagnostics" = mcmc_info(m),
+    "Predicted probability (Median [95% CI])" =
+      estimate_relation(m, by = c("Dem_Age=c(25, 35, 45, 55, 65)", "Dem_Gender")) |>
+      predictions_wide("Dem_Age") |>
+      rename(Profile = Response)
+  ), "Profiles by gender and age")
+}
+#
+#
+#
+#
+#
+#
+#| message: false
+
+# `at`: values of the continuous predictor for the Markdown tables (summarize_model())
+run_models <- function(dat = data, f = "~ Dem_Gender * poly(Dem_Age, 2)", means="Dem_Gender",
+                       at = "Dem_Age=c(25, 35, 45, 55, 65)") {
+  models <- list()
+  pred <- data.frame()
+  mmeans <- data.frame()
+  tables <- list()
+  for(outcome in c("Open_Science", "Rigorous_Science", "Green_Science", "Slow_Science", "Ethical_Science")) {
+    m_f <- brms::bf(as.formula(paste0(outcome, f)))
+    dat_m <- drop_na(dat, all_of(all.vars(m_f$formula)))  # E.g., no career stage (brms would drop them with a warning)
+    
+    params <- get_prior(m_f, data = dat_m)$coef
+    params <- params[str_ends(params, "22")]
+    
+    priors <- brms::set_prior("normal(0, 1)", class = "b", coef = params) |>
+      brms::validate_prior(m_f, data = dat_m)
+    
+    m <- brms::brm(m_f,
+                   data = dat_m,
+                   refresh =  0,
+                   prior = priors,
+                   draws = 3000,
+                   single_path_draws  = 3000,
+                   backend = "cmdstanr",
+                   algorithm = "pathfinder",
+                   seed = 123)
+    models[[outcome]] <- m
+    
+    pred <- rbind(pred, mutate(estimate_relation(m, length = 40), Outcome = str_replace(outcome, "_", " ")))
+    mmeans <- rbind(mmeans, mutate(estimate_means(m, by=means), Outcome = str_replace(outcome, "_", " ")))
+    tables[[outcome]] <- summarize_model(m, group = means, at = at, outcome = str_replace(outcome, "_", " "))
+  }
+  pred <- mutate(pred, Outcome = factor(Outcome, levels = c("Open Science", "Rigorous Science", "Slow Science", "Green Science", "Ethical Science")))
+  mmeans <- mutate(mmeans, Outcome = factor(Outcome, levels = c("Open Science", "Rigorous Science", "Slow Science", "Green Science", "Ethical Science")))
+  list(pred=pred, mmeans=mmeans, tables=tables)
+}
+ 
+
+rez <- data |>
+  mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |>
+  filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 65) |> 
+  run_models(f = "~ Dem_Gender * poly(Dem_Age, 2)", means="Dem_Gender")
+
+
+
+p_resval_pred1 <- rez$pred |>
+  ggplot(aes(x = Dem_Age, y = Predicted)) +
+  geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill=Outcome,
+                  group = interaction(Dem_Gender, Outcome)), alpha = 0.1) +
+  geom_line(aes(color=Outcome, linetype = Dem_Gender), linewidth = 1) +
+  ggside::geom_xsidedensity(data = data |>
+    mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |>
+    filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 65), aes(linetype = Dem_Gender),
+    show.legend = FALSE) +
+  ggside::geom_ysidesegment(data=rez$mmeans, aes(x = Dem_Gender, xend = Dem_Gender, 
+                                                 y = CI_low, yend = CI_high, color = Outcome,
+                                                 linetype = Dem_Gender), linewidth = 0.5) +
+  ggside::geom_ysidepoint(data = rez$mmeans, 
+                            aes(x = Dem_Gender, y = Median, color = Outcome)) +
+  scale_linetype_manual(values = c("longdash", "solid")) +
+  scale_colour_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
+                      "Slow Science" = "#FF9800", "Ethical Science" = "#9C27B0"), guide = "none") +
+  scale_fill_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
+                      "Slow Science" = "#FF9800", "Ethical Science" = "#9C27B0"), guide = "none") +
+  guides(linetype = guide_legend(override.aes = list(linewidth = 0.3))) +
+  labs(y = "Research Value", x = "Age",
+       fill = "Profile", color = "Profile", linetype = "Gender",
+       title = "Age and Gender") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0)) +
+  ggside::theme_ggside_void() +
+  facet_wrap(~Outcome, ncol = 5) 
+p_resval_pred1
+#
+#
+#
+#| label: md_resval_age
+#| echo: false
+#| cache: false
+
+make_markdown(model_tables(rez$tables), "Research values by gender and age")
+#
+#
+#
+#
+#
+#
+rez <- data |>
+  run_models(f = "~ Work_Career_Stage * poly(WB_Carrer_worry, 2)", means="Work_Career_Stage",
+             at = "WB_Carrer_worry=c(0, 0.25, 0.5, 0.75, 1)")
+
+p_resval_pred2 <- rez$pred |>
+  ggplot(aes(x = WB_Carrer_worry, y = Predicted)) +
+  geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill=Outcome,
+                  group = interaction(Work_Career_Stage, Outcome)), alpha = 0.1) +
+  geom_line(aes(color=Outcome, linetype = Work_Career_Stage), linewidth = 1) +
+  ggside::geom_xsidedensity(data = filter(data, !is.na(Work_Career_Stage)), aes(linetype = Work_Career_Stage),
+    show.legend = FALSE) +
+  ggside::geom_ysidesegment(data=rez$mmeans, aes(x = Work_Career_Stage, xend = Work_Career_Stage, 
+                                                 y = CI_low, yend = CI_high, color = Outcome,
+                                                 linetype = Work_Career_Stage), linewidth = 0.5) +
+  ggside::geom_ysidepoint(data = rez$mmeans, 
+                            aes(x = Work_Career_Stage, y = Median, color = Outcome)) +
+  scale_linetype_manual(values = c("dotted", "longdash", "solid")) +
+  scale_colour_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
+                      "Slow Science" = "#FF9800", "Ethical Science" = "#9C27B0"), guide = "none") +
+  scale_fill_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
+                      "Slow Science" = "#FF9800", "Ethical Science" = "#9C27B0"), guide = "none") +
+  scale_x_continuous(labels = scales::percent_format()) +
+  guides(linetype = guide_legend(override.aes = list(linewidth = 0.3))) +
+  labs(y = "Research Value", x = "Career Worry",
+       fill = "Profile", color = "Profile", linetype = "Career Stage",
+       title = "Career Stage and Career Worry") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0)) +
+  ggside::theme_ggside_void() + 
+  facet_wrap(~Outcome, ncol = 5) 
+p_resval_pred2
+#
+#
+#
+#| label: md_resval_worry
+#| echo: false
+#| cache: false
+
+make_markdown(model_tables(rez$tables), "Research values by career stage and career worry")
+#
+#
+#
+#
+#
+rez <- data |>
+  run_models(f = "~ Work_Career_Stage * poly(WB_Time_research, 2)", means="Work_Career_Stage",
+             at = "WB_Time_research=c(0, 0.25, 0.5, 0.75, 1)")
+
+p_resval_pred3 <- rez$pred |>
+  ggplot(aes(x = WB_Time_research, y = Predicted)) +
+  geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill=Outcome,
+                  group = interaction(Work_Career_Stage, Outcome)), alpha = 0.1) +
+  geom_line(aes(color=Outcome, linetype = Work_Career_Stage), linewidth = 1) +
+  ggside::geom_xsidedensity(data = filter(data, !is.na(Work_Career_Stage)), aes(linetype = Work_Career_Stage),
+    show.legend = FALSE) +
+  ggside::geom_ysidesegment(data=rez$mmeans, aes(x = Work_Career_Stage, xend = Work_Career_Stage, 
+                                                 y = CI_low, yend = CI_high, color = Outcome,
+                                                 linetype = Work_Career_Stage), linewidth = 0.5) +
+  ggside::geom_ysidepoint(data = rez$mmeans, 
+                            aes(x = Work_Career_Stage, y = Median, color = Outcome)) +
+  scale_linetype_manual(values = c("dotted", "longdash", "solid")) +
+  scale_colour_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
+                      "Slow Science" = "#FF9800", "Ethical Science" = "#9C27B0"), guide = "none") +
+  scale_fill_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
+                      "Slow Science" = "#FF9800", "Ethical Science" = "#9C27B0"), guide = "none") +
+  scale_x_continuous(labels = scales::percent_format()) +
+  guides(linetype = guide_legend(override.aes = list(linewidth = 0.3))) +
+  labs(y = "Research Value", x = "Research Time",
+       fill = "Profile", color = "Profile", linetype = "Career Stage",
+       title = "Career Stage and Research Time") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 12, face = "bold", hjust = 0)) +
+  ggside::theme_ggside_void() + 
+  facet_wrap(~Outcome, ncol = 5) 
+p_resval_pred3
+#
+#
+#
+#| label: md_resval_time
+#| echo: false
+#| cache: false
+
+make_markdown(model_tables(rez$tables), "Research values by career stage and research time")
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#| fig-width: 9
+#| fig-height: 12
+#| warning: false
+
+(p_age + p_children) / 
+  (p_discipline + p_position) / 
+  patchwork::wrap_elements(p_country) +
+  plot_layout(heights = c(0.25, 0.3, 0.45)) +
+  plot_annotation(
+    title = paste0("Sample (N = ", nrow(df), ")"),
+    theme = theme(plot.title = element_text(size = 18, face = "bold.italic", hjust = 0.5))
+  )
+
+# (p_position | p_country) / (p_time | p_career) +
+#   plot_layout(heights = c(0.5, 0.5)) +
+#   plot_annotation(title = "Demographics", theme = theme(plot.title = element_text(size = 18, face = "bold.italic", hjust = 0)))
+#
+#
+#
+#
+#
+#| fig-width: 10.5
+#| fig-height: 13.5
+#| warning: false
+
+# Panels redrawn from the data of the plots above as horizontal bars, with one
+# style for the paper (Figure "landscape" of the manuscript)
+theme_panel <- theme_minimal(base_size = 10) +
+  theme(plot.title = element_text(face = "bold", size = 11),
+        plot.subtitle = element_text(color = "grey40", size = 9),
+        panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        plot.title.position = "plot")
+
+bar_panel <- function(data, x, y, fill, title, subtitle = NULL) {
+  ggplot(data, aes(x = {{ x }}, y = fct_reorder({{ y }}, {{ x }}))) +
+    geom_col(fill = fill, width = 0.75) +
+    geom_text(aes(label = scales::percent({{ x }}, accuracy = 1)), hjust = -0.15, size = 2.8, color = "grey25") +
+    scale_x_continuous(labels = scales::percent_format(), expand = expansion(mult = c(0, 0.12))) +
+    theme_panel +
+    labs(title = title, subtitle = subtitle, x = NULL, y = NULL)
+}
+
+p1 <- bar_panel(p_criteria$data, pct, Criterion, "#546E7A",
+                "Criteria of Scientific Quality", "Most important criteria to assess scientific work (3 choices)")
+
+p2 <- p_sliders + theme_panel +
+  theme(strip.placement = "outside", strip.text.y.left = element_text(angle = 0, face = "bold", hjust = 1)) +
+  labs(title = "Familiarity, Importance and Engagement", subtitle = "Histograms, mean and interquartile range")
+
+p3 <- p_os_adoption + theme_panel +
+  theme(legend.position = "bottom", panel.grid.major.x = element_blank(),
+        legend.key.size = unit(0.35, "cm")) +
+  guides(fill = guide_legend(nrow = 2)) +
+  labs(subtitle = "Knowledge and use of each practice")
+
+p4 <- p_os_help$data |>
+  mutate(name = str_replace_all(name, "\n", " "),
+         Type = fct_recode(Type, "Funding" = "Money")) |>
+  bar_panel(Total, name, domain_colors[["Open Science"]],
+            "Levers for Open Science", "What would you need to further adopt open science practices? (up to 5)") +
+  facet_grid(Type ~ ., scales = "free_y", space = "free_y", switch = "y") +
+  theme(strip.placement = "outside", strip.text.y.left = element_text(angle = 0, face = "bold", hjust = 1))
+
+p5 <- ss_def$data |>
+  mutate(name = str_replace_all(name, "\n", " ")) |>
+  bar_panel(Total, name, domain_colors[["Slow Science"]],
+            "Meaning of Slow Science", "Which of these best describes slow science for you? (up to 3)")
+
+p6 <- ss_feas$data |>
+  mutate(Practice = fct_rev(fct_relabel(Practice, \(x) str_replace_all(x, "\n", " "))),
+         Level = fct_recode(Level, "Individual level" = "Individual", "Institutional level" = "Institution",
+                            "Not feasible" = "Not Feasible")) |>
+  ggplot(aes(x = Proportion, y = Practice, fill = Level)) +
+  geom_col(position = position_dodge2(reverse = TRUE, padding = 0.1), width = 0.8) +
+  scale_x_continuous(labels = scales::percent_format(), expand = expansion(mult = c(0, 0.05))) +
+  scale_fill_manual(values = c("Individual level" = "#FFB74D", "Institutional level" = "#E65100",
+                               "Not feasible" = "#9E9E9E")) +
+  theme_panel +
+  theme(legend.position = "bottom", legend.key.size = unit(0.35, "cm")) +
+  labs(title = "Feasibility of Slow Science Measures", subtitle = "At which level is each measure feasible? (several choices)",
+       x = NULL, y = NULL, fill = NULL)
+
+fig_landscape <- (p1 | p2) / (p3 | p4) / (p5 | p6) +
+  plot_layout(heights = c(11, 14, 12)) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(face = "bold", size = 14))
+dir.create("../paper/figures", showWarnings = FALSE)
+ggsave("../paper/figures/fig_landscape.png", fig_landscape, width = 10.5, height = 13.5, dpi = 300, bg = "white")
+fig_landscape
+#
+#
+#
+#
+#
+#
+#
+#| fig-width: 10.5
+#| fig-height: 12.5
+#| warning: false
+
+# Figure "facets" of the manuscript: EFA loadings next to the item correlations
+# (same item order), facet correlations (CFA) and structure of quality criteria
+movement_colors <- c("Open Science" = "#2196F3", "Slow Science" = "#FF9800",
+                     "Green Science" = "#4CAF50", "Ethical Science" = "#9C27B0")
+facet_colors <- c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Slow Science" = "#FF9800",
+                  "Green Science" = "#4CAF50", "Ethical Science" = "#9C27B0")
+item_labels <- c(
+  "Open Science - Importance"               = "Importance of open science",
+  "Endorsement - Open Data"                 = "Open data",
+  "Endorsement - Open Materials"            = "Open materials",
+  "Endorsement - Open Access"               = "Open access",
+  "Endorsement - Preregistration"           = "Preregistration",
+  "Endorsement - Registered Reports"        = "Registered reports",
+  "Endorsement - Replication Studies"       = "Replication studies",
+  "Endorsement - Participatory Research"    = "Participatory research",
+  "Endorsement - Open Peer Review"          = "Open peer review",
+  "Slow Science - Familiarity"              = "Familiarity with slow science",
+  "Slow Science - Importance"               = "Importance of slow science",
+  "Green Science - Ecofriendly Practices"   = "Importance in conducting research",
+  "Green Science - Ecofriendly Topics"      = "Importance in choosing topics",
+  "Green Science - Changed Practices"       = "Changed research practices",
+  "Green Science - Changed Communication"   = "Changed communication (e.g., travel)",
+  "Green Science - Change Willingness"      = "Willing to change practices",
+  "Green Science - Belief Relation"         = "Link between research and environment",
+  "Ethical Science - Team Diversity"        = "Importance of team diversity",
+  "Ethical Science - Societal Consequences" = "Care for societal consequences"
+)
+stopifnot(setequal(names(item_labels), names(df_resprac)))
+diverging <- scale_fill_gradient2(low = "#D6604D", mid = "white", high = "#4D4D4D", limits = c(-1, 1), na.value = "white",
+                                  name = "Loading / r", breaks = c(-1, -0.5, 0, 0.5, 1))
+theme_heat <- theme_minimal(base_size = 10) +
+  theme(panel.grid = element_blank(), plot.title = element_text(face = "bold", size = 11),
+        plot.subtitle = element_text(color = "grey40", size = 9), plot.title.position = "plot")
+
+# Items ordered by the facet they load most on, then by loading
+facet_names <- setNames(str_replace_all(names(efa_ids), "\n", " "), efa_ids)
+efa_long <- as.data.frame(f) |>
+  select(Variable, all_of(unname(efa_ids))) |>
+  pivot_longer(-Variable, names_to = "Factor", values_to = "Loading") |>
+  mutate(Facet = factor(facet_names[Factor], levels = names(facet_colors)))
+efa_main <- slice_max(efa_long, abs(Loading), by = Variable, with_ties = FALSE) |>
+  arrange(Facet, desc(abs(Loading)))
+item_order <- efa_main$Variable
+item_levels <- rev(unname(item_labels[item_order]))  # First item on top
+efa_long <- mutate(efa_long, Item = factor(item_labels[Variable], levels = item_levels))
+
+p_strip <- tibble(Variable = item_order) |>
+  mutate(Item = factor(item_labels[Variable], levels = item_levels),
+         Movement = case_when(str_starts(Variable, "Open Science|Endorsement") ~ "Open Science",
+                              str_starts(Variable, "Slow") ~ "Slow Science",
+                              str_starts(Variable, "Green") ~ "Green Science",
+                              .default = "Ethical Science"),
+         Movement = factor(Movement, levels = names(movement_colors))) |>
+  ggplot(aes(x = 1, y = Item, fill = Movement)) +
+  geom_tile(width = 0.9, height = 0.9) +
+  scale_fill_manual(values = movement_colors, name = "Movement") +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_heat +
+  theme(axis.text.x = element_blank()) +
+  labs(x = NULL, y = NULL, tag = "A", title = "Facets (Exploratory Factor Analysis)",
+       subtitle = "Loadings of each item, by the movement it was asked under")
+
+p_loadings <- efa_long |>
+  ggplot(aes(x = Facet, y = Item)) +
+  geom_tile(aes(fill = Loading), color = "white", linewidth = 0.5) +
+  geom_text(aes(label = str_replace(sprintf("%.2f", Loading), "^(-?)0", "\\1"),
+                color = ifelse(abs(Loading) >= 0.5, "white", "grey20"), fontface = ifelse(abs(Loading) >= 0.3, "bold", "plain")),
+            size = 2.6, show.legend = FALSE) +
+  geom_point(data = tibble(Facet = factor(names(facet_colors), levels = names(facet_colors))),
+             aes(x = Facet, y = length(item_levels) + 0.85, color = facet_colors[as.character(Facet)]), inherit.aes = FALSE,
+             shape = 15, size = 3.5, show.legend = FALSE) +
+  diverging +
+  scale_color_identity() +
+  scale_x_discrete(position = "top", labels = \(x) str_remove(x, " Science")) +
+  coord_cartesian(clip = "off") +
+  theme_heat +
+  theme(axis.text.y = element_blank(), axis.text.x.top = element_text(size = 8, angle = 45, hjust = 0, vjust = 0, margin = margin(b = 10))) +
+  labs(x = NULL, y = NULL)
+
+# Item correlations, in the same order, with the items of each facet framed
+cor_long <- as.data.frame(as.table(cor(df_resprac, use = "pairwise.complete.obs"))) |>
+  transmute(Row = factor(item_labels[as.character(Var1)], levels = item_levels),
+            Col = factor(item_labels[as.character(Var2)], levels = rev(item_levels)),
+            r = ifelse(Var1 == Var2, NA, Freq))
+n_items <- length(item_order)
+facet_blocks <- efa_main |>
+  mutate(k = row_number()) |>
+  summarise(xmin = min(k) - 0.5, xmax = max(k) + 0.5, .by = Facet) |>
+  mutate(ymin = n_items - xmax + 1, ymax = n_items - xmin + 1)
+p_cor_items <- cor_long |>
+  ggplot(aes(x = Col, y = Row)) +
+  geom_tile(aes(fill = r), color = "white", linewidth = 0.3) +
+  geom_text(aes(label = ifelse(!is.na(r) & abs(r) >= 0.3, str_replace(sprintf("%.2f", r), "^(-?)0", "\\1"), ""),
+                color = ifelse(!is.na(r) & abs(r) >= 0.5, "white", "grey20")), size = 2.2, show.legend = FALSE) +
+  geom_rect(data = facet_blocks, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, color = facet_colors[as.character(Facet)]),
+            inherit.aes = FALSE, fill = NA, linewidth = 1, show.legend = FALSE) +
+  diverging +
+  scale_color_identity() +
+  theme_heat +
+  theme(axis.text = element_blank()) +
+  labs(x = NULL, y = NULL, tag = "B", title = "Item Correlations",
+       subtitle = "Items in the same order as in A; |r| ≥ .30 labelled; facets framed")
+
+# Facet correlations (CFA), significant ones only
+facet_pos <- tibble(Facet = c("Slow Science", "Green Science", "Ethical Science", "Rigorous Science", "Open Science"),
+                    angle = (90 - 72 * 0:4) * pi / 180) |>
+  mutate(x = cos(angle), y = sin(angle), Latent = str_replace(Facet, " ", "_"))
+cfa_cor <- lavaan::parameterEstimates(fit_cfa) |>
+  filter(op == "~~", lhs != rhs) |>
+  left_join(select(facet_pos, lhs = Latent, x, y), by = "lhs") |>
+  left_join(select(facet_pos, rhs = Latent, xend = x, yend = y), by = "rhs")
+p_cor_facets <- cfa_cor |>
+  filter(ci.lower > 0 | ci.upper < 0) |>
+  ggplot() +
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend, linewidth = abs(est)), color = "grey55", alpha = 0.8) +
+  geom_label(aes(x = (x + xend) / 2, y = (y + yend) / 2, label = str_replace(sprintf("%.2f", est), "^(-?)0", "\\1")),
+             size = 3, fill = "white", label.size = 0, label.padding = unit(0.15, "lines"), color = "grey20") +
+  geom_point(data = facet_pos, aes(x = x, y = y, color = Facet), size = 23) +
+  geom_text(data = facet_pos, aes(x = x, y = y, label = str_replace(Facet, " ", "\n")),
+            color = "white", fontface = "bold", size = 3, lineheight = 0.9) +
+  scale_color_manual(values = facet_colors, guide = "none") +
+  scale_linewidth_continuous(range = c(0.5, 4), guide = "none") +
+  coord_equal(xlim = c(-1.25, 1.25), ylim = c(-1.1, 1.25)) +
+  theme_void(base_size = 10) +
+  theme(plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(color = "grey40", size = 9),
+        plot.title.position = "plot") +
+  labs(tag = "C", title = "Correlations between Facets",
+       subtitle = "Latent correlations (CFA) whose 95% CI excludes 0")
+
+# Quality criteria: loadings on the two principal components
+pca_var <- as.data.frame(summary(pca_criteria)) |> filter(Parameter == "Variance") |> select(-Parameter) |> unlist()
+p_pca_criteria <- as.data.frame(pca_criteria) |>
+  select(Variable, PC1, PC2) |>
+  left_join(p_criteria$data, by = c("Variable" = "Criterion")) |>
+  # Labels beside their point, on the side with room (neighbours on the other)
+  mutate(side = case_when(Variable %in% c("Originality / Innovation", "High Impact Factor Journal", "Replication") ~ "left",
+                          Variable == "Significance / Impact" ~ "below",
+                          .default = "right"),
+         offset = 0.04 + 0.08 * sqrt(pct),
+         label_x = PC1 + case_when(side == "left" ~ -offset, side == "right" ~ offset, .default = 0),
+         label_y = PC2 - ifelse(side == "below", offset, 0),
+         hjust = case_when(side == "left" ~ 1, side == "right" ~ 0, .default = 0.5)) |>
+  ggplot(aes(x = PC1, y = PC2)) +
+  geom_hline(yintercept = 0, color = "grey80") +
+  geom_vline(xintercept = 0, color = "grey80") +
+  geom_point(aes(size = pct), color = "#546E7A", alpha = 0.8) +
+  geom_text(aes(x = label_x, y = label_y, label = Variable, hjust = hjust), size = 2.9, color = "grey20") +
+  scale_size_area(max_size = 9, guide = "none") +
+  scale_x_continuous(limits = c(-0.8, 0.9), breaks = c(-0.5, 0, 0.5)) +
+  scale_y_continuous(limits = c(-0.7, 0.7)) +
+  theme_minimal(base_size = 10) +
+  theme(panel.grid.minor = element_blank(), plot.title = element_text(face = "bold", size = 11),
+        plot.subtitle = element_text(color = "grey40", size = 9), plot.title.position = "plot",
+        axis.title = element_text(size = 8.5)) +
+  labs(tag = "D", title = "Structure of Quality Criteria",
+       subtitle = "Loadings on the principal components (point size: % selecting)",
+       x = sprintf("PC1 (%.0f%%): rigour and transparency (−) vs. novelty and impact (+)", 100 * pca_var[1]),
+       y = sprintf("PC2 (%.0f%%): transparency and inclusivity (−) vs. rigour and innovation (+)", 100 * pca_var[2]))
+
+fig_facets <- ((p_strip | p_loadings | p_cor_items) + plot_layout(widths = c(0.35, 5, 19))) /
+  ((p_cor_facets | p_pca_criteria) + plot_layout(widths = c(1, 1.25))) +
+  plot_layout(heights = c(1.55, 1), guides = "collect") &
+  theme(legend.position = "bottom", plot.tag = element_text(face = "bold", size = 14))
+ggsave("../paper/figures/fig_facets.png", fig_facets, width = 10.5, height = 12.5, dpi = 300, bg = "white")
+fig_facets
+#
+#
+#
+#| label: export_facets
+#| cache: false
+
+# Numbers the manuscript reports on the facets (read by ../paper/manuscript.qmd)
+cfa_params <- lavaan::parameterEstimates(fit_cfa, standardized = TRUE)
+dir.create("../paper/results", showWarnings = FALSE)
+saveRDS(list(
+  n_factors = as.data.frame(summary(rez_resprac)),
+  efa_loadings = efa_long |> select(Variable, Facet, Loading),
+  efa_variance = as_tibble(as.data.frame(summary(f))) |> rename_with(\(n) coalesce(facet_names[n], n)),
+  efa_cor = attributes(f)$model$Phi |> (\(m) `dimnames<-`(m, list(facet_names[rownames(m)], facet_names[colnames(m)])))(),
+  cfa_fit = as.data.frame(performance::model_performance(fit_cfa)),
+  cfa_loadings = filter(cfa_params, op == "=~") |> select(Facet = lhs, Item = rhs, est = std.all, ci.lower, ci.upper),
+  cfa_cor = filter(cfa_params, op == "~~", lhs != rhs, lhs %in% facet_pos$Latent) |>
+    select(Facet1 = lhs, Facet2 = rhs, r = est, ci.lower, ci.upper),
+  item_cor = cor(df_resprac, use = "pairwise.complete.obs"),
+  cfa_comparison = cfa_comparison,
+  criteria_cor = as_tibble(cor_pairs(df_quality_num)),
+  criteria_n_components = as.data.frame(summary(rez_criteria)),
+  criteria_pca = as_tibble(as.data.frame(pca_criteria)) |> select(Variable, PC1, PC2),
+  criteria_pca_variance = pca_var
+), "../paper/results/facets.rds")
+#
+#
+#
+#| label: md_facets
+#| echo: false
+#| cache: false
+
+facets <- readRDS("../paper/results/facets.rds")
+make_markdown(list(
+  "CFA fit" = facets$cfa_fit |> select(any_of(c("Chi2", "Chi2_df", "CFI", "NNFI", "RMSEA", "RMSEA_CI_low", "RMSEA_CI_high", "SRMR"))),
+  "CFA standardized loadings" = facets$cfa_loadings,
+  "CFA latent correlations" = facets$cfa_cor
+), "Facets: confirmatory factor analysis")
+#
+#
+#
+#
+#
+#| fig-width: 13
+#| fig-height: 16
+#| warning: false
+
+(wrap_elements(p_cor + 
+                scale_x_discrete(expand = expansion(mult = c(0, 0.2))) +
+                theme(panel.grid.major = element_blank())) | wrap_elements(p_resprac)) / 
+  wrap_elements(p_cfa) /
+  wrap_elements(p_radar) +
+  plot_layout(heights = c(0.45, 0.3, 0.25)) +
+  plot_annotation(title = "Researcher Profiles", theme = theme(plot.title = element_text(size = 18, face = "bold.italic", hjust = 0.5)))
+#
+#
+#
+#
+#
+#
+#| fig-width: 10
+#| fig-height: 10
+#| warning: false
+
+p_resval_pred1 /
+  p_resval_pred2 / 
+  p_resval_pred3 +
+  # plot_layout(guides = "collect") +
+  plot_annotation(title = "Research Values", theme = theme(plot.title = element_text(size = 18, face = "bold.italic", hjust = 0.5)))
+#
+#
+#
+#

@@ -35,4 +35,5 @@ Commands: [README.md](README.md). Variable prefix `OSA_`; cluster dir
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-09-30 | Profile | 11417708 | general / rtx-01 | 2.6 min (job 2:49, MaxRSS 1.4 GB) | 0 | 1.005 | N681 data, hand-named clusters; warmup 1000 + 1000 draws x 4 chains x 2 threads, seed 123; min ESS 1,066; 3.2 MB fit |
 | 2026-09-30 | Profile | 11417711 | general | 2.5 min (job 2:43, MaxRSS 0.7 GB) | 0 | 1.005 | N682 data, superseded: the clusters reshuffled, so the hand-given names were wrong |
-| 2026-09-30 | Profile | 11417721 | general | 2.3 min (job 2:30) | 0 | 1.003 | N682 data, profiles labelled by pattern ("Profile A +Open ..."); min ESS 1,259. Current fit |
+| 2026-09-30 | Profile | 11417721 | general | 2.3 min (job 2:30) | 0 | 1.003 | N682 data, profiles labelled by pattern ("Profile A +Open ..."); min ESS 1,259. Superseded |
+| 2026-09-30 | Profile | 11417882 | general | ~3 min | 1 | 1.005 | Open science practices rescored as engagement ("not familiar" = 0, below "no plan"): new CFA scores and clusters; min ESS 1,085. Current fit |

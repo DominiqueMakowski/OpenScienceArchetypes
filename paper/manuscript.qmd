@@ -140,6 +140,35 @@ pct_use <- function(x, answer) pct(x == use_answers[[answer]])
 m_sd <- function(x) paste0("*M* = ", fmt(mean(x, na.rm = TRUE)), ", *SD* = ", fmt(sd(x, na.rm = TRUE)))
 crit <- function(x) yes(df[[paste0("Work_Criteria_quality_science_", x)]])
 ss_def_none <- rowSums(select(df, starts_with("SS_Definition_"), -SS_Definition_Other) == "Yes") == 0
+
+# Results, facets: computed by ../analysis/analysis.qmd (chunk export_facets)
+facets <- readRDS("results/facets.rds")
+fmt_r <- function(x, digits = 2) sub("^(-?)0\\.", "\\1.", sprintf(paste0("%.", digits, "f"), x))  # No leading zero (APA)
+# EFA loading of an item (as named in the analysis) on a facet
+efa_l <- function(item, facet) {
+  fmt_r(with(facets$efa_loadings, Loading[Variable == item & Facet == facet]))
+}
+efa_r <- function(a, b) fmt_r(facets$efa_cor[a, b])
+cfa_row <- function(a, b) {
+  a <- str_replace(a, " ", "_"); b <- str_replace(b, " ", "_")
+  filter(facets$cfa_cor, (Facet1 == a & Facet2 == b) | (Facet1 == b & Facet2 == a))
+}
+cfa_r <- function(a, b) with(cfa_row(a, b), paste0(fmt_r(r), " [", fmt_r(ci.lower), ", ", fmt_r(ci.upper), "]"))
+cfa_fit <- function(index, digits = 2) fmt_r(facets$cfa_fit[[index]], digits)
+crit_r <- function(a, b) {
+  fmt_r(with(facets$criteria_cor, r[(Variable1 == a & Variable2 == b) | (Variable1 == b & Variable2 == a)]))
+}
+crit_l <- function(criterion, pc) fmt_r(with(facets$criteria_pca, get(pc)[Variable == criterion]))
+nf <- facets$n_factors
+cfa_alt <- function(model, index, digits = 3) fmt_r(facets$cfa_comparison[[index]][facets$cfa_comparison$Model == model], digits)
+aic_gain <- function(model) with(facets$cfa_comparison, round(aic[Model == "Movement-based (used)"] - aic[Model == model]))
+
+# General open science familiarity and training by answer to the practice items, pooled over practices
+os_answers <- df |>
+  select(OS_Familiar, OS_Workshops, OS_Study_Preregistration:OS_Participatory_Research) |>
+  pivot_longer(-c(OS_Familiar, OS_Workshops), values_to = "Answer") |>
+  summarise(Familiar = mean(OS_Familiar), Trained = 100 * mean(OS_Workshops == "Yes"), .by = Answer)
+os_by <- function(answer, var) fmt(os_answers[[var]][os_answers$Answer == use_answers[[answer]]])
 ```
 
 # Introduction
@@ -212,7 +241,11 @@ A total of `r n` participants completed the survey. Participants had a mean age 
 
 ## Data analysis
 
-The analysis followed three axes. First, we described how participants answered each item, to draw the landscape of research practices: for multiple-choice questions, we report the percentage of all participants selecting each option, and for sliders, the mean (*M*) and standard deviation (*SD*) on their 0--100 scale. Second, we examined the structure of these practices, i.e., how they relate to one another, to identify the facets of reform-oriented science. Third, we identified researcher profiles based on these facets, and modelled the determinants of the facets and of the profiles. TODO: describe the methods of the second and third axes (correlations, EFA, CFA, clustering, Bayesian models).
+The analysis followed three axes. First, we described how participants answered each item, to draw the landscape of research practices: for multiple-choice questions, we report the percentage of all participants selecting each option, and for sliders, the mean (*M*) and standard deviation (*SD*) on their 0--100 scale. Second, we examined the structure of these practices, i.e., how they relate to one another, to identify the facets of reform-oriented science. Third, we identified researcher profiles based on these facets, and modelled the determinants of the facets and of the profiles.
+
+For the second axis, we analysed the 19 rating items of the four movements: the importance of open science and the knowledge and use of eight open science practices, the familiarity with and importance of slow science, the six items on environmental sustainability, and the two items on ethical and inclusive science. The knowledge and use of each open science practice was scored as a level of engagement, from 0 to 1 ("I am not familiar with it": 0; "I haven't used it yet, and I don't plan to do it in the future": 1/3; "I haven't used it yet, but I plan to do it in the future": 2/3; "I know it and I used it": 1), and sliders were rescaled to 0--1. This scoring places the unfamiliarity with a practice below its deliberate non-use, which the data supported: across practices, participants who were not familiar with a practice were less familiar with open science in general (*M* = `r os_by("unfamiliar", "Familiar")`) than those who knew it but did not plan to use it (*M* = `r os_by("no", "Familiar")`), and less often trained in open science (`r os_by("unfamiliar", "Trained")`% vs. `r os_by("no", "Trained")`%). **[TO CONFIRM: the facet structure was robust to alternative scorings (unfamiliarity above non-use, both at 0, or unfamiliarity as missing); to report in the supplementary materials]** The number of factors was chosen by the agreement between `r sum(nf$n_Methods)` methods [@ludecke2020parameters], and the structure explored with an exploratory factor analysis (EFA; minimum residual, oblimin rotation) [@revelle2026psych]. We then fitted a confirmatory factor analysis (CFA; maximum likelihood, standardised latent variables) [@rosseel2012lavaan] with five correlated factors, which provided the facet scores used in the third axis. Finally, we examined the structure of the criteria of scientific quality with the correlations (phi coefficients) between the nine binary criteria and a principal component analysis (PCA).
+
+TODO: describe the methods of the third axis (clustering, Bayesian models).
 
 # Results
 
@@ -248,7 +281,27 @@ TODO: compare France with the other countries (objective ii of the preregistrati
 
 ## The Facets of Reform-Oriented Science
 
-TODO. Correlations between items; EFA and CFA (five facets from four movements: Open, Rigorous, Slow, Green and Ethical Science, open science splitting into open outputs and procedural rigour); structure of the quality criteria (novelty and impact vs. rigour and transparency).
+![The Facets of Reform-Oriented Science](figures/fig_facets.png){#fig-facets apa-twocolumn="true" apa-note="**A**: Loadings of the 19 rating items on the five factors of the exploratory factor analysis (oblimin rotation), with the movement under which each item was asked (left strip). Items are ordered by the facet on which they load most, and loadings of at least .30 are in bold. **B**: Correlations between the same items, in the same order, with the items loading most on each facet framed; correlations of at least .30 in absolute value are labelled. **C**: Correlations between the facets estimated by the confirmatory factor analysis, shown when their 95% confidence interval excludes 0. **D**: Loadings of the nine criteria of scientific quality on the first two components of a principal component analysis; point size is proportional to the percentage of participants selecting the criterion."}
+
+### Four movements, five facets
+
+The agreement between methods favoured five factors (supported by `r nf$n_Methods[nf$n_Factors == 5]` of the `r sum(nf$n_Methods)` methods, the largest number), which together explained `r fmt(100 * facets$efa_variance[["Ethical Science"]][facets$efa_variance$Parameter == "Variance_Cumulative"], 0)`% of the variance of the items. These five facets did not map one-to-one onto the four movements (@fig-facets A). In what follows, facet names are capitalised (e.g., Open Science) to distinguish them from the movements (e.g., open science).
+
+First, the open science movement split into two facets. The first, *Open Science*, gathered practices of sharing research outputs: open data (`r efa_l("Endorsement - Open Data", "Open Science")`), open materials (`r efa_l("Endorsement - Open Materials", "Open Science")`) and open access (`r efa_l("Endorsement - Open Access", "Open Science")`), together with the importance attributed to the movement (`r efa_l("Open Science - Importance", "Open Science")`). The second, *Rigorous Science*, gathered practices that reform how research is designed and evaluated: registered reports (`r efa_l("Endorsement - Registered Reports", "Rigorous Science")`), preregistration (`r efa_l("Endorsement - Preregistration", "Rigorous Science")`) and, more weakly, participatory research (`r efa_l("Endorsement - Participatory Research", "Rigorous Science")`) and replication studies (`r efa_l("Endorsement - Replication Studies", "Rigorous Science")`). Open peer review loaded weakly on all factors (at most `r fmt_r(max(abs(filter(facets$efa_loadings, Variable == "Endorsement - Open Peer Review")$Loading)))`). The two open science facets were only moderately correlated (*r* = `r efa_r("Open Science", "Rigorous Science")`): sharing one's outputs and changing one's procedures are thus distinct commitments, in line with their very different rates of adoption (@fig-landscape C).
+
+Second, the slow science movement formed a single facet, *Slow Science*, defined by the familiarity with the movement (`r efa_l("Slow Science - Familiarity", "Slow Science")`) and its perceived importance (`r efa_l("Slow Science - Importance", "Slow Science")`).
+
+Third, the environmental and ethical movements were partly merged. The *Green Science* facet gathered the importance of sustainability in how research is conducted (`r efa_l("Green Science - Ecofriendly Practices", "Green Science")`) and in the choice of topics (`r efa_l("Green Science - Ecofriendly Topics", "Green Science")`), and the changes made to research (`r efa_l("Green Science - Changed Practices", "Green Science")`) and communication practices (`r efa_l("Green Science - Changed Communication", "Green Science")`). The *Ethical Science* facet gathered the importance of team diversity (`r efa_l("Ethical Science - Team Diversity", "Ethical Science")`) and the care for the societal consequences of research (`r efa_l("Ethical Science - Societal Consequences", "Ethical Science")`), and two of the environmental items loaded on both facets: the perceived link between research and environmental sustainability (Ethical Science: `r efa_l("Green Science - Belief Relation", "Ethical Science")`; Green Science: `r efa_l("Green Science - Belief Relation", "Green Science")`) and the willingness to change one's practices for environmental reasons (Ethical Science: `r efa_l("Green Science - Change Willingness", "Ethical Science")`; Green Science: `r efa_l("Green Science - Change Willingness", "Green Science")`). Ethical Science thus extends to a broader sense of responsibility for the consequences of research, including environmental ones, whereas Green Science is anchored in sustainability as it is put into practice. Accordingly, these two facets were the most correlated (*r* = `r efa_r("Green Science", "Ethical Science")`).
+
+The five-factor structure was then tested with a CFA in which the items were assigned to the facets following the movements under which they were asked, except for the split of open science: all six environmental items were assigned to Green Science and open peer review to Rigorous Science. This model fitted the data moderately well (CFI = `r cfa_fit("CFI")`, TLI = `r cfa_fit("NNFI")`, RMSEA = `r cfa_fit("RMSEA", 3)` [`r cfa_fit("RMSEA_CI_low", 3)`, `r cfa_fit("RMSEA_CI_high", 3)`], SRMR = `r cfa_fit("SRMR", 3)`) **[TO CONFIRM: a CFA assigning the link between research and sustainability and the willingness to change to Ethical Science fits better (CFI = `r cfa_alt("Green beliefs on Ethical", "cfi")`, RMSEA = `r cfa_alt("Green beliefs on Ethical", "rmsea")`, AIC `r aic_gain("Green beliefs on Ethical")` points lower), and one letting these two items load on both facets, as in the EFA, better still (CFI = `r cfa_alt("Cross-loadings", "cfi")`, AIC `r aic_gain("Cross-loadings")` points lower); the facet scores used in the third axis come from the movement-based model]**.
+
+### Epistemic and societal sides, bridged by slow science
+
+The correlations between the facets (@fig-facets C) revealed two pairs. On one side, the two open science facets were correlated (*r* = `r cfa_r("Open Science", "Rigorous Science")`), forming an epistemic side concerned with how research is conducted and shared. On the other side, Green Science and Ethical Science were strongly correlated (*r* = `r cfa_r("Green Science", "Ethical Science")`), forming a societal side concerned with the consequences of research. The two sides were nearly independent: Green Science was barely related to Open Science (*r* = `r cfa_r("Open Science", "Green Science")`) and to Rigorous Science (*r* = `r cfa_r("Rigorous Science", "Green Science")`), and the correlations of Ethical Science with Open Science (*r* = `r cfa_r("Open Science", "Ethical Science")`) and Rigorous Science (*r* = `r cfa_r("Rigorous Science", "Ethical Science")`) were weak. Slow Science stood between them, being related to Open Science (*r* = `r cfa_r("Open Science", "Slow Science")`) as well as to Green Science (*r* = `r cfa_r("Green Science", "Slow Science")`) and Ethical Science (*r* = `r cfa_r("Slow Science", "Ethical Science")`). Endorsing the reform of research practices is thus largely independent of endorsing their environmental and ethical responsibility, and these two orientations meet only in the value placed on slowing down research.
+
+### The structure of quality criteria
+
+A related tension appeared in the criteria of scientific quality (@fig-facets D). As participants selected three criteria each (`r pct(rowSums(select(df, starts_with("Work_Criteria_quality_science_")) == "Yes") == 3)`% selected exactly three), choosing one criterion made choosing another less likely, and the criteria were mostly negatively correlated. The strongest oppositions were between originality and transparency (*r* = `r crit_r("Originality / Innovation", "Transparency / Open Science")`), between significance and appropriate statistics (*r* = `r crit_r("Significance / Impact", "Appropriate Statistics")`), and between significance and transparency (*r* = `r crit_r("Significance / Impact", "Transparency / Open Science")`). The first principal component (`r fmt(100 * facets$criteria_pca_variance[["PC1"]], 0)`% of the variance) opposed novelty and impact (originality: `r crit_l("Originality / Innovation", "PC1")`; significance: `r crit_l("Significance / Impact", "PC1")`; high impact factor journals: `r crit_l("High Impact Factor Journal", "PC1")`) to rigour and transparency (transparency: `r crit_l("Transparency / Open Science", "PC1")`; appropriate statistics: `r crit_l("Appropriate Statistics", "PC1")`; rigorous methodology: `r crit_l("Rigorous Methodology", "PC1")`). The second (`r fmt(100 * facets$criteria_pca_variance[["PC2"]], 0)`%) opposed the classical criteria of good research, rigour (`r crit_l("Rigorous Methodology", "PC2")`) and innovation (`r crit_l("Originality / Innovation", "PC2")`), to those carried by the reform movements: transparency (`r crit_l("Transparency / Open Science", "PC2")`), inclusivity (`r crit_l("Inclusivity / Diversity", "PC2")`), environmental impact (`r crit_l("Environmental Impact", "PC2")`) and replication (`r crit_l("Replication", "PC2")`) **[TO CONFIRM: the methods did not agree on the number of components (one and eight components were each supported by `r facets$criteria_n_components$n_Methods[facets$criteria_n_components$n_Factors == 1]` methods); two were retained for interpretation]**. Part of these oppositions is built into the forced choice of three criteria, but they indicate that, when quality must be defined in a few words, the values of the reform movements compete with the novelty and impact that traditionally define it.
 
 ## Researcher Profiles and their Determinants
 
@@ -257,6 +310,10 @@ TODO. Effects of gender and age, career stage, career worry and research time on
 # Discussion
 
 TODO.
+
+## Limitations
+
+TODO. The Slow Science facet rests on two items only, the familiarity with the movement and its perceived importance, which were strongly correlated (*r* = `r fmt_r(facets$item_cor["Slow Science - Familiarity", "Slow Science - Importance"])`). As `r pct(df$SS_Familiar == 0)`% of participants were not at all familiar with slow science, and these participants rated its importance close to zero, this facet reflects the knowledge of the movement as much as the endorsement of its values. Its relationships with the other facets, and with career stage, may thus partly reflect a greater exposure to debates about research practices rather than a specific commitment to slowing down research.
 
 # References
 

@@ -15,7 +15,7 @@ execute:
 
 ## Headline Findings
 
-<!-- Written from the N = 682 data (MapResPrac-130726-N682.csv, 2026-09-30): update when the data change. -->
+<!-- Written from the N = 682 data (MapResPrac-130726-N682.csv, 2026-09-30), open science practices scored as engagement ("not familiar" lowest): update when the data or scoring change. -->
 
 Researchers (N = 682; 57% women; 72% working in France; 44% on permanent contracts). Model estimates are posterior medians [95% CI], in factor-score units.
 
@@ -23,9 +23,9 @@ Researchers (N = 682; 57% women; 72% working in France; 44% on permanent contrac
 - **Novelty and rigour are traded off, and the balance shifts with age.** Choices oppose novelty and impact to rigour and transparency (e.g., originality vs. transparency, r = -.40). The novelty end gains ground with age (women: -0.67 [-0.88, -0.47] at 25, +0.49 [0.26, 0.73] at 55) and is stronger in men (+0.40 [0.17, 0.68] at the mean age). Part of this opposition is built into the forced choice of three criteria.
 - **Barriers to open science are seen as structural.** Career recognition (51%), institutional incentives (44%), dedicated funding (42%) and time (40%) come well ahead of information (21%) or training (28%); 4% say nothing would help.
 - **Slow science means quality over quantity, and is a job for institutions.** 81% define it as quality over quantity. Its measures are assigned to institutions far more than to individuals (assessing quality rather than quantity: 87% vs. 45%), and hard caps (one article, or one grant, per year) are judged not feasible by 28%.
-- **Research values are multidimensional.** Five weakly to moderately correlated factors (largest: green-ethical, .46) separate green, slow and ethical science, and split open science into open outputs (Open Science: open data, materials, access) and procedural reforms (Rigorous Science: preregistration, registered reports, replication, participatory research). The five-factor CFA fits only moderately (CFI = .88, RMSEA = .062, SRMR = .056).
-- **Gender and career stage split these dimensions differently.** At the mean age, men score lower than women on Ethical (-0.47 [-0.60, -0.34]), Green (-0.27 [-0.42, -0.11]) and Rigorous Science (-0.15 [-0.30, -0.01]), but not on Open or Slow Science, and the green and ethical gaps widen with age. Rigorous Science declines with age and is lowest among permanent staff (-0.33 [-0.51, -0.13] vs. non-permanent), Open Science peaks among non-permanent researchers (+0.27 [0.09, 0.47] vs. PhD students), whereas permanent staff value Slow Science more (+0.26 [0.04, 0.47] vs. PhD students): reforming *how* research is done is carried by early-career researchers, slowing it down by those in secure positions.
-- **Discrete archetypes are fragile.** Five profiles can be described (A, 26%: high on Open, Rigorous, Slow and Ethical; B, 24%: low on Slow; C, 20%: low on Rigorous, high on Green, Slow and Ethical; D, 16%: low on Green and Ethical; E, 13%: low on all), but bootstrap agreement with the full-sample partition is modest (median ARI = .75, 95% range .32-.91), and only a two-cluster split is reasonably stable (.83). Continuous value dimensions may be a sounder basis than named archetypes.
+- **Research values are multidimensional.** Five weakly to moderately correlated factors (largest: green-ethical, .42) separate green, slow and ethical science, and split open science into open outputs (Open Science: open data, materials, access) and procedural reforms (Rigorous Science: preregistration, registered reports, replication, participatory research). Two green items (link between research and sustainability, willingness to change) load on both Green and Ethical. The five-factor CFA fits only moderately (CFI = .89, RMSEA = .063, SRMR = .057); letting these two items load on Ethical too fits better (CFI = .92).
+- **Gender and career stage split these dimensions differently.** At the mean age, men score lower than women on Ethical (-0.47 [-0.60, -0.34]) and Green Science (-0.26 [-0.42, -0.11]), slightly higher on Open Science (+0.15 [0.01, 0.30]), and similar on Rigorous and Slow Science; the green and ethical gaps widen with age. Rigorous Science declines after 45 and is lowest among permanent staff (-0.30 [-0.49, -0.10] vs. non-permanent), Open Science peaks among non-permanent researchers (+0.29 [0.08, 0.49] vs. PhD students), whereas permanent staff value Slow Science more (+0.28 [0.08, 0.50] vs. PhD students): reforming *how* research is done is carried by early-career researchers, slowing it down by those in secure positions.
+- **Discrete archetypes are fragile.** Five profiles can be described (A, 28%: high on Open, Rigorous, Slow and Ethical; B, 25%: low on Slow; C, 19%: low on Rigorous, high on Green, Slow and Ethical; D, 14%: low on Open, Rigorous, Slow and Ethical; E, 13%: high on Rigorous, low on Green and Ethical), but bootstrap agreement with the full-sample partition is low (median ARI = .56, 95% range .30-.89), whereas two- and three-cluster splits are reasonably stable (.85). Continuous value dimensions may be a sounder basis than named archetypes.
 
 ## Data Preparation
 
@@ -67,11 +67,14 @@ dictionary <- data.frame(Variable = names(df), Question = names(question_labels)
 format_binary <- function(x) {
   case_when(x == "Yes" ~ 1, x == "No" ~ 0, .default = NA)
 }
+# Engagement with an open science practice: not knowing it is the lowest level,
+# below knowing it and not planning to use it (those answering "not familiar"
+# are the least familiar with, and trained in, open science overall)
 format_use <- function(x) {
   case_when(x == "I know it and I used it" ~ 3/3,
             x == "I haven't used it yet, but I plan to do it in the future" ~ 2/3,
-            x == "I am not familiar with it" ~ 1/3,
-            x == "I haven't used it yet, and I don't plan to do it in the future" ~ 0,
+            x == "I haven't used it yet, and I don't plan to do it in the future" ~ 1/3,
+            x == "I am not familiar with it" ~ 0,
             .default = NA)
 }
 
@@ -1247,9 +1250,9 @@ make_markdown(c(
 ```{r}
 #| label: os_adoption
 
-# The four answers, which the 0-1 "use" score above orders by assumption
-os_use_levels <- c("Used" = 3, "Plan to use" = 2, "Not familiar" = 1, "Do not plan to use" = 0)
-os_use_colors <- c("Used" = "#1565C0", "Plan to use" = "#90CAF9", "Not familiar" = "#BDBDBD", "Do not plan to use" = "#E57373")
+# The four answers, in the order of the 0-1 engagement score (format_use())
+os_use_levels <- c("Used" = 3, "Plan to use" = 2, "Do not plan to use" = 1, "Not familiar" = 0)
+os_use_colors <- c("Used" = "#1565C0", "Plan to use" = "#90CAF9", "Do not plan to use" = "#E57373", "Not familiar" = "#BDBDBD")
 
 df_os_adoption <- df |>
   select(Preregistration = OS_Study_Preregistration, `Registered reports` = OS_Registered_Reports,
@@ -1926,6 +1929,34 @@ p_cfa
 
 
 
+```{r}
+#| label: cfa_alternatives
+
+# The EFA puts two green items (link between research and sustainability,
+# willingness to change) on the Ethical factor rather than the Green one: the
+# model used above assigns them to Green (their movement); these alternatives
+# move them to Ethical, or let them load on both (as in the EFA)
+green_core <- "GS_Importance_conducting + GS_Importance_topic + GS_Changes_practices + GS_Changes_communication_practices"
+green_beliefs <- "GS_Relation_Research_Sustainability + GS_Change_practices_agreeing"
+# The Open, Rigorous and Slow factors of cfa_model (each factor's definition runs to the next one)
+cfa_common <- str_extract_all(cfa_model, "(?s)(Open|Rigorous|Slow)_Science\\s*=~.*?(?=\\n\\s*\\w+_Science\\s*=~|\\s*$)")[[1]] |>
+  paste(collapse = "\n") |>
+  paste0("\n")
+cfa_models <- list(
+  "Movement-based (used)" = cfa_model,
+  "Green beliefs on Ethical" = paste0(cfa_common, "Green_Science =~ ", green_core, "\n",
+                       "Ethical_Science =~ ES_Importance_research_team + ES_Consequences_society + ", green_beliefs),
+  "Cross-loadings" = paste0(cfa_common, "Green_Science =~ ", green_core, " + ", green_beliefs, "\n",
+                            "Ethical_Science =~ ES_Importance_research_team + ES_Consequences_society + ", green_beliefs)
+)
+cfa_comparison <- imap_dfr(cfa_models, \(model, name) {
+  fit <- cfa(model, data = df, std.lv = TRUE)
+  tibble(Model = name, r_Green_Ethical = lavInspect(fit, "cor.lv")["Green_Science", "Ethical_Science"],
+         !!!as.list(unclass(fitMeasures(fit, c("cfi", "tli", "rmsea", "srmr", "aic", "bic")))))
+})
+knitr::kable(cfa_comparison, format = "pipe", digits = 3, caption = "Alternative CFA specifications")
+```
+
 ### Clustering
 
 ```{r}
@@ -2473,6 +2504,218 @@ fig_landscape
 ```
 
 
+
+### Facets
+
+```{r fig_facets}
+#| fig-width: 10.5
+#| fig-height: 12.5
+#| warning: false
+
+# Figure "facets" of the manuscript: EFA loadings next to the item correlations
+# (same item order), facet correlations (CFA) and structure of quality criteria
+movement_colors <- c("Open Science" = "#2196F3", "Slow Science" = "#FF9800",
+                     "Green Science" = "#4CAF50", "Ethical Science" = "#9C27B0")
+facet_colors <- c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Slow Science" = "#FF9800",
+                  "Green Science" = "#4CAF50", "Ethical Science" = "#9C27B0")
+item_labels <- c(
+  "Open Science - Importance"               = "Importance of open science",
+  "Endorsement - Open Data"                 = "Open data",
+  "Endorsement - Open Materials"            = "Open materials",
+  "Endorsement - Open Access"               = "Open access",
+  "Endorsement - Preregistration"           = "Preregistration",
+  "Endorsement - Registered Reports"        = "Registered reports",
+  "Endorsement - Replication Studies"       = "Replication studies",
+  "Endorsement - Participatory Research"    = "Participatory research",
+  "Endorsement - Open Peer Review"          = "Open peer review",
+  "Slow Science - Familiarity"              = "Familiarity with slow science",
+  "Slow Science - Importance"               = "Importance of slow science",
+  "Green Science - Ecofriendly Practices"   = "Importance in conducting research",
+  "Green Science - Ecofriendly Topics"      = "Importance in choosing topics",
+  "Green Science - Changed Practices"       = "Changed research practices",
+  "Green Science - Changed Communication"   = "Changed communication (e.g., travel)",
+  "Green Science - Change Willingness"      = "Willing to change practices",
+  "Green Science - Belief Relation"         = "Link between research and environment",
+  "Ethical Science - Team Diversity"        = "Importance of team diversity",
+  "Ethical Science - Societal Consequences" = "Care for societal consequences"
+)
+stopifnot(setequal(names(item_labels), names(df_resprac)))
+diverging <- scale_fill_gradient2(low = "#D6604D", mid = "white", high = "#4D4D4D", limits = c(-1, 1), na.value = "white",
+                                  name = "Loading / r", breaks = c(-1, -0.5, 0, 0.5, 1))
+theme_heat <- theme_minimal(base_size = 10) +
+  theme(panel.grid = element_blank(), plot.title = element_text(face = "bold", size = 11),
+        plot.subtitle = element_text(color = "grey40", size = 9), plot.title.position = "plot")
+
+# Items ordered by the facet they load most on, then by loading
+facet_names <- setNames(str_replace_all(names(efa_ids), "\n", " "), efa_ids)
+efa_long <- as.data.frame(f) |>
+  select(Variable, all_of(unname(efa_ids))) |>
+  pivot_longer(-Variable, names_to = "Factor", values_to = "Loading") |>
+  mutate(Facet = factor(facet_names[Factor], levels = names(facet_colors)))
+efa_main <- slice_max(efa_long, abs(Loading), by = Variable, with_ties = FALSE) |>
+  arrange(Facet, desc(abs(Loading)))
+item_order <- efa_main$Variable
+item_levels <- rev(unname(item_labels[item_order]))  # First item on top
+efa_long <- mutate(efa_long, Item = factor(item_labels[Variable], levels = item_levels))
+
+p_strip <- tibble(Variable = item_order) |>
+  mutate(Item = factor(item_labels[Variable], levels = item_levels),
+         Movement = case_when(str_starts(Variable, "Open Science|Endorsement") ~ "Open Science",
+                              str_starts(Variable, "Slow") ~ "Slow Science",
+                              str_starts(Variable, "Green") ~ "Green Science",
+                              .default = "Ethical Science"),
+         Movement = factor(Movement, levels = names(movement_colors))) |>
+  ggplot(aes(x = 1, y = Item, fill = Movement)) +
+  geom_tile(width = 0.9, height = 0.9) +
+  scale_fill_manual(values = movement_colors, name = "Movement") +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_heat +
+  theme(axis.text.x = element_blank()) +
+  labs(x = NULL, y = NULL, tag = "A", title = "Facets (Exploratory Factor Analysis)",
+       subtitle = "Loadings of each item, by the movement it was asked under")
+
+p_loadings <- efa_long |>
+  ggplot(aes(x = Facet, y = Item)) +
+  geom_tile(aes(fill = Loading), color = "white", linewidth = 0.5) +
+  geom_text(aes(label = str_replace(sprintf("%.2f", Loading), "^(-?)0", "\\1"),
+                color = ifelse(abs(Loading) >= 0.5, "white", "grey20"), fontface = ifelse(abs(Loading) >= 0.3, "bold", "plain")),
+            size = 2.6, show.legend = FALSE) +
+  geom_point(data = tibble(Facet = factor(names(facet_colors), levels = names(facet_colors))),
+             aes(x = Facet, y = length(item_levels) + 0.85, color = facet_colors[as.character(Facet)]), inherit.aes = FALSE,
+             shape = 15, size = 3.5, show.legend = FALSE) +
+  diverging +
+  scale_color_identity() +
+  scale_x_discrete(position = "top", labels = \(x) str_remove(x, " Science")) +
+  coord_cartesian(clip = "off") +
+  theme_heat +
+  theme(axis.text.y = element_blank(), axis.text.x.top = element_text(size = 8, angle = 45, hjust = 0, vjust = 0, margin = margin(b = 10))) +
+  labs(x = NULL, y = NULL)
+
+# Item correlations, in the same order, with the items of each facet framed
+cor_long <- as.data.frame(as.table(cor(df_resprac, use = "pairwise.complete.obs"))) |>
+  transmute(Row = factor(item_labels[as.character(Var1)], levels = item_levels),
+            Col = factor(item_labels[as.character(Var2)], levels = rev(item_levels)),
+            r = ifelse(Var1 == Var2, NA, Freq))
+n_items <- length(item_order)
+facet_blocks <- efa_main |>
+  mutate(k = row_number()) |>
+  summarise(xmin = min(k) - 0.5, xmax = max(k) + 0.5, .by = Facet) |>
+  mutate(ymin = n_items - xmax + 1, ymax = n_items - xmin + 1)
+p_cor_items <- cor_long |>
+  ggplot(aes(x = Col, y = Row)) +
+  geom_tile(aes(fill = r), color = "white", linewidth = 0.3) +
+  geom_text(aes(label = ifelse(!is.na(r) & abs(r) >= 0.3, str_replace(sprintf("%.2f", r), "^(-?)0", "\\1"), ""),
+                color = ifelse(!is.na(r) & abs(r) >= 0.5, "white", "grey20")), size = 2.2, show.legend = FALSE) +
+  geom_rect(data = facet_blocks, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, color = facet_colors[as.character(Facet)]),
+            inherit.aes = FALSE, fill = NA, linewidth = 1, show.legend = FALSE) +
+  diverging +
+  scale_color_identity() +
+  theme_heat +
+  theme(axis.text = element_blank()) +
+  labs(x = NULL, y = NULL, tag = "B", title = "Item Correlations",
+       subtitle = "Items in the same order as in A; |r| ≥ .30 labelled; facets framed")
+
+# Facet correlations (CFA), significant ones only
+facet_pos <- tibble(Facet = c("Slow Science", "Green Science", "Ethical Science", "Rigorous Science", "Open Science"),
+                    angle = (90 - 72 * 0:4) * pi / 180) |>
+  mutate(x = cos(angle), y = sin(angle), Latent = str_replace(Facet, " ", "_"))
+cfa_cor <- lavaan::parameterEstimates(fit_cfa) |>
+  filter(op == "~~", lhs != rhs) |>
+  left_join(select(facet_pos, lhs = Latent, x, y), by = "lhs") |>
+  left_join(select(facet_pos, rhs = Latent, xend = x, yend = y), by = "rhs")
+p_cor_facets <- cfa_cor |>
+  filter(ci.lower > 0 | ci.upper < 0) |>
+  ggplot() +
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend, linewidth = abs(est)), color = "grey55", alpha = 0.8) +
+  geom_label(aes(x = (x + xend) / 2, y = (y + yend) / 2, label = str_replace(sprintf("%.2f", est), "^(-?)0", "\\1")),
+             size = 3, fill = "white", label.size = 0, label.padding = unit(0.15, "lines"), color = "grey20") +
+  geom_point(data = facet_pos, aes(x = x, y = y, color = Facet), size = 23) +
+  geom_text(data = facet_pos, aes(x = x, y = y, label = str_replace(Facet, " ", "\n")),
+            color = "white", fontface = "bold", size = 3, lineheight = 0.9) +
+  scale_color_manual(values = facet_colors, guide = "none") +
+  scale_linewidth_continuous(range = c(0.5, 4), guide = "none") +
+  coord_equal(xlim = c(-1.25, 1.25), ylim = c(-1.1, 1.25)) +
+  theme_void(base_size = 10) +
+  theme(plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(color = "grey40", size = 9),
+        plot.title.position = "plot") +
+  labs(tag = "C", title = "Correlations between Facets",
+       subtitle = "Latent correlations (CFA) whose 95% CI excludes 0")
+
+# Quality criteria: loadings on the two principal components
+pca_var <- as.data.frame(summary(pca_criteria)) |> filter(Parameter == "Variance") |> select(-Parameter) |> unlist()
+p_pca_criteria <- as.data.frame(pca_criteria) |>
+  select(Variable, PC1, PC2) |>
+  left_join(p_criteria$data, by = c("Variable" = "Criterion")) |>
+  # Labels beside their point, on the side with room (neighbours on the other)
+  mutate(side = case_when(Variable %in% c("Originality / Innovation", "High Impact Factor Journal", "Replication") ~ "left",
+                          Variable == "Significance / Impact" ~ "below",
+                          .default = "right"),
+         offset = 0.04 + 0.08 * sqrt(pct),
+         label_x = PC1 + case_when(side == "left" ~ -offset, side == "right" ~ offset, .default = 0),
+         label_y = PC2 - ifelse(side == "below", offset, 0),
+         hjust = case_when(side == "left" ~ 1, side == "right" ~ 0, .default = 0.5)) |>
+  ggplot(aes(x = PC1, y = PC2)) +
+  geom_hline(yintercept = 0, color = "grey80") +
+  geom_vline(xintercept = 0, color = "grey80") +
+  geom_point(aes(size = pct), color = "#546E7A", alpha = 0.8) +
+  geom_text(aes(x = label_x, y = label_y, label = Variable, hjust = hjust), size = 2.9, color = "grey20") +
+  scale_size_area(max_size = 9, guide = "none") +
+  scale_x_continuous(limits = c(-0.8, 0.9), breaks = c(-0.5, 0, 0.5)) +
+  scale_y_continuous(limits = c(-0.7, 0.7)) +
+  theme_minimal(base_size = 10) +
+  theme(panel.grid.minor = element_blank(), plot.title = element_text(face = "bold", size = 11),
+        plot.subtitle = element_text(color = "grey40", size = 9), plot.title.position = "plot",
+        axis.title = element_text(size = 8.5)) +
+  labs(tag = "D", title = "Structure of Quality Criteria",
+       subtitle = "Loadings on the principal components (point size: % selecting)",
+       x = sprintf("PC1 (%.0f%%): rigour and transparency (−) vs. novelty and impact (+)", 100 * pca_var[1]),
+       y = sprintf("PC2 (%.0f%%): transparency and inclusivity (−) vs. rigour and innovation (+)", 100 * pca_var[2]))
+
+fig_facets <- ((p_strip | p_loadings | p_cor_items) + plot_layout(widths = c(0.35, 5, 19))) /
+  ((p_cor_facets | p_pca_criteria) + plot_layout(widths = c(1, 1.25))) +
+  plot_layout(heights = c(1.55, 1), guides = "collect") &
+  theme(legend.position = "bottom", plot.tag = element_text(face = "bold", size = 14))
+ggsave("../paper/figures/fig_facets.png", fig_facets, width = 10.5, height = 12.5, dpi = 300, bg = "white")
+fig_facets
+```
+
+```{r}
+#| label: export_facets
+#| cache: false
+
+# Numbers the manuscript reports on the facets (read by ../paper/manuscript.qmd)
+cfa_params <- lavaan::parameterEstimates(fit_cfa, standardized = TRUE)
+dir.create("../paper/results", showWarnings = FALSE)
+saveRDS(list(
+  n_factors = as.data.frame(summary(rez_resprac)),
+  efa_loadings = efa_long |> select(Variable, Facet, Loading),
+  efa_variance = as_tibble(as.data.frame(summary(f))) |> rename_with(\(n) coalesce(facet_names[n], n)),
+  efa_cor = attributes(f)$model$Phi |> (\(m) `dimnames<-`(m, list(facet_names[rownames(m)], facet_names[colnames(m)])))(),
+  cfa_fit = as.data.frame(performance::model_performance(fit_cfa)),
+  cfa_loadings = filter(cfa_params, op == "=~") |> select(Facet = lhs, Item = rhs, est = std.all, ci.lower, ci.upper),
+  cfa_cor = filter(cfa_params, op == "~~", lhs != rhs, lhs %in% facet_pos$Latent) |>
+    select(Facet1 = lhs, Facet2 = rhs, r = est, ci.lower, ci.upper),
+  item_cor = cor(df_resprac, use = "pairwise.complete.obs"),
+  cfa_comparison = cfa_comparison,
+  criteria_cor = as_tibble(cor_pairs(df_quality_num)),
+  criteria_n_components = as.data.frame(summary(rez_criteria)),
+  criteria_pca = as_tibble(as.data.frame(pca_criteria)) |> select(Variable, PC1, PC2),
+  criteria_pca_variance = pca_var
+), "../paper/results/facets.rds")
+```
+
+```{r}
+#| label: md_facets
+#| echo: false
+#| cache: false
+
+facets <- readRDS("../paper/results/facets.rds")
+make_markdown(list(
+  "CFA fit" = facets$cfa_fit |> select(any_of(c("Chi2", "Chi2_df", "CFI", "NNFI", "RMSEA", "RMSEA_CI_low", "RMSEA_CI_high", "SRMR"))),
+  "CFA standardized loadings" = facets$cfa_loadings,
+  "CFA latent correlations" = facets$cfa_cor
+), "Facets: confirmatory factor analysis")
+```
 
 ### Structure of Research Values
 

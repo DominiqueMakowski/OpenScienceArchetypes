@@ -15,7 +15,7 @@ execute:
 
 ## Headline Findings
 
-<!-- Written from the N = 682 data (MapResPrac-130726-N682.csv, 2026-09-30): update when the data change. -->
+<!-- Written from the N = 682 data (MapResPrac-130726-N682.csv, 2026-09-30), open science practices scored as engagement ("not familiar" lowest): update when the data or scoring change. -->
 
 Researchers (N = 682; 57% women; 72% working in France; 44% on permanent contracts). Model estimates are posterior medians [95% CI], in factor-score units.
 
@@ -23,9 +23,9 @@ Researchers (N = 682; 57% women; 72% working in France; 44% on permanent contrac
 - **Novelty and rigour are traded off, and the balance shifts with age.** Choices oppose novelty and impact to rigour and transparency (e.g., originality vs. transparency, r = -.40). The novelty end gains ground with age (women: -0.67 [-0.88, -0.47] at 25, +0.49 [0.26, 0.73] at 55) and is stronger in men (+0.40 [0.17, 0.68] at the mean age). Part of this opposition is built into the forced choice of three criteria.
 - **Barriers to open science are seen as structural.** Career recognition (51%), institutional incentives (44%), dedicated funding (42%) and time (40%) come well ahead of information (21%) or training (28%); 4% say nothing would help.
 - **Slow science means quality over quantity, and is a job for institutions.** 81% define it as quality over quantity. Its measures are assigned to institutions far more than to individuals (assessing quality rather than quantity: 87% vs. 45%), and hard caps (one article, or one grant, per year) are judged not feasible by 28%.
-- **Research values are multidimensional.** Five weakly to moderately correlated factors (largest: green-ethical, .46) separate green, slow and ethical science, and split open science into open outputs (Open Science: open data, materials, access) and procedural reforms (Rigorous Science: preregistration, registered reports, replication, participatory research). The five-factor CFA fits only moderately (CFI = .88, RMSEA = .062, SRMR = .056).
-- **Gender and career stage split these dimensions differently.** At the mean age, men score lower than women on Ethical (-0.47 [-0.60, -0.34]), Green (-0.27 [-0.42, -0.11]) and Rigorous Science (-0.15 [-0.30, -0.01]), but not on Open or Slow Science, and the green and ethical gaps widen with age. Rigorous Science declines with age and is lowest among permanent staff (-0.33 [-0.51, -0.13] vs. non-permanent), Open Science peaks among non-permanent researchers (+0.27 [0.09, 0.47] vs. PhD students), whereas permanent staff value Slow Science more (+0.26 [0.04, 0.47] vs. PhD students): reforming *how* research is done is carried by early-career researchers, slowing it down by those in secure positions.
-- **Discrete archetypes are fragile.** Five profiles can be described (A, 26%: high on Open, Rigorous, Slow and Ethical; B, 24%: low on Slow; C, 20%: low on Rigorous, high on Green, Slow and Ethical; D, 16%: low on Green and Ethical; E, 13%: low on all), but bootstrap agreement with the full-sample partition is modest (median ARI = .75, 95% range .32-.91), and only a two-cluster split is reasonably stable (.83). Continuous value dimensions may be a sounder basis than named archetypes.
+- **Research values are multidimensional.** Five weakly to moderately correlated factors (largest: green-ethical, .42) separate green, slow and ethical science, and split open science into open outputs (Open Science: open data, materials, access) and procedural reforms (Rigorous Science: preregistration, registered reports, replication, participatory research). Two green items (link between research and sustainability, willingness to change) load on both Green and Ethical. The five-factor CFA fits only moderately (CFI = .89, RMSEA = .063, SRMR = .057); letting these two items load on Ethical too fits better (CFI = .92).
+- **Gender and career stage split these dimensions differently.** At the mean age, men score lower than women on Ethical (-0.47 [-0.60, -0.34]) and Green Science (-0.26 [-0.42, -0.11]), slightly higher on Open Science (+0.15 [0.01, 0.30]), and similar on Rigorous and Slow Science; the green and ethical gaps widen with age. Rigorous Science declines after 45 and is lowest among permanent staff (-0.30 [-0.49, -0.10] vs. non-permanent), Open Science peaks among non-permanent researchers (+0.29 [0.08, 0.49] vs. PhD students), whereas permanent staff value Slow Science more (+0.28 [0.08, 0.50] vs. PhD students): reforming *how* research is done is carried by early-career researchers, slowing it down by those in secure positions.
+- **Discrete archetypes are fragile.** Five profiles can be described (A, 28%: high on Open, Rigorous, Slow and Ethical; B, 25%: low on Slow; C, 19%: low on Rigorous, high on Green, Slow and Ethical; D, 14%: low on Open, Rigorous, Slow and Ethical; E, 13%: high on Rigorous, low on Green and Ethical), but bootstrap agreement with the full-sample partition is low (median ARI = .56, 95% range .30-.89), whereas two- and three-cluster splits are reasonably stable (.85). Continuous value dimensions may be a sounder basis than named archetypes.
 
 ## Data Preparation
 
@@ -65,11 +65,14 @@ dictionary <- data.frame(Variable = names(df), Question = names(question_labels)
 format_binary <- function(x) {
   case_when(x == "Yes" ~ 1, x == "No" ~ 0, .default = NA)
 }
+# Engagement with an open science practice: not knowing it is the lowest level,
+# below knowing it and not planning to use it (those answering "not familiar"
+# are the least familiar with, and trained in, open science overall)
 format_use <- function(x) {
   case_when(x == "I know it and I used it" ~ 3/3,
             x == "I haven't used it yet, but I plan to do it in the future" ~ 2/3,
-            x == "I am not familiar with it" ~ 1/3,
-            x == "I haven't used it yet, and I don't plan to do it in the future" ~ 0,
+            x == "I haven't used it yet, and I don't plan to do it in the future" ~ 1/3,
+            x == "I am not familiar with it" ~ 0,
             .default = NA)
 }
 
@@ -1751,97 +1754,108 @@ Table: Descriptive statistics
 |OS Familiarity | 0.73| 0.24| 0| 1| 682| 0|
 |OS Importance | 0.82| 0.23| 0| 1| 682| 0|
 |OS Training | 0.53| 0.50| 0| 1| 682| 0|
-|View on Preregistration | 0.63| 0.35| 0| 1| 682| 0|
-|View on Registered Reports | 0.51| 0.32| 0| 1| 682| 0|
-|View on Open Materials | 0.81| 0.27| 0| 1| 682| 0|
-|View on Open Data | 0.81| 0.27| 0| 1| 682| 0|
-|View on Open Peer Review | 0.60| 0.35| 0| 1| 682| 0|
-|View on Open Access | 0.88| 0.23| 0| 1| 682| 0|
-|View on Replication Studies | 0.58| 0.37| 0| 1| 682| 0|
-|View on Participatory Research | 0.58| 0.35| 0| 1| 682| 0|
+|View on Preregistration | 0.57| 0.41| 0| 1| 682| 0|
+|View on Registered Reports | 0.47| 0.36| 0| 1| 682| 0|
+|View on Open Materials | 0.79| 0.30| 0| 1| 682| 0|
+|View on Open Data | 0.80| 0.28| 0| 1| 682| 0|
+|View on Open Peer Review | 0.59| 0.37| 0| 1| 682| 0|
+|View on Open Access | 0.87| 0.23| 0| 1| 682| 0|
+|View on Replication Studies | 0.60| 0.34| 0| 1| 682| 0|
+|View on Participatory Research | 0.56| 0.38| 0| 1| 682| 0|
 
 Table: Correlations
 
 |Variable1 |Variable2 | r|95% CI |
-|:--------------------------|:------------------------------|----:|:------------|
+|:---------------------------|:------------------------------|----:|:------------|
 |OS Familiarity |OS Importance | 0.64|[0.59, 0.68] |
-|View on Preregistration |View on Registered Reports | 0.52|[0.47, 0.58] |
-|View on Open Materials |View on Open Data | 0.49|[0.43, 0.55] |
+|View on Preregistration |View on Registered Reports | 0.61|[0.56, 0.66] |
+|View on Open Materials |View on Open Data | 0.46|[0.40, 0.52] |
 |OS Familiarity |OS Training | 0.44|[0.38, 0.50] |
-|OS Training |View on Preregistration | 0.37|[0.30, 0.43] |
+|View on Preregistration |View on Replication Studies | 0.40|[0.34, 0.46] |
+|View on Registered Reports |View on Replication Studies | 0.40|[0.34, 0.46] |
+|OS Training |View on Preregistration | 0.40|[0.33, 0.46] |
+|View on Open Data |View on Open Access | 0.39|[0.32, 0.45] |
+|View on Open Materials |View on Open Access | 0.37|[0.31, 0.44] |
+|OS Familiarity |View on Open Data | 0.36|[0.30, 0.43] |
+|OS Familiarity |View on Preregistration | 0.36|[0.29, 0.42] |
+|View on Preregistration |View on Open Materials | 0.33|[0.26, 0.39] |
+|OS Training |View on Registered Reports | 0.32|[0.26, 0.39] |
 |OS Importance |OS Training | 0.32|[0.25, 0.38] |
-|OS Familiarity |View on Open Data | 0.32|[0.25, 0.38] |
-|View on Open Materials |View on Open Access | 0.31|[0.24, 0.37] |
-|OS Familiarity |View on Preregistration | 0.30|[0.23, 0.37] |
-|View on Open Data |View on Open Access | 0.30|[0.23, 0.37] |
-|OS Familiarity |View on Open Access | 0.30|[0.23, 0.37] |
-|OS Familiarity |View on Open Materials | 0.30|[0.23, 0.36] |
-|View on Preregistration |View on Open Materials | 0.28|[0.21, 0.35] |
-|OS Importance |View on Open Data | 0.27|[0.20, 0.34] |
-|View on Preregistration |View on Replication Studies | 0.26|[0.19, 0.33] |
-|View on Registered Reports |View on Replication Studies | 0.25|[0.18, 0.32] |
-|View on Open Materials |View on Replication Studies | 0.24|[0.16, 0.31] |
-|OS Training |View on Registered Reports | 0.23|[0.16, 0.30] |
-|OS Training |View on Open Data | 0.23|[0.16, 0.30] |
-|OS Importance |View on Open Access | 0.23|[0.16, 0.30] |
-|View on Registered Reports |View on Open Materials | 0.22|[0.14, 0.29] |
-|View on Registered Reports |View on Participatory Research | 0.22|[0.14, 0.29] |
-|View on Preregistration |View on Open Data | 0.21|[0.14, 0.29] |
-|View on Preregistration |View on Participatory Research | 0.21|[0.14, 0.28] |
+|View on Registered Reports |View on Open Materials | 0.31|[0.24, 0.38] |
+|OS Familiarity |View on Open Access | 0.31|[0.24, 0.38] |
+|OS Familiarity |View on Open Materials | 0.30|[0.23, 0.37] |
+|View on Registered Reports |View on Open Peer Review | 0.29|[0.22, 0.36] |
+|View on Open Materials |View on Replication Studies | 0.29|[0.22, 0.36] |
+|View on Preregistration |View on Participatory Research | 0.29|[0.22, 0.36] |
+|OS Familiarity |View on Registered Reports | 0.29|[0.22, 0.36] |
+|OS Importance |View on Open Data | 0.28|[0.21, 0.35] |
+|View on Open Peer Review |View on Open Access | 0.28|[0.21, 0.35] |
+|View on Registered Reports |View on Participatory Research | 0.28|[0.20, 0.34] |
+|View on Open Data |View on Open Peer Review | 0.26|[0.19, 0.33] |
+|OS Training |View on Open Data | 0.25|[0.18, 0.32] |
+|View on Preregistration |View on Open Data | 0.24|[0.17, 0.31] |
+|OS Familiarity |View on Open Peer Review | 0.24|[0.17, 0.31] |
+|OS Importance |View on Open Access | 0.24|[0.17, 0.31] |
+|View on Preregistration |View on Open Peer Review | 0.24|[0.17, 0.31] |
+|View on Open Materials |View on Open Peer Review | 0.23|[0.16, 0.30] |
+|OS Familiarity |View on Replication Studies | 0.23|[0.15, 0.30] |
+|View on Open Data |View on Replication Studies | 0.22|[0.14, 0.29] |
+|View on Open Peer Review |View on Replication Studies | 0.22|[0.14, 0.29] |
+|View on Registered Reports |View on Open Data | 0.21|[0.14, 0.28] |
+|OS Training |View on Replication Studies | 0.21|[0.13, 0.28] |
 |OS Training |View on Open Materials | 0.20|[0.13, 0.27] |
-|View on Open Peer Review |View on Open Access | 0.20|[0.13, 0.27] |
-|OS Importance |View on Open Materials | 0.19|[0.11, 0.26] |
-|OS Familiarity |View on Registered Reports | 0.18|[0.11, 0.26] |
-|OS Familiarity |View on Open Peer Review | 0.18|[0.11, 0.25] |
-|OS Importance |View on Preregistration | 0.18|[0.10, 0.25] |
-|View on Registered Reports |View on Open Peer Review | 0.17|[0.10, 0.25] |
-|OS Familiarity |View on Replication Studies | 0.17|[0.10, 0.24] |
-|View on Open Data |View on Replication Studies | 0.17|[0.10, 0.24] |
+|OS Importance |View on Open Materials | 0.20|[0.12, 0.27] |
+|View on Replication Studies |View on Participatory Research | 0.19|[0.12, 0.26] |
+|View on Open Peer Review |View on Participatory Research | 0.19|[0.12, 0.26] |
+|OS Importance |View on Preregistration | 0.17|[0.10, 0.25] |
+|OS Familiarity |View on Participatory Research | 0.17|[0.09, 0.24] |
 |OS Training |View on Open Access | 0.16|[0.09, 0.23] |
-|View on Registered Reports |View on Open Data | 0.16|[0.09, 0.23] |
+|View on Registered Reports |View on Open Access | 0.16|[0.08, 0.23] |
 
 Table: Number of factors: agreement between methods
 
 | n_Factors| n_Methods| Variance_Cumulative|
 |---------:|---------:|-------------------:|
-| 1| 5| 0.25|
-| 3| 5| 0.40|
-| 4| 5| 0.44|
-| 10| 3| 0.48|
-| 11| 1| 0.48|
+| 1| 4| 0.29|
+| 2| 2| 0.39|
+| 3| 7| 0.45|
+| 4| 2| 0.48|
+| 5| 1| 0.50|
+| 9| 2| 0.52|
+| 10| 1| 0.52|
 
 Table: Loadings
 
-|Variable | MR3| MR2| MR1| Complexity| Uniqueness|
+|Variable | MR2| MR1| MR3| Complexity| Uniqueness|
 |:------------------------------|-----:|-----:|-----:|----------:|----------:|
-|OS Familiarity | 0.91| 0.02| 0.01| 1.00| 0.16|
-|OS Importance | 0.70| -0.04| 0.01| 1.01| 0.52|
-|OS Training | 0.38| 0.26| 0.01| 1.77| 0.71|
-|View on Preregistration | 0.05| 0.73| 0.01| 1.01| 0.42|
-|View on Registered Reports | -0.04| 0.70| 0.00| 1.01| 0.53|
-|View on Open Materials | -0.07| 0.07| 0.73| 1.04| 0.47|
-|View on Open Data | 0.07| -0.05| 0.67| 1.04| 0.53|
-|View on Open Peer Review | 0.04| 0.15| 0.16| 2.15| 0.92|
-|View on Open Access | 0.17| -0.08| 0.39| 1.48| 0.78|
-|View on Replication Studies | 0.01| 0.30| 0.15| 1.46| 0.85|
-|View on Participatory Research | 0.02| 0.33| -0.05| 1.06| 0.90|
+|OS Familiarity | 0.09| 0.82| 0.04| 1.03| 0.23|
+|OS Importance | -0.10| 0.77| 0.00| 1.03| 0.45|
+|OS Training | 0.30| 0.39| -0.03| 1.88| 0.70|
+|View on Preregistration | 0.79| 0.07| -0.03| 1.02| 0.35|
+|View on Registered Reports | 0.77| -0.03| 0.04| 1.01| 0.40|
+|View on Open Materials | 0.14| -0.06| 0.62| 1.13| 0.55|
+|View on Open Data | -0.04| 0.09| 0.65| 1.05| 0.53|
+|View on Open Peer Review | 0.22| -0.05| 0.33| 1.77| 0.80|
+|View on Open Access | -0.09| 0.06| 0.60| 1.07| 0.64|
+|View on Replication Studies | 0.45| -0.03| 0.16| 1.24| 0.72|
+|View on Participatory Research | 0.37| 0.02| -0.03| 1.02| 0.87|
 
 Table: Explained variance
 
-|Parameter | MR3| MR2| MR1|
+|Parameter | MR2| MR1| MR3|
 |:-------------------|----:|----:|----:|
-|Eigenvalues | 2.71| 0.87| 0.63|
-|Variance | 0.14| 0.13| 0.11|
-|Variance_Cumulative | 0.14| 0.27| 0.38|
-|Variance_Proportion | 0.38| 0.33| 0.30|
+|Eigenvalues | 3.15| 0.96| 0.64|
+|Variance | 0.17| 0.14| 0.13|
+|Variance_Cumulative | 0.17| 0.30| 0.43|
+|Variance_Proportion | 0.39| 0.32| 0.30|
 
 Table: Factor correlations
 
-|Factor | MR3| MR2| MR1|
+|Factor | MR2| MR1| MR3|
 |:------|----:|----:|----:|
-|MR3 | 1.00| 0.35| 0.47|
-|MR2 | 0.35| 1.00| 0.40|
-|MR1 | 0.47| 0.40| 1.00|
+|MR2 | 1.00| 0.36| 0.43|
+|MR1 | 0.36| 1.00| 0.50|
+|MR3 | 0.43| 0.50| 1.00|
 
 :::
 
@@ -1855,9 +1869,9 @@ Table: Factor correlations
 ::: {.cell}
 
 ```{.r .cell-code}
-# The four answers, which the 0-1 "use" score above orders by assumption
-os_use_levels <- c("Used" = 3, "Plan to use" = 2, "Not familiar" = 1, "Do not plan to use" = 0)
-os_use_colors <- c("Used" = "#1565C0", "Plan to use" = "#90CAF9", "Not familiar" = "#BDBDBD", "Do not plan to use" = "#E57373")
+# The four answers, in the order of the 0-1 engagement score (format_use())
+os_use_levels <- c("Used" = 3, "Plan to use" = 2, "Do not plan to use" = 1, "Not familiar" = 0)
+os_use_colors <- c("Used" = "#1565C0", "Plan to use" = "#90CAF9", "Do not plan to use" = "#E57373", "Not familiar" = "#BDBDBD")
 
 df_os_adoption <- df |>
   select(Preregistration = OS_Study_Preregistration, `Registered reports` = OS_Registered_Reports,
@@ -1897,16 +1911,16 @@ p_os_adoption
 ::: {.cell-output-display}
 ::: {.callout-note collapse="true" title="Adoption of open science practices (Markdown table, for text readers)"}
 
-|Practice |Used |Plan to use |Not familiar |Do not plan to use |
-|:----------------------|:------|:-----------|:------------|:------------------|
-|Open access |71.55% |22.58% |3.23% |2.64% |
-|Open materials |59.38% |28.01% |8.36% |4.25% |
-|Open data |57.48% |31.82% |6.16% |4.55% |
-|Preregistration |38.56% |21.99% |28.15% |11.29% |
-|Open peer review |32.40% |32.26% |19.06% |16.28% |
-|Replication studies |29.62% |35.19% |14.08% |21.11% |
-|Participatory research |29.03% |31.82% |23.17% |15.98% |
-|Registered reports |16.72% |36.36% |29.62% |17.30% |
+|Practice |Used |Plan to use |Do not plan to use |Not familiar |
+|:----------------------|:------|:-----------|:------------------|:------------|
+|Open access |71.55% |22.58% |2.64% |3.23% |
+|Open materials |59.38% |28.01% |4.25% |8.36% |
+|Open data |57.48% |31.82% |4.55% |6.16% |
+|Preregistration |38.56% |21.99% |11.29% |28.15% |
+|Open peer review |32.40% |32.26% |16.28% |19.06% |
+|Replication studies |29.62% |35.19% |21.11% |14.08% |
+|Participatory research |29.03% |31.82% |15.98% |23.17% |
+|Registered reports |16.72% |36.36% |17.30% |29.62% |
 
 :::
 
@@ -2403,14 +2417,14 @@ Table: Descriptive statistics
 |Variable | Mean| SD| Min| Max| n| n_Missing|
 |:---------------------------------------|----:|----:|---:|---:|---:|---------:|
 |Open Science - Importance | 0.82| 0.23| 0| 1| 682| 0|
-|Endorsement - Preregistration | 0.63| 0.35| 0| 1| 682| 0|
-|Endorsement - Registered Reports | 0.51| 0.32| 0| 1| 682| 0|
-|Endorsement - Open Materials | 0.81| 0.27| 0| 1| 682| 0|
-|Endorsement - Open Data | 0.81| 0.27| 0| 1| 682| 0|
-|Endorsement - Open Peer Review | 0.60| 0.35| 0| 1| 682| 0|
-|Endorsement - Open Access | 0.88| 0.23| 0| 1| 682| 0|
-|Endorsement - Replication Studies | 0.58| 0.37| 0| 1| 682| 0|
-|Endorsement - Participatory Research | 0.58| 0.35| 0| 1| 682| 0|
+|Endorsement - Preregistration | 0.57| 0.41| 0| 1| 682| 0|
+|Endorsement - Registered Reports | 0.47| 0.36| 0| 1| 682| 0|
+|Endorsement - Open Materials | 0.79| 0.30| 0| 1| 682| 0|
+|Endorsement - Open Data | 0.80| 0.28| 0| 1| 682| 0|
+|Endorsement - Open Peer Review | 0.59| 0.37| 0| 1| 682| 0|
+|Endorsement - Open Access | 0.87| 0.23| 0| 1| 682| 0|
+|Endorsement - Replication Studies | 0.60| 0.34| 0| 1| 682| 0|
+|Endorsement - Participatory Research | 0.56| 0.38| 0| 1| 682| 0|
 |Green Science - Ecofriendly Practices | 0.59| 0.27| 0| 1| 682| 0|
 |Green Science - Ecofriendly Topics | 0.50| 0.30| 0| 1| 682| 0|
 |Green Science - Changed Practices | 0.36| 0.30| 0| 1| 682| 0|
@@ -2428,61 +2442,71 @@ Table: Correlations
 |:-------------------------------------|:---------------------------------------|-----:|:--------------|
 |Slow Science - Importance |Slow Science - Familiarity | 0.79|[0.76, 0.81] |
 |Green Science - Ecofriendly Practices |Green Science - Ecofriendly Topics | 0.65|[0.60, 0.69] |
-|Endorsement - Preregistration |Endorsement - Registered Reports | 0.52|[0.47, 0.58] |
+|Endorsement - Preregistration |Endorsement - Registered Reports | 0.61|[0.56, 0.66] |
 |Green Science - Ecofriendly Practices |Green Science - Change Willingness | 0.51|[0.46, 0.57] |
-|Endorsement - Open Materials |Endorsement - Open Data | 0.49|[0.43, 0.55] |
 |Green Science - Ecofriendly Practices |Green Science - Changed Practices | 0.48|[0.42, 0.53] |
 |Green Science - Change Willingness |Green Science - Belief Relation | 0.47|[0.41, 0.53] |
+|Endorsement - Open Materials |Endorsement - Open Data | 0.46|[0.40, 0.52] |
 |Green Science - Changed Communication |Green Science - Change Willingness | 0.44|[0.38, 0.50] |
 |Green Science - Ecofriendly Topics |Green Science - Changed Practices | 0.44|[0.37, 0.49] |
 |Green Science - Ecofriendly Practices |Green Science - Changed Communication | 0.42|[0.36, 0.48] |
 |Green Science - Ecofriendly Topics |Green Science - Change Willingness | 0.42|[0.35, 0.48] |
 |Green Science - Changed Practices |Green Science - Changed Communication | 0.41|[0.35, 0.47] |
+|Endorsement - Preregistration |Endorsement - Replication Studies | 0.40|[0.34, 0.46] |
+|Endorsement - Registered Reports |Endorsement - Replication Studies | 0.40|[0.34, 0.46] |
+|Endorsement - Open Data |Endorsement - Open Access | 0.39|[0.32, 0.45] |
 |Green Science - Ecofriendly Practices |Green Science - Belief Relation | 0.38|[0.31, 0.44] |
+|Endorsement - Open Materials |Endorsement - Open Access | 0.37|[0.31, 0.44] |
 |Green Science - Ecofriendly Topics |Green Science - Belief Relation | 0.36|[0.30, 0.43] |
 |Green Science - Change Willingness |Ethical Science - Team Diversity | 0.36|[0.29, 0.42] |
 |Green Science - Changed Practices |Green Science - Change Willingness | 0.35|[0.28, 0.41] |
 |Green Science - Belief Relation |Ethical Science - Team Diversity | 0.34|[0.27, 0.40] |
-|Endorsement - Open Materials |Endorsement - Open Access | 0.31|[0.24, 0.37] |
+|Endorsement - Preregistration |Endorsement - Open Materials | 0.33|[0.26, 0.39] |
+|Endorsement - Registered Reports |Endorsement - Open Materials | 0.31|[0.24, 0.38] |
 |Ethical Science - Team Diversity |Ethical Science - Societal Consequences | 0.30|[0.23, 0.37] |
 |Green Science - Ecofriendly Topics |Green Science - Changed Communication | 0.30|[0.23, 0.37] |
-|Endorsement - Open Data |Endorsement - Open Access | 0.30|[0.23, 0.37] |
 |Green Science - Belief Relation |Ethical Science - Societal Consequences | 0.29|[0.22, 0.36] |
-|Endorsement - Preregistration |Endorsement - Open Materials | 0.28|[0.21, 0.35] |
+|Endorsement - Registered Reports |Endorsement - Open Peer Review | 0.29|[0.22, 0.36] |
+|Endorsement - Open Materials |Endorsement - Replication Studies | 0.29|[0.22, 0.36] |
+|Endorsement - Preregistration |Endorsement - Participatory Research | 0.29|[0.22, 0.36] |
+|Open Science - Importance |Endorsement - Open Data | 0.28|[0.21, 0.35] |
+|Endorsement - Open Peer Review |Endorsement - Open Access | 0.28|[0.21, 0.35] |
 |Green Science - Changed Communication |Green Science - Belief Relation | 0.28|[0.21, 0.34] |
+|Endorsement - Registered Reports |Endorsement - Participatory Research | 0.28|[0.20, 0.34] |
 |Green Science - Changed Practices |Green Science - Belief Relation | 0.27|[0.20, 0.34] |
-|Open Science - Importance |Endorsement - Open Data | 0.27|[0.20, 0.34] |
-|Endorsement - Preregistration |Endorsement - Replication Studies | 0.26|[0.19, 0.33] |
 |Green Science - Change Willingness |Ethical Science - Societal Consequences | 0.26|[0.19, 0.33] |
 |Green Science - Ecofriendly Practices |Ethical Science - Team Diversity | 0.26|[0.19, 0.33] |
 |Open Science - Importance |Slow Science - Importance | 0.26|[0.19, 0.33] |
-|Endorsement - Registered Reports |Endorsement - Replication Studies | 0.25|[0.18, 0.32] |
+|Endorsement - Open Data |Endorsement - Open Peer Review | 0.26|[0.19, 0.33] |
+|Endorsement - Preregistration |Endorsement - Open Data | 0.24|[0.17, 0.31] |
+|Open Science - Importance |Endorsement - Open Access | 0.24|[0.17, 0.31] |
+|Endorsement - Preregistration |Endorsement - Open Peer Review | 0.24|[0.17, 0.31] |
 |Green Science - Changed Communication |Slow Science - Importance | 0.24|[0.17, 0.31] |
-|Endorsement - Open Materials |Endorsement - Replication Studies | 0.24|[0.16, 0.31] |
 |Green Science - Changed Communication |Slow Science - Familiarity | 0.23|[0.16, 0.30] |
-|Open Science - Importance |Endorsement - Open Access | 0.23|[0.16, 0.30] |
+|Endorsement - Open Materials |Endorsement - Open Peer Review | 0.23|[0.16, 0.30] |
 |Green Science - Ecofriendly Practices |Ethical Science - Societal Consequences | 0.23|[0.16, 0.30] |
-|Endorsement - Registered Reports |Endorsement - Open Materials | 0.22|[0.14, 0.29] |
-|Endorsement - Registered Reports |Endorsement - Participatory Research | 0.22|[0.14, 0.29] |
-|Endorsement - Preregistration |Endorsement - Open Data | 0.21|[0.14, 0.29] |
-|Endorsement - Preregistration |Endorsement - Participatory Research | 0.21|[0.14, 0.28] |
+|Endorsement - Open Data |Endorsement - Replication Studies | 0.22|[0.14, 0.29] |
+|Endorsement - Open Peer Review |Endorsement - Replication Studies | 0.22|[0.14, 0.29] |
+|Endorsement - Open Materials |Slow Science - Familiarity | 0.21|[0.14, 0.28] |
+|Endorsement - Registered Reports |Endorsement - Open Data | 0.21|[0.14, 0.28] |
 |Open Science - Importance |Slow Science - Familiarity | 0.21|[0.14, 0.28] |
 |Green Science - Ecofriendly Topics |Ethical Science - Team Diversity | 0.21|[0.13, 0.28] |
-|Endorsement - Open Materials |Slow Science - Familiarity | 0.21|[0.13, 0.28] |
 |Green Science - Ecofriendly Topics |Ethical Science - Societal Consequences | 0.20|[0.13, 0.27] |
-|Endorsement - Open Peer Review |Endorsement - Open Access | 0.20|[0.13, 0.27] |
-|Endorsement - Preregistration |Green Science - Changed Practices | -0.19|[-0.26, -0.12] |
+|Endorsement - Preregistration |Green Science - Changed Practices | -0.20|[-0.27, -0.12] |
+|Open Science - Importance |Endorsement - Open Materials | 0.20|[0.12, 0.27] |
+|Endorsement - Open Materials |Slow Science - Importance | 0.19|[0.12, 0.27] |
+|Endorsement - Open Data |Slow Science - Familiarity | 0.19|[0.12, 0.26] |
+|Endorsement - Replication Studies |Endorsement - Participatory Research | 0.19|[0.12, 0.26] |
+|Endorsement - Open Peer Review |Endorsement - Participatory Research | 0.19|[0.12, 0.26] |
 |Green Science - Change Willingness |Slow Science - Importance | 0.19|[0.11, 0.26] |
 |Green Science - Belief Relation |Slow Science - Importance | 0.19|[0.11, 0.26] |
-|Open Science - Importance |Endorsement - Open Materials | 0.19|[0.11, 0.26] |
+|Endorsement - Registered Reports |Slow Science - Familiarity | 0.18|[0.11, 0.25] |
 |Green Science - Changed Practices |Ethical Science - Team Diversity | 0.18|[0.11, 0.25] |
-|Endorsement - Open Materials |Slow Science - Importance | 0.18|[0.10, 0.25] |
-|Open Science - Importance |Endorsement - Preregistration | 0.18|[0.10, 0.25] |
-|Endorsement - Registered Reports |Endorsement - Open Peer Review | 0.17|[0.10, 0.25] |
+|Endorsement - Open Peer Review |Slow Science - Familiarity | 0.18|[0.10, 0.25] |
+|Open Science - Importance |Endorsement - Preregistration | 0.17|[0.10, 0.25] |
 |Green Science - Changed Communication |Ethical Science - Team Diversity | 0.17|[0.10, 0.25] |
 |Open Science - Importance |Green Science - Change Willingness | 0.17|[0.10, 0.25] |
-|Endorsement - Open Data |Slow Science - Familiarity | 0.17|[0.10, 0.24] |
-|Endorsement - Open Data |Endorsement - Replication Studies | 0.17|[0.10, 0.24] |
+|Endorsement - Open Data |Slow Science - Importance | 0.17|[0.10, 0.24] |
 
 :::
 
@@ -2584,58 +2608,57 @@ Table: Number of factors: agreement between methods
 
 | n_Factors| n_Methods| Variance_Cumulative|
 |---------:|---------:|-------------------:|
-| 1| 2| 0.17|
-| 2| 3| 0.30|
-| 3| 1| 0.37|
-| 4| 3| 0.42|
-| 5| 4| 0.45|
-| 6| 1| 0.47|
-| 11| 1| 0.54|
-| 14| 1| 0.55|
-| 18| 3| 0.56|
+| 2| 3| 0.32|
+| 3| 2| 0.39|
+| 4| 3| 0.44|
+| 5| 5| 0.48|
+| 6| 1| 0.50|
+| 9| 1| 0.54|
+| 13| 1| 0.57|
+| 18| 3| 0.58|
 
 Table: Loadings
 
-|Variable | Green Science| Slow Science| Open Science| Rigorous Science| Ethical Science| Complexity| Uniqueness|
-|:---------------------------------------|-------------:|------------:|------------:|----------------:|---------------:|----------:|----------:|
-|Open Science - Importance | -0.05| 0.14| 0.30| 0.06| 0.22| 2.48| 0.80|
-|Endorsement - Preregistration | -0.12| 0.03| 0.09| 0.67| 0.10| 1.15| 0.46|
-|Endorsement - Registered Reports | 0.09| 0.01| 0.01| 0.70| -0.07| 1.06| 0.51|
-|Endorsement - Open Materials | -0.02| 0.02| 0.61| 0.13| -0.01| 1.09| 0.56|
-|Endorsement - Open Data | 0.01| -0.03| 0.73| -0.01| 0.00| 1.00| 0.49|
-|Endorsement - Open Peer Review | 0.11| 0.08| 0.16| 0.21| -0.19| 3.69| 0.88|
-|Endorsement - Open Access | 0.05| 0.02| 0.47| -0.02| -0.01| 1.03| 0.77|
-|Endorsement - Replication Studies | -0.02| 0.03| 0.16| 0.30| 0.00| 1.53| 0.85|
-|Endorsement - Participatory Research | 0.11| -0.02| -0.06| 0.37| -0.01| 1.24| 0.87|
-|Green Science - Ecofriendly Practices | 0.77| -0.01| -0.02| 0.05| 0.09| 1.04| 0.34|
-|Green Science - Ecofriendly Topics | 0.72| -0.05| -0.05| 0.08| 0.04| 1.05| 0.47|
-|Green Science - Changed Practices | 0.67| 0.02| 0.06| -0.13| -0.10| 1.13| 0.56|
-|Green Science - Changed Communication | 0.48| 0.16| 0.18| -0.20| 0.04| 1.98| 0.61|
-|Green Science - Change Willingness | 0.40| 0.06| -0.03| -0.03| 0.43| 2.06| 0.47|
-|Green Science - Belief Relation | 0.26| 0.07| -0.08| 0.07| 0.46| 1.78| 0.58|
-|Slow Science - Importance | -0.04| 0.84| 0.01| -0.02| 0.13| 1.05| 0.26|
-|Slow Science - Familiarity | 0.02| 0.94| -0.01| 0.03| -0.10| 1.02| 0.13|
-|Ethical Science - Team Diversity | 0.03| -0.03| 0.09| -0.04| 0.55| 1.08| 0.68|
-|Ethical Science - Societal Consequences | -0.03| -0.02| -0.01| 0.07| 0.51| 1.04| 0.75|
+|Variable | Green Science| Rigorous Science| Slow Science| Open Science| Ethical Science| Complexity| Uniqueness|
+|:---------------------------------------|-------------:|----------------:|------------:|------------:|---------------:|----------:|----------:|
+|Open Science - Importance | -0.07| 0.01| 0.13| 0.33| 0.26| 2.33| 0.79|
+|Endorsement - Preregistration | -0.10| 0.73| 0.02| 0.05| 0.07| 1.07| 0.39|
+|Endorsement - Registered Reports | 0.06| 0.78| 0.03| 0.01| -0.06| 1.03| 0.40|
+|Endorsement - Open Materials | -0.03| 0.19| 0.02| 0.55| 0.01| 1.24| 0.58|
+|Endorsement - Open Data | 0.00| 0.00| -0.01| 0.71| 0.00| 1.00| 0.50|
+|Endorsement - Open Peer Review | 0.10| 0.28| 0.04| 0.26| -0.20| 3.17| 0.77|
+|Endorsement - Open Access | 0.04| -0.01| -0.01| 0.59| 0.00| 1.01| 0.65|
+|Endorsement - Replication Studies | -0.04| 0.45| -0.02| 0.15| 0.01| 1.25| 0.72|
+|Endorsement - Participatory Research | 0.12| 0.43| 0.00| -0.06| 0.03| 1.21| 0.82|
+|Green Science - Ecofriendly Practices | 0.78| 0.04| -0.02| -0.02| 0.08| 1.03| 0.35|
+|Green Science - Ecofriendly Topics | 0.71| 0.07| -0.05| -0.06| 0.04| 1.06| 0.49|
+|Green Science - Changed Practices | 0.67| -0.12| 0.02| 0.07| -0.12| 1.15| 0.56|
+|Green Science - Changed Communication | 0.50| -0.15| 0.17| 0.18| -0.01| 1.73| 0.62|
+|Green Science - Change Willingness | 0.44| -0.05| 0.07| 0.00| 0.39| 2.06| 0.48|
+|Green Science - Belief Relation | 0.31| 0.09| 0.06| -0.08| 0.42| 2.09| 0.59|
+|Slow Science - Importance | -0.04| -0.02| 0.85| 0.02| 0.13| 1.05| 0.25|
+|Slow Science - Familiarity | 0.02| 0.04| 0.93| -0.02| -0.10| 1.03| 0.14|
+|Ethical Science - Team Diversity | 0.07| -0.03| -0.02| 0.08| 0.54| 1.09| 0.67|
+|Ethical Science - Societal Consequences | 0.01| 0.06| -0.01| -0.01| 0.50| 1.03| 0.74|
 
 Table: Explained variance
 
-|Parameter | Green Science| Slow Science| Open Science| Rigorous Science| Ethical Science|
-|:-------------------|-------------:|------------:|------------:|----------------:|---------------:|
-|Eigenvalues | 3.13| 2.21| 1.26| 0.82| 0.53|
-|Variance | 0.12| 0.09| 0.07| 0.07| 0.07|
-|Variance_Cumulative | 0.12| 0.21| 0.28| 0.35| 0.42|
-|Variance_Proportion | 0.28| 0.21| 0.18| 0.17| 0.16|
+|Parameter | Green Science| Rigorous Science| Slow Science| Open Science| Ethical Science|
+|:-------------------|-------------:|----------------:|------------:|------------:|---------------:|
+|Eigenvalues | 3.16| 2.69| 1.22| 0.86| 0.56|
+|Variance | 0.12| 0.09| 0.09| 0.08| 0.06|
+|Variance_Cumulative | 0.12| 0.22| 0.31| 0.39| 0.45|
+|Variance_Proportion | 0.27| 0.21| 0.20| 0.18| 0.14|
 
 Table: Factor correlations
 
-|Factor | Green Science| Slow Science| Open Science| Rigorous Science| Ethical Science|
-|:----------------|-------------:|------------:|------------:|----------------:|---------------:|
-|Green Science | 1.00| 0.15| 0.03| -0.10| 0.46|
-|Slow Science | 0.15| 1.00| 0.29| 0.09| 0.16|
-|Open Science | 0.03| 0.29| 1.00| 0.30| 0.04|
-|Rigorous Science | -0.10| 0.09| 0.30| 1.00| 0.10|
-|Ethical Science | 0.46| 0.16| 0.04| 0.10| 1.00|
+|Factor | Green Science| Rigorous Science| Slow Science| Open Science| Ethical Science|
+|:----------------|-------------:|----------------:|------------:|------------:|---------------:|
+|Green Science | 1.00| -0.13| 0.16| 0.04| 0.42|
+|Rigorous Science | -0.13| 1.00| 0.18| 0.36| 0.06|
+|Slow Science | 0.16| 0.18| 1.00| 0.30| 0.14|
+|Open Science | 0.04| 0.36| 0.30| 1.00| 0.00|
+|Ethical Science | 0.42| 0.06| 0.14| 0.00| 1.00|
 
 :::
 
@@ -2805,74 +2828,74 @@ model_parameters(fit_cfa, standardize = TRUE)
 Link                                                 | Coefficient |   SE
 -------------------------------------------------------------------------
 Open_Science =~ OS_Importance                        |        0.39 | 0.04
-Open_Science =~ OS_Open_Data                         |        0.68 | 0.03
+Open_Science =~ OS_Open_Data                         |        0.67 | 0.03
 Open_Science =~ OS_Open_Materials                    |        0.69 | 0.03
-Open_Science =~ OS_Open_Access_Publication           |        0.45 | 0.04
-Rigorous_Science =~ OS_Study_Preregistration         |        0.75 | 0.03
-Rigorous_Science =~ OS_Registered_Reports            |        0.68 | 0.03
-Rigorous_Science =~ OS_Replication_Studies           |        0.38 | 0.04
-Rigorous_Science =~ OS_Participatory_Research        |        0.30 | 0.04
-Rigorous_Science =~ OS_Open_Peer_Review              |        0.26 | 0.04
+Open_Science =~ OS_Open_Access_Publication           |        0.55 | 0.04
+Rigorous_Science =~ OS_Study_Preregistration         |        0.78 | 0.02
+Rigorous_Science =~ OS_Registered_Reports            |        0.77 | 0.03
+Rigorous_Science =~ OS_Replication_Studies           |        0.53 | 0.03
+Rigorous_Science =~ OS_Participatory_Research        |        0.36 | 0.04
+Rigorous_Science =~ OS_Open_Peer_Review              |        0.38 | 0.04
 Green_Science =~ GS_Importance_conducting            |        0.80 | 0.02
 Green_Science =~ GS_Importance_topic                 |        0.71 | 0.02
 Green_Science =~ GS_Changes_practices                |        0.58 | 0.03
 Green_Science =~ GS_Changes_communication_practices  |        0.54 | 0.03
 Green_Science =~ GS_Relation_Research_Sustainability |        0.54 | 0.03
 Green_Science =~ GS_Change_practices_agreeing        |        0.68 | 0.03
-Slow_Science =~ SS_Importance                        |        0.94 | 0.04
-Slow_Science =~ SS_Familiar                          |        0.84 | 0.04
-Ethical_Science =~ ES_Importance_research_team       |        0.62 | 0.05
+Slow_Science =~ SS_Importance                        |        0.92 | 0.03
+Slow_Science =~ SS_Familiar                          |        0.86 | 0.03
+Ethical_Science =~ ES_Importance_research_team       |        0.63 | 0.05
 Ethical_Science =~ ES_Consequences_society           |        0.49 | 0.05
 
 Link                                                 |       95% CI |     z |      p
 ------------------------------------------------------------------------------------
-Open_Science =~ OS_Importance                        | [0.31, 0.47] |  9.73 | < .001
-Open_Science =~ OS_Open_Data                         | [0.61, 0.74] | 20.05 | < .001
-Open_Science =~ OS_Open_Materials                    | [0.63, 0.76] | 20.57 | < .001
-Open_Science =~ OS_Open_Access_Publication           | [0.37, 0.52] | 11.48 | < .001
-Rigorous_Science =~ OS_Study_Preregistration         | [0.68, 0.81] | 21.81 | < .001
-Rigorous_Science =~ OS_Registered_Reports            | [0.61, 0.75] | 19.72 | < .001
-Rigorous_Science =~ OS_Replication_Studies           | [0.30, 0.46] |  9.57 | < .001
-Rigorous_Science =~ OS_Participatory_Research        | [0.21, 0.38] |  7.04 | < .001
-Rigorous_Science =~ OS_Open_Peer_Review              | [0.17, 0.34] |  6.01 | < .001
-Green_Science =~ GS_Importance_conducting            | [0.77, 0.84] | 41.11 | < .001
-Green_Science =~ GS_Importance_topic                 | [0.66, 0.76] | 29.93 | < .001
-Green_Science =~ GS_Changes_practices                | [0.53, 0.64] | 19.91 | < .001
-Green_Science =~ GS_Changes_communication_practices  | [0.48, 0.60] | 17.59 | < .001
-Green_Science =~ GS_Relation_Research_Sustainability | [0.48, 0.61] | 17.68 | < .001
-Green_Science =~ GS_Change_practices_agreeing        | [0.63, 0.73] | 26.89 | < .001
-Slow_Science =~ SS_Importance                        | [0.86, 1.02] | 23.54 | < .001
-Slow_Science =~ SS_Familiar                          | [0.77, 0.91] | 22.57 | < .001
-Ethical_Science =~ ES_Importance_research_team       | [0.52, 0.72] | 12.03 | < .001
-Ethical_Science =~ ES_Consequences_society           | [0.40, 0.58] | 10.52 | < .001
+Open_Science =~ OS_Importance                        | [0.32, 0.47] |  9.94 | < .001
+Open_Science =~ OS_Open_Data                         | [0.60, 0.73] | 20.79 | < .001
+Open_Science =~ OS_Open_Materials                    | [0.62, 0.75] | 21.63 | < .001
+Open_Science =~ OS_Open_Access_Publication           | [0.48, 0.62] | 15.55 | < .001
+Rigorous_Science =~ OS_Study_Preregistration         | [0.73, 0.82] | 31.16 | < .001
+Rigorous_Science =~ OS_Registered_Reports            | [0.72, 0.82] | 30.53 | < .001
+Rigorous_Science =~ OS_Replication_Studies           | [0.47, 0.60] | 16.33 | < .001
+Rigorous_Science =~ OS_Participatory_Research        | [0.29, 0.44] |  9.47 | < .001
+Rigorous_Science =~ OS_Open_Peer_Review              | [0.31, 0.46] | 10.16 | < .001
+Green_Science =~ GS_Importance_conducting            | [0.77, 0.84] | 41.07 | < .001
+Green_Science =~ GS_Importance_topic                 | [0.66, 0.76] | 29.90 | < .001
+Green_Science =~ GS_Changes_practices                | [0.53, 0.64] | 19.99 | < .001
+Green_Science =~ GS_Changes_communication_practices  | [0.48, 0.60] | 17.63 | < .001
+Green_Science =~ GS_Relation_Research_Sustainability | [0.48, 0.60] | 17.62 | < .001
+Green_Science =~ GS_Change_practices_agreeing        | [0.63, 0.73] | 26.95 | < .001
+Slow_Science =~ SS_Importance                        | [0.85, 0.98] | 26.34 | < .001
+Slow_Science =~ SS_Familiar                          | [0.79, 0.93] | 25.56 | < .001
+Ethical_Science =~ ES_Importance_research_team       | [0.52, 0.73] | 11.89 | < .001
+Ethical_Science =~ ES_Consequences_society           | [0.39, 0.58] | 10.35 | < .001
 
 # Correlation
 
-Link                                | Coefficient |   SE |        95% CI
-------------------------------------------------------------------------
-Open_Science ~~ Rigorous_Science    |        0.47 | 0.05 | [ 0.38, 0.57]
-Open_Science ~~ Green_Science       |        0.06 | 0.05 | [-0.04, 0.16]
-Open_Science ~~ Slow_Science        |        0.31 | 0.05 | [ 0.22, 0.40]
-Open_Science ~~ Ethical_Science     |        0.18 | 0.07 | [ 0.05, 0.30]
-Rigorous_Science ~~ Green_Science   |       -0.06 | 0.05 | [-0.15, 0.04]
-Rigorous_Science ~~ Slow_Science    |        0.15 | 0.05 | [ 0.06, 0.24]
-Rigorous_Science ~~ Ethical_Science |        0.12 | 0.06 | [-0.01, 0.25]
-Green_Science ~~ Slow_Science       |        0.21 | 0.04 | [ 0.13, 0.29]
-Green_Science ~~ Ethical_Science    |        0.60 | 0.05 | [ 0.49, 0.70]
-Slow_Science ~~ Ethical_Science     |        0.20 | 0.06 | [ 0.08, 0.31]
+Link                                | Coefficient |   SE |         95% CI
+-------------------------------------------------------------------------
+Open_Science ~~ Rigorous_Science    |        0.53 | 0.04 | [ 0.45,  0.61]
+Open_Science ~~ Green_Science       |        0.05 | 0.05 | [-0.04,  0.15]
+Open_Science ~~ Slow_Science        |        0.35 | 0.04 | [ 0.26,  0.43]
+Open_Science ~~ Ethical_Science     |        0.14 | 0.07 | [ 0.01,  0.27]
+Rigorous_Science ~~ Green_Science   |       -0.10 | 0.05 | [-0.19, -0.01]
+Rigorous_Science ~~ Slow_Science    |        0.22 | 0.04 | [ 0.13,  0.31]
+Rigorous_Science ~~ Ethical_Science |        0.06 | 0.06 | [-0.06,  0.18]
+Green_Science ~~ Slow_Science       |        0.21 | 0.04 | [ 0.12,  0.29]
+Green_Science ~~ Ethical_Science    |        0.60 | 0.05 | [ 0.49,  0.70]
+Slow_Science ~~ Ethical_Science     |        0.18 | 0.06 | [ 0.07,  0.29]
 
 Link                                |     z |      p
 ----------------------------------------------------
-Open_Science ~~ Rigorous_Science    | 10.03 | < .001
-Open_Science ~~ Green_Science       |  1.22 | 0.221 
-Open_Science ~~ Slow_Science        |  6.87 | < .001
-Open_Science ~~ Ethical_Science     |  2.68 | 0.007 
-Rigorous_Science ~~ Green_Science   | -1.13 | 0.260 
-Rigorous_Science ~~ Slow_Science    |  3.16 | 0.002 
-Rigorous_Science ~~ Ethical_Science |  1.84 | 0.066 
-Green_Science ~~ Slow_Science       |  4.90 | < .001
-Green_Science ~~ Ethical_Science    | 11.06 | < .001
-Slow_Science ~~ Ethical_Science     |  3.44 | < .001
+Open_Science ~~ Rigorous_Science    | 12.60 | < .001
+Open_Science ~~ Green_Science       |  1.09 | 0.275 
+Open_Science ~~ Slow_Science        |  7.77 | < .001
+Open_Science ~~ Ethical_Science     |  2.16 | 0.031 
+Rigorous_Science ~~ Green_Science   | -2.14 | 0.032 
+Rigorous_Science ~~ Slow_Science    |  5.01 | < .001
+Rigorous_Science ~~ Ethical_Science |  1.00 | 0.316 
+Green_Science ~~ Slow_Science       |  4.79 | < .001
+Green_Science ~~ Ethical_Science    | 11.00 | < .001
+Slow_Science ~~ Ethical_Science     |  3.17 | 0.002 
 ```
 
 
@@ -2889,15 +2912,15 @@ model_performance(fit_cfa)
 
 Chi2(142) | p (Chi2) | Baseline(171) | p (Baseline) |   GFI |  AGFI |   NFI
 ---------------------------------------------------------------------------
-509.147   |   < .001 |      3328.272 |       < .001 | 0.920 | 0.893 | 0.847
+526.210   |   < .001 |      3700.932 |       < .001 | 0.917 | 0.889 | 0.858
 
 Chi2(142) |  NNFI |   CFI | RMSEA |      RMSEA  CI | p (RMSEA) |   RMR |  SRMR
 ------------------------------------------------------------------------------
-509.147   | 0.860 | 0.884 | 0.062 | [0.056, 0.067] |    < .001 | 0.005 | 0.056
+526.210   | 0.869 | 0.891 | 0.063 | [0.057, 0.069] |    < .001 | 0.005 | 0.057
 
 Chi2(142) |   RFI |  PNFI |   IFI |   RNI | Loglikelihood |    AIC |    BIC | BIC_adjusted
 ------------------------------------------------------------------------------------------
-509.147   | 0.816 | 0.703 | 0.885 | 0.884 |     -1111.602 | 2319.2 | 2536.4 |     2384.000
+526.210   | 0.829 | 0.712 | 0.892 | 0.891 |     -1263.120 | 2622.2 | 2839.4 |     2687.035
 ```
 
 
@@ -3021,6 +3044,51 @@ p_cfa
 
 
 
+
+::: {.cell}
+
+```{.r .cell-code}
+# The EFA puts two green items (link between research and sustainability,
+# willingness to change) on the Ethical factor rather than the Green one: the
+# model used above assigns them to Green (their movement); these alternatives
+# move them to Ethical, or let them load on both (as in the EFA)
+green_core <- "GS_Importance_conducting + GS_Importance_topic + GS_Changes_practices + GS_Changes_communication_practices"
+green_beliefs <- "GS_Relation_Research_Sustainability + GS_Change_practices_agreeing"
+# The Open, Rigorous and Slow factors of cfa_model (each factor's definition runs to the next one)
+cfa_common <- str_extract_all(cfa_model, "(?s)(Open|Rigorous|Slow)_Science\\s*=~.*?(?=\\n\\s*\\w+_Science\\s*=~|\\s*$)")[[1]] |>
+  paste(collapse = "\n") |>
+  paste0("\n")
+cfa_models <- list(
+  "Movement-based (used)" = cfa_model,
+  "Green beliefs on Ethical" = paste0(cfa_common, "Green_Science =~ ", green_core, "\n",
+                       "Ethical_Science =~ ES_Importance_research_team + ES_Consequences_society + ", green_beliefs),
+  "Cross-loadings" = paste0(cfa_common, "Green_Science =~ ", green_core, " + ", green_beliefs, "\n",
+                            "Ethical_Science =~ ES_Importance_research_team + ES_Consequences_society + ", green_beliefs)
+)
+cfa_comparison <- imap_dfr(cfa_models, \(model, name) {
+  fit <- cfa(model, data = df, std.lv = TRUE)
+  tibble(Model = name, r_Green_Ethical = lavInspect(fit, "cor.lv")["Green_Science", "Ethical_Science"],
+         !!!as.list(unclass(fitMeasures(fit, c("cfi", "tli", "rmsea", "srmr", "aic", "bic")))))
+})
+knitr::kable(cfa_comparison, format = "pipe", digits = 3, caption = "Alternative CFA specifications")
+```
+
+::: {.cell-output-display}
+
+
+Table: Alternative CFA specifications
+
+|Model                    | r_Green_Ethical|   cfi|   tli| rmsea|  srmr|      aic|      bic|
+|:------------------------|---------------:|-----:|-----:|-----:|-----:|--------:|--------:|
+|Movement-based (used)    |           0.595| 0.891| 0.869| 0.063| 0.057| 2622.239| 2839.441|
+|Green beliefs on Ethical |           0.752| 0.912| 0.894| 0.057| 0.056| 2549.192| 2766.394|
+|Cross-loadings           |           0.523| 0.919| 0.901| 0.055| 0.053| 2525.190| 2751.442|
+
+
+:::
+:::
+
+
 ### Clustering
 
 
@@ -3055,29 +3123,29 @@ rez
 ```
 # Clustering Solution
 
-The 5 clusters accounted for 56.93% of the total variance of the original data.
+The 5 clusters accounted for 57.24% of the total variance of the original data.
 
 Cluster | n_Obs | Sum_Squares | Open_Science | Rigorous_Science | Green_Science
 -------------------------------------------------------------------------------
-1       |   179 |      278.29 |         0.72 |             0.92 |          0.25
-2       |   166 |      303.96 |         0.03 |             0.10 |          0.26
-3       |   137 |      268.81 |        -0.05 |            -0.77 |          0.75
-4       |   108 |      357.98 |         0.32 |             0.35 |         -1.44
-5       |    92 |      257.62 |        -1.76 |            -1.22 |         -0.37
+1       |   193 |      290.53 |         0.69 |             0.82 |          0.19
+2       |   170 |      303.97 |         0.14 |             0.19 |          0.09
+3       |   130 |      275.73 |        -0.05 |            -0.78 |          0.89
+4       |    92 |      284.41 |         0.22 |             0.42 |         -1.53
+5       |    97 |      301.29 |        -1.74 |            -1.33 |         -0.26
 
 Cluster | Slow_Science | Ethical_Science
 ----------------------------------------
-1       |         0.91 |            0.53
-2       |        -1.01 |            0.36
-3       |         0.79 |            0.48
-4       |        -0.29 |           -1.36
-5       |        -0.79 |           -0.79
+1       |         0.93 |            0.44
+2       |        -0.95 |            0.26
+3       |         0.68 |            0.57
+4       |        -0.27 |           -1.61
+5       |        -0.84 |           -0.56
 
 # Indices of model performance
 
 Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 --------------------------------------------------------------------
-3405              |            1938.344 |           1466.656 | 0.569
+3405              |            1949.071 |           1455.929 | 0.572
 
 # You can access the predicted clusters via `predict()`.
 ```
@@ -3111,12 +3179,13 @@ df_resprac_fac$Profile <- profile_labels$Label[match(predict(rez), profile_label
 | n_Clusters| n_Methods|
 |----------:|---------:|
 | 1| 1|
-| 2| 7|
-| 3| 2|
-| 5| 8|
-| 6| 1|
-| 8| 4|
-| 9| 1|
+| 2| 6|
+| 3| 7|
+| 4| 1|
+| 6| 4|
+| 8| 1|
+| 9| 2|
+| 10| 2|
 
 :::
 
@@ -3269,12 +3338,12 @@ p_radar
 Table: Mean CFA factor score per profile
 
 |Profile | N|Percentage | Rigorous_Science| Open_Science| Slow_Science| Green_Science| Ethical_Science|
-|:-----------------------------------------------|---:|:----------|----------------:|------------:|------------:|-------------:|---------------:|
-|Profile A +Open +Rigorous +Slow +Ethical | 179|26.25% | 0.78| 0.61| 0.87| 0.23| 0.40|
-|Profile B -Slow | 166|24.34% | 0.08| 0.02| -0.96| 0.24| 0.28|
-|Profile C -Rigorous +Green +Slow +Ethical | 137|20.09% | -0.65| -0.04| 0.75| 0.68| 0.37|
-|Profile D -Green -Ethical | 108|15.84% | 0.29| 0.27| -0.27| -1.32| -1.05|
-|Profile E -Open -Rigorous -Green -Slow -Ethical | 92|13.49% | -1.04| -1.49| -0.75| -0.34| -0.61|
+|:-----------------------------------------|---:|:----------|----------------:|------------:|------------:|-------------:|---------------:|
+|Profile A +Open +Rigorous +Slow +Ethical | 193|28.30% | 0.74| 0.59| 0.88| 0.17| 0.34|
+|Profile B -Slow | 170|24.93% | 0.17| 0.12| -0.90| 0.08| 0.20|
+|Profile C -Rigorous +Green +Slow +Ethical | 130|19.06% | -0.70| -0.05| 0.64| 0.81| 0.43|
+|Profile D -Open -Rigorous -Slow -Ethical | 97|14.22% | -1.19| -1.49| -0.79| -0.24| -0.43|
+|Profile E +Rigorous -Green -Ethical | 92|13.49% | 0.37| 0.19| -0.26| -1.41| -1.24|
 
 :::
 
@@ -3315,11 +3384,11 @@ Table: Bootstrap stability of the hkmeans solutions (100 resamples each)
 
 | Clusters| Median ARI| 2.5%| 97.5%|
 |--------:|----------:|----:|-----:|
-|        2|       0.83| 0.60|  0.99|
-|        3|       0.76| 0.31|  0.94|
-|        4|       0.60| 0.29|  0.93|
-|        5|       0.75| 0.32|  0.91|
-|        6|       0.57| 0.38|  0.73|
+|        2|       0.85| 0.52|  0.99|
+|        3|       0.85| 0.65|  0.95|
+|        4|       0.54| 0.26|  0.86|
+|        5|       0.56| 0.30|  0.89|
+|        6|       0.55| 0.37|  0.88|
 
 
 :::
@@ -3389,22 +3458,22 @@ Table: MCMC diagnostics
 
 | Chains| Draws| Divergent|Max Rhat | Min ESS|
 |------:|-----:|---------:|:--------|-------:|
-| 4| 4000| 0|1.003 | 1259|
+| 4| 4000| 1|1.005 | 1085|
 
 Table: Predicted probability (Median [95% CI])
 
 |Profile |Dem_Gender |Dem_Age = 25 |Dem_Age = 35 |Dem_Age = 45 |Dem_Age = 55 |Dem_Age = 65 |
-|:-----------------------------------------------|:----------|:-----------------|:-----------------|:-----------------|:-----------------|:-----------------|
-|Profile A +Open +Rigorous +Slow +Ethical |Female |0.26 [0.18, 0.35] |0.38 [0.30, 0.47] |0.34 [0.26, 0.43] |0.23 [0.14, 0.34] |0.11 [0.02, 0.26] |
-|Profile A +Open +Rigorous +Slow +Ethical |Male |0.24 [0.16, 0.34] |0.21 [0.16, 0.28] |0.17 [0.12, 0.24] |0.14 [0.08, 0.22] |0.11 [0.03, 0.22] |
-|Profile B -Slow |Female |0.37 [0.29, 0.47] |0.24 [0.17, 0.32] |0.22 [0.15, 0.31] |0.21 [0.12, 0.34] |0.11 [0.02, 0.30] |
-|Profile B -Slow |Male |0.24 [0.14, 0.37] |0.16 [0.10, 0.23] |0.16 [0.10, 0.24] |0.18 [0.10, 0.28] |0.23 [0.08, 0.47] |
-|Profile C -Rigorous +Green +Slow +Ethical |Female |0.15 [0.09, 0.22] |0.14 [0.08, 0.20] |0.21 [0.14, 0.31] |0.33 [0.21, 0.46] |0.47 [0.21, 0.75] |
-|Profile C -Rigorous +Green +Slow +Ethical |Male |0.23 [0.14, 0.33] |0.24 [0.17, 0.31] |0.24 [0.17, 0.33] |0.22 [0.14, 0.33] |0.18 [0.06, 0.35] |
-|Profile D -Green -Ethical |Female |0.08 [0.04, 0.13] |0.16 [0.10, 0.23] |0.12 [0.06, 0.19] |0.05 [0.01, 0.11] |0.02 [0.00, 0.07] |
-|Profile D -Green -Ethical |Male |0.21 [0.12, 0.32] |0.26 [0.19, 0.36] |0.23 [0.15, 0.31] |0.23 [0.14, 0.34] |0.25 [0.10, 0.48] |
-|Profile E -Open -Rigorous -Green -Slow -Ethical |Female |0.13 [0.08, 0.20] |0.08 [0.04, 0.13] |0.11 [0.06, 0.19] |0.18 [0.09, 0.28] |0.29 [0.08, 0.59] |
-|Profile E -Open -Rigorous -Green -Slow -Ethical |Male |0.08 [0.03, 0.15] |0.12 [0.08, 0.18] |0.19 [0.13, 0.27] |0.23 [0.13, 0.34] |0.23 [0.07, 0.44] |
+|:-----------------------------------------|:----------|:-----------------|:-----------------|:-----------------|:-----------------|:-----------------|
+|Profile A +Open +Rigorous +Slow +Ethical |Female |0.28 [0.20, 0.37] |0.39 [0.31, 0.48] |0.34 [0.26, 0.43] |0.26 [0.16, 0.36] |0.16 [0.05, 0.33] |
+|Profile A +Open +Rigorous +Slow +Ethical |Male |0.27 [0.18, 0.37] |0.24 [0.18, 0.30] |0.20 [0.15, 0.27] |0.17 [0.10, 0.25] |0.14 [0.05, 0.26] |
+|Profile B -Slow |Female |0.39 [0.31, 0.49] |0.25 [0.17, 0.33] |0.20 [0.13, 0.29] |0.19 [0.10, 0.30] |0.13 [0.03, 0.33] |
+|Profile B -Slow |Male |0.23 [0.14, 0.33] |0.20 [0.13, 0.27] |0.20 [0.14, 0.29] |0.17 [0.09, 0.27] |0.17 [0.05, 0.36] |
+|Profile C -Rigorous +Green +Slow +Ethical |Female |0.11 [0.06, 0.17] |0.14 [0.09, 0.20] |0.23 [0.15, 0.32] |0.34 [0.23, 0.46] |0.40 [0.17, 0.67] |
+|Profile C -Rigorous +Green +Slow +Ethical |Male |0.21 [0.12, 0.30] |0.22 [0.15, 0.28] |0.23 [0.16, 0.31] |0.23 [0.14, 0.33] |0.23 [0.09, 0.42] |
+|Profile D -Open -Rigorous -Slow -Ethical |Female |0.17 [0.10, 0.24] |0.10 [0.06, 0.16] |0.13 [0.07, 0.22] |0.19 [0.11, 0.31] |0.29 [0.09, 0.58] |
+|Profile D -Open -Rigorous -Slow -Ethical |Male |0.11 [0.05, 0.19] |0.11 [0.07, 0.17] |0.14 [0.09, 0.21] |0.17 [0.09, 0.27] |0.16 [0.05, 0.34] |
+|Profile E +Rigorous -Green -Ethical |Female |0.05 [0.02, 0.10] |0.11 [0.07, 0.18] |0.09 [0.04, 0.16] |0.03 [0.00, 0.07] |0.01 [0.00, 0.05] |
+|Profile E +Rigorous -Green -Ethical |Male |0.19 [0.11, 0.29] |0.23 [0.16, 0.31] |0.22 [0.14, 0.30] |0.27 [0.17, 0.38] |0.31 [0.13, 0.52] |
 
 :::
 
@@ -3475,6 +3544,7 @@ Finished in  0.1 seconds.
 ::: {.cell-output .cell-output-stdout}
 
 ```
+Pareto k value (0.77) is greater than 0.7. Importance resampling was not able to improve the approximation, which may indicate that the approximation itself is poor. 
 Finished in  0.1 seconds.
 ```
 
@@ -3493,6 +3563,7 @@ Finished in  0.1 seconds.
 ::: {.cell-output .cell-output-stdout}
 
 ```
+Pareto k value (0.75) is greater than 0.7. Importance resampling was not able to improve the approximation, which may indicate that the approximation itself is poor. 
 Finished in  0.1 seconds.
 ```
 
@@ -3554,86 +3625,86 @@ Table: Posterior draws
 
 |Outcome | Draws| Unique draws|
 |:----------------|-----:|------------:|
-|Open Science | 3000| 2530|
-|Rigorous Science | 3000| 2366|
-|Green Science | 3000| 2455|
-|Slow Science | 3000| 2511|
-|Ethical Science | 3000| 2379|
+|Open Science | 3000| 2392|
+|Rigorous Science | 3000| 2220|
+|Green Science | 3000| 2495|
+|Slow Science | 3000| 2362|
+|Ethical Science | 3000| 2493|
 
 Table: Marginal means (continuous predictor at its mean)
 
 |Outcome |Dem_Gender |Median [95% CI] |pd |
 |:----------------|:----------|:--------------------|:-------|
-|Open Science |Female |0.07 [-0.03, 0.17] |90.47% |
-|Open Science |Male |0.17 [0.06, 0.29] |99.80% |
-|Rigorous Science |Female |0.12 [0.01, 0.22] |99.00% |
-|Rigorous Science |Male |-0.04 [-0.15, 0.08] |71.97% |
-|Green Science |Female |0.11 [0.00, 0.21] |97.47% |
-|Green Science |Male |-0.16 [-0.28, -0.03] |99.30% |
-|Slow Science |Female |0.03 [-0.08, 0.14] |70.50% |
-|Slow Science |Male |0.09 [-0.03, 0.22] |92.17% |
-|Ethical Science |Female |0.18 [0.09, 0.27] |100.00% |
+|Open Science |Female |0.05 [-0.04, 0.15] |86.60% |
+|Open Science |Male |0.20 [0.09, 0.32] |100.00% |
+|Rigorous Science |Female |0.09 [-0.02, 0.19] |94.83% |
+|Rigorous Science |Male |0.05 [-0.07, 0.18] |79.10% |
+|Green Science |Female |0.10 [0.00, 0.21] |97.57% |
+|Green Science |Male |-0.16 [-0.28, -0.04] |99.33% |
+|Slow Science |Female |0.02 [-0.08, 0.14] |68.10% |
+|Slow Science |Male |0.11 [-0.03, 0.24] |94.27% |
+|Ethical Science |Female |0.18 [0.08, 0.27] |100.00% |
 |Ethical Science |Male |-0.29 [-0.39, -0.19] |100.00% |
 
 Table: Contrasts between groups (continuous predictor at its mean)
 
 |Outcome |Contrast |Median [95% CI] |pd |
 |:----------------|:-------------|:--------------------|:-------|
-|Open Science |Male - Female |0.11 [-0.03, 0.25] |93.23% |
-|Rigorous Science |Male - Female |-0.15 [-0.30, -0.01] |98.03% |
-|Green Science |Male - Female |-0.27 [-0.42, -0.11] |99.97% |
-|Slow Science |Male - Female |0.06 [-0.10, 0.23] |77.23% |
+|Open Science |Male - Female |0.15 [0.01, 0.30] |98.07% |
+|Rigorous Science |Male - Female |-0.03 [-0.19, 0.12] |66.53% |
+|Green Science |Male - Female |-0.26 [-0.42, -0.11] |99.97% |
+|Slow Science |Male - Female |0.09 [-0.08, 0.25] |84.13% |
 |Ethical Science |Male - Female |-0.47 [-0.60, -0.34] |100.00% |
 
 Table: Predictions (Median [95% CI])
 
 |Outcome |Dem_Gender |Dem_Age = 25 |Dem_Age = 35 |Dem_Age = 45 |Dem_Age = 55 |Dem_Age = 65 |
 |:----------------|:----------|:-------------------|:--------------------|:--------------------|:--------------------|:--------------------|
-|Open Science |Female |-0.11 [-0.23, 0.01] |0.05 [-0.04, 0.14] |0.06 [-0.05, 0.18] |-0.07 [-0.22, 0.10] |-0.34 [-0.60, -0.07] |
-|Open Science |Male |0.10 [-0.08, 0.27] |0.18 [0.07, 0.29] |0.11 [-0.01, 0.24] |-0.10 [-0.27, 0.07] |-0.45 [-0.76, -0.16] |
-|Rigorous Science |Female |0.15 [0.01, 0.28] |0.14 [0.04, 0.23] |0.03 [-0.09, 0.15] |-0.17 [-0.32, 0.01] |-0.46 [-0.74, -0.17] |
-|Rigorous Science |Male |0.04 [-0.13, 0.22] |-0.01 [-0.13, 0.11] |-0.13 [-0.26, 0.00] |-0.32 [-0.49, -0.16] |-0.59 [-0.90, -0.27] |
-|Green Science |Female |0.01 [-0.13, 0.15] |0.08 [-0.02, 0.18] |0.18 [0.05, 0.31] |0.30 [0.12, 0.48] |0.44 [0.13, 0.75] |
-|Green Science |Male |0.01 [-0.18, 0.21] |-0.13 [-0.25, -0.01] |-0.23 [-0.37, -0.08] |-0.29 [-0.47, -0.12] |-0.32 [-0.64, 0.00] |
-|Slow Science |Female |-0.14 [-0.29, 0.01] |0.00 [-0.10, 0.11] |0.08 [-0.05, 0.21] |0.11 [-0.08, 0.29] |0.07 [-0.25, 0.40] |
-|Slow Science |Male |0.11 [-0.09, 0.31] |0.11 [-0.02, 0.23] |0.04 [-0.11, 0.18] |-0.10 [-0.29, 0.08] |-0.30 [-0.66, 0.04] |
-|Ethical Science |Female |0.25 [0.13, 0.36] |0.19 [0.11, 0.27] |0.16 [0.06, 0.26] |0.15 [0.02, 0.30] |0.16 [-0.09, 0.43] |
-|Ethical Science |Male |-0.09 [-0.25, 0.08] |-0.25 [-0.35, -0.15] |-0.37 [-0.49, -0.26] |-0.45 [-0.60, -0.31] |-0.48 [-0.77, -0.21] |
+|Open Science |Female |-0.12 [-0.25, 0.02] |0.04 [-0.05, 0.13] |0.04 [-0.08, 0.15] |-0.12 [-0.31, 0.04] |-0.44 [-0.81, -0.18] |
+|Open Science |Male |0.08 [-0.10, 0.25] |0.20 [0.09, 0.31] |0.16 [0.04, 0.28] |-0.03 [-0.20, 0.13] |-0.39 [-0.69, -0.09] |
+|Rigorous Science |Female |0.09 [-0.07, 0.23] |0.11 [0.00, 0.21] |-0.01 [-0.13, 0.11] |-0.25 [-0.41, -0.09] |-0.62 [-0.92, -0.32] |
+|Rigorous Science |Male |0.02 [-0.17, 0.23] |0.06 [-0.06, 0.19] |-0.01 [-0.14, 0.14] |-0.19 [-0.37, -0.03] |-0.49 [-0.82, -0.17] |
+|Green Science |Female |0.01 [-0.14, 0.15] |0.08 [-0.02, 0.18] |0.18 [0.06, 0.31] |0.30 [0.13, 0.48] |0.45 [0.14, 0.76] |
+|Green Science |Male |0.01 [-0.18, 0.20] |-0.13 [-0.25, -0.01] |-0.23 [-0.36, -0.09] |-0.29 [-0.47, -0.12] |-0.32 [-0.66, 0.01] |
+|Slow Science |Female |-0.15 [-0.33, 0.00] |0.00 [-0.11, 0.10] |0.08 [-0.05, 0.20] |0.09 [-0.10, 0.27] |0.04 [-0.29, 0.34] |
+|Slow Science |Male |0.11 [-0.09, 0.30] |0.12 [-0.01, 0.25] |0.06 [-0.09, 0.20] |-0.08 [-0.26, 0.10] |-0.29 [-0.63, 0.03] |
+|Ethical Science |Female |0.25 [0.14, 0.36] |0.19 [0.10, 0.27] |0.15 [0.05, 0.26] |0.14 [0.02, 0.29] |0.16 [-0.09, 0.40] |
+|Ethical Science |Male |-0.09 [-0.25, 0.06] |-0.26 [-0.35, -0.16] |-0.37 [-0.49, -0.26] |-0.44 [-0.59, -0.30] |-0.46 [-0.74, -0.18] |
 
 Table: Parameters
 
 |Outcome |Parameter |Median [95% CI] |pd |
 |:----------------|:----------------------------|:--------------------|:-------|
-|Open Science |Intercept |-0.02 [-0.10, 0.06] |71.83% |
-|Open Science |Dem_GenderMale |0.10 [-0.02, 0.23] |94.80% |
-|Open Science |polyDem_Age21 |-0.24 [-2.35, 1.76] |58.73% |
-|Open Science |polyDem_Age22 |-2.29 [-3.61, -1.01] |99.90% |
-|Open Science |Dem_GenderMale:polyDem_Age21 |-2.29 [-5.55, 1.02] |91.63% |
-|Open Science |Dem_GenderMale:polyDem_Age22 |-0.08 [-1.66, 1.50] |53.67% |
-|Rigorous Science |Intercept |0.06 [-0.03, 0.15] |90.97% |
-|Rigorous Science |Dem_GenderMale |-0.14 [-0.27, -0.01] |98.37% |
-|Rigorous Science |polyDem_Age21 |-3.49 [-5.64, -1.18] |98.63% |
-|Rigorous Science |polyDem_Age22 |-1.51 [-2.90, -0.10] |98.30% |
-|Rigorous Science |Dem_GenderMale:polyDem_Age21 |-0.40 [-4.00, 2.58] |59.03% |
-|Rigorous Science |Dem_GenderMale:polyDem_Age22 |0.35 [-1.37, 2.03] |65.93% |
-|Green Science |Intercept |0.12 [0.03, 0.21] |99.73% |
+|Open Science |Intercept |-0.05 [-0.13, 0.04] |87.00% |
+|Open Science |Dem_GenderMale |0.15 [0.02, 0.27] |98.50% |
+|Open Science |polyDem_Age21 |-0.80 [-2.92, 1.43] |75.40% |
+|Open Science |polyDem_Age22 |-2.56 [-3.85, -1.23] |100.00% |
+|Open Science |Dem_GenderMale:polyDem_Age21 |-0.95 [-4.61, 2.70] |71.07% |
+|Open Science |Dem_GenderMale:polyDem_Age22 |0.01 [-1.70, 1.57] |50.47% |
+|Rigorous Science |Intercept |0.00 [-0.08, 0.09] |54.10% |
+|Rigorous Science |Dem_GenderMale |-0.02 [-0.17, 0.11] |62.63% |
+|Rigorous Science |polyDem_Age21 |-3.86 [-6.07, -1.32] |100.00% |
+|Rigorous Science |polyDem_Age22 |-2.12 [-3.45, -0.73] |99.93% |
+|Rigorous Science |Dem_GenderMale:polyDem_Age21 |1.33 [-2.34, 4.76] |76.47% |
+|Rigorous Science |Dem_GenderMale:polyDem_Age22 |0.23 [-1.55, 1.85] |60.90% |
+|Green Science |Intercept |0.12 [0.03, 0.21] |99.67% |
 |Green Science |Dem_GenderMale |-0.26 [-0.40, -0.12] |100.00% |
-|Green Science |polyDem_Age21 |2.89 [0.46, 5.30] |98.93% |
-|Green Science |polyDem_Age22 |0.39 [-0.99, 1.84] |70.30% |
-|Green Science |Dem_GenderMale:polyDem_Age21 |-5.65 [-9.53, -1.84] |99.87% |
-|Green Science |Dem_GenderMale:polyDem_Age22 |0.23 [-1.38, 1.78] |60.97% |
-|Slow Science |Intercept |0.00 [-0.10, 0.09] |53.87% |
-|Slow Science |Dem_GenderMale |0.06 [-0.09, 0.21] |76.20% |
-|Slow Science |polyDem_Age21 |2.11 [-0.47, 4.59] |94.40% |
-|Slow Science |polyDem_Age22 |-0.92 [-2.36, 0.56] |89.97% |
-|Slow Science |Dem_GenderMale:polyDem_Age21 |-4.45 [-8.16, -0.73] |99.33% |
-|Slow Science |Dem_GenderMale:polyDem_Age22 |-0.12 [-1.77, 1.59] |55.47% |
-|Ethical Science |Intercept |0.19 [0.12, 0.26] |100.00% |
+|Green Science |polyDem_Age21 |2.95 [0.52, 5.29] |99.23% |
+|Green Science |polyDem_Age22 |0.41 [-0.97, 1.83] |71.77% |
+|Green Science |Dem_GenderMale:polyDem_Age21 |-5.76 [-9.52, -2.13] |99.80% |
+|Green Science |Dem_GenderMale:polyDem_Age22 |0.21 [-1.49, 1.82] |59.47% |
+|Slow Science |Intercept |-0.01 [-0.11, 0.08] |61.40% |
+|Slow Science |Dem_GenderMale |0.08 [-0.07, 0.22] |84.83% |
+|Slow Science |polyDem_Age21 |1.99 [-0.77, 4.90] |92.33% |
+|Slow Science |polyDem_Age22 |-1.03 [-2.44, 0.29] |92.73% |
+|Slow Science |Dem_GenderMale:polyDem_Age21 |-4.22 [-7.77, -0.23] |98.87% |
+|Slow Science |Dem_GenderMale:polyDem_Age22 |-0.17 [-1.86, 1.44] |57.00% |
+|Ethical Science |Intercept |0.19 [0.12, 0.27] |100.00% |
 |Ethical Science |Dem_GenderMale |-0.46 [-0.57, -0.34] |100.00% |
-|Ethical Science |polyDem_Age21 |-0.88 [-2.81, 1.07] |80.40% |
-|Ethical Science |polyDem_Age22 |0.39 [-0.82, 1.63] |72.60% |
-|Ethical Science |Dem_GenderMale:polyDem_Age21 |-2.43 [-5.57, 0.27] |95.80% |
-|Ethical Science |Dem_GenderMale:polyDem_Age22 |0.30 [-1.29, 1.75] |64.00% |
+|Ethical Science |polyDem_Age21 |-0.93 [-2.82, 0.81] |84.73% |
+|Ethical Science |polyDem_Age22 |0.45 [-0.86, 1.77] |75.57% |
+|Ethical Science |Dem_GenderMale:polyDem_Age21 |-2.26 [-5.08, 0.52] |94.47% |
+|Ethical Science |Dem_GenderMale:polyDem_Age22 |0.35 [-1.18, 1.81] |66.80% |
 
 :::
 
@@ -3683,44 +3754,6 @@ Start sampling
 ::: {.cell-output .cell-output-stdout}
 
 ```
-Pareto k value (0.78) is greater than 0.7. Importance resampling was not able to improve the approximation, which may indicate that the approximation itself is poor. 
-Finished in  0.1 seconds.
-```
-
-
-:::
-
-::: {.cell-output .cell-output-stderr}
-
-```
-Start sampling
-```
-
-
-:::
-
-::: {.cell-output .cell-output-stdout}
-
-```
-Finished in  0.1 seconds.
-```
-
-
-:::
-
-::: {.cell-output .cell-output-stderr}
-
-```
-Start sampling
-```
-
-
-:::
-
-::: {.cell-output .cell-output-stdout}
-
-```
-Pareto k value (0.72) is greater than 0.7. Importance resampling was not able to improve the approximation, which may indicate that the approximation itself is poor. 
 Finished in  0.2 seconds.
 ```
 
@@ -3739,7 +3772,45 @@ Start sampling
 ::: {.cell-output .cell-output-stdout}
 
 ```
+Pareto k value (0.79) is greater than 0.7. Importance resampling was not able to improve the approximation, which may indicate that the approximation itself is poor. 
+Finished in  0.1 seconds.
+```
+
+
+:::
+
+::: {.cell-output .cell-output-stderr}
+
+```
+Start sampling
+```
+
+
+:::
+
+::: {.cell-output .cell-output-stdout}
+
+```
+Pareto k value (0.83) is greater than 0.7. Importance resampling was not able to improve the approximation, which may indicate that the approximation itself is poor. 
 Finished in  0.2 seconds.
+```
+
+
+:::
+
+::: {.cell-output .cell-output-stderr}
+
+```
+Start sampling
+```
+
+
+:::
+
+::: {.cell-output .cell-output-stdout}
+
+```
+Finished in  0.1 seconds.
 ```
 
 
@@ -3790,121 +3861,121 @@ Table: Posterior draws
 
 |Outcome | Draws| Unique draws|
 |:----------------|-----:|------------:|
-|Open Science | 3000| 1946|
-|Rigorous Science | 3000| 1879|
-|Green Science | 3000| 1792|
-|Slow Science | 3000| 1918|
-|Ethical Science | 3000| 1896|
+|Open Science | 3000| 1879|
+|Rigorous Science | 3000| 1976|
+|Green Science | 3000| 1849|
+|Slow Science | 3000| 1827|
+|Ethical Science | 3000| 2050|
 
 Table: Marginal means (continuous predictor at its mean)
 
 |Outcome |Work_Career_Stage |Median [95% CI] |pd |
 |:----------------|:-----------------|:--------------------|:------|
-|Open Science |PhD / Student |-0.10 [-0.24, 0.04] |91.40% |
-|Open Science |Non-permanent |0.16 [0.00, 0.31] |98.27% |
-|Open Science |Permanent |0.00 [-0.12, 0.12] |50.70% |
-|Rigorous Science |PhD / Student |0.05 [-0.09, 0.20] |78.07% |
-|Rigorous Science |Non-permanent |0.15 [-0.03, 0.31] |95.00% |
-|Rigorous Science |Permanent |-0.17 [-0.30, -0.02] |98.10% |
-|Green Science |PhD / Student |-0.04 [-0.21, 0.10] |71.53% |
-|Green Science |Non-permanent |-0.07 [-0.23, 0.10] |75.73% |
-|Green Science |Permanent |0.03 [-0.12, 0.17] |65.73% |
-|Slow Science |PhD / Student |-0.20 [-0.38, -0.03] |98.90% |
-|Slow Science |Non-permanent |-0.06 [-0.22, 0.11] |75.63% |
-|Slow Science |Permanent |0.08 [-0.06, 0.21] |85.27% |
-|Ethical Science |PhD / Student |0.11 [-0.03, 0.23] |93.50% |
-|Ethical Science |Non-permanent |-0.03 [-0.17, 0.12] |63.40% |
-|Ethical Science |Permanent |-0.09 [-0.20, 0.02] |96.13% |
+|Open Science |PhD / Student |-0.12 [-0.27, 0.02] |95.37% |
+|Open Science |Non-permanent |0.16 [0.01, 0.33] |98.17% |
+|Open Science |Permanent |0.00 [-0.12, 0.14] |51.90% |
+|Rigorous Science |PhD / Student |0.01 [-0.16, 0.16] |53.23% |
+|Rigorous Science |Non-permanent |0.14 [-0.02, 0.30] |95.83% |
+|Rigorous Science |Permanent |-0.15 [-0.28, -0.03] |99.50% |
+|Green Science |PhD / Student |-0.04 [-0.28, 0.11] |69.30% |
+|Green Science |Non-permanent |-0.06 [-0.22, 0.14] |77.40% |
+|Green Science |Permanent |0.03 [-0.11, 0.16] |62.77% |
+|Slow Science |PhD / Student |-0.21 [-0.36, -0.05] |99.23% |
+|Slow Science |Non-permanent |-0.07 [-0.23, 0.11] |74.53% |
+|Slow Science |Permanent |0.09 [-0.06, 0.21] |87.30% |
+|Ethical Science |PhD / Student |0.11 [-0.02, 0.23] |93.87% |
+|Ethical Science |Non-permanent |-0.03 [-0.17, 0.11] |67.07% |
+|Ethical Science |Permanent |-0.09 [-0.21, 0.02] |94.20% |
 
 Table: Contrasts between groups (continuous predictor at its mean)
 
 |Outcome |Contrast |Median [95% CI] |pd |
-|:----------------|:-----------------------------|:--------------------|:-------|
-|Open Science |Non-permanent - PhD / Student |0.26 [0.08, 0.46] |99.80% |
-|Open Science |Permanent - PhD / Student |0.10 [-0.08, 0.28] |88.37% |
-|Open Science |Permanent - Non-permanent |-0.16 [-0.35, 0.01] |96.33% |
-|Rigorous Science |Non-permanent - PhD / Student |0.09 [-0.10, 0.29] |82.00% |
-|Rigorous Science |Permanent - PhD / Student |-0.23 [-0.42, -0.03] |99.37% |
-|Rigorous Science |Permanent - Non-permanent |-0.32 [-0.51, -0.13] |100.00% |
-|Green Science |Non-permanent - PhD / Student |-0.02 [-0.24, 0.19] |58.20% |
-|Green Science |Permanent - PhD / Student |0.08 [-0.13, 0.26] |76.80% |
-|Green Science |Permanent - Non-permanent |0.09 [-0.11, 0.33] |82.20% |
-|Slow Science |Non-permanent - PhD / Student |0.14 [-0.09, 0.35] |88.20% |
-|Slow Science |Permanent - PhD / Student |0.28 [0.05, 0.52] |99.30% |
-|Slow Science |Permanent - Non-permanent |0.13 [-0.09, 0.33] |89.27% |
-|Ethical Science |Non-permanent - PhD / Student |-0.13 [-0.31, 0.05] |92.23% |
-|Ethical Science |Permanent - PhD / Student |-0.20 [-0.36, -0.04] |98.77% |
-|Ethical Science |Permanent - Non-permanent |-0.07 [-0.25, 0.11] |77.67% |
+|:----------------|:-----------------------------|:--------------------|:------|
+|Open Science |Non-permanent - PhD / Student |0.29 [0.08, 0.49] |99.97% |
+|Open Science |Permanent - PhD / Student |0.13 [-0.04, 0.32] |92.17% |
+|Open Science |Permanent - Non-permanent |-0.16 [-0.34, 0.04] |94.93% |
+|Rigorous Science |Non-permanent - PhD / Student |0.13 [-0.07, 0.38] |89.83% |
+|Rigorous Science |Permanent - PhD / Student |-0.16 [-0.36, 0.04] |92.73% |
+|Rigorous Science |Permanent - Non-permanent |-0.30 [-0.49, -0.10] |99.90% |
+|Green Science |Non-permanent - PhD / Student |-0.03 [-0.23, 0.20] |57.53% |
+|Green Science |Permanent - PhD / Student |0.06 [-0.14, 0.37] |70.70% |
+|Green Science |Permanent - Non-permanent |0.09 [-0.12, 0.30] |79.90% |
+|Slow Science |Non-permanent - PhD / Student |0.15 [-0.08, 0.37] |90.07% |
+|Slow Science |Permanent - PhD / Student |0.28 [0.08, 0.50] |99.43% |
+|Slow Science |Permanent - Non-permanent |0.14 [-0.07, 0.36] |89.90% |
+|Ethical Science |Non-permanent - PhD / Student |-0.14 [-0.31, 0.03] |93.37% |
+|Ethical Science |Permanent - PhD / Student |-0.20 [-0.35, -0.03] |98.97% |
+|Ethical Science |Permanent - Non-permanent |-0.06 [-0.23, 0.11] |75.60% |
 
 Table: Predictions (Median [95% CI])
 
 |Outcome |Work_Career_Stage |WB_Carrer_worry = 0 |WB_Carrer_worry = 0.25 |WB_Carrer_worry = 0.5 |WB_Carrer_worry = 0.75 |WB_Carrer_worry = 1 |
 |:----------------|:-----------------|:--------------------|:----------------------|:---------------------|:----------------------|:--------------------|
-|Open Science |PhD / Student |-0.04 [-0.47, 0.36] |-0.05 [-0.32, 0.20] |-0.09 [-0.25, 0.07] |-0.14 [-0.26, -0.03] |-0.21 [-0.37, -0.04] |
-|Open Science |Non-permanent |-0.05 [-0.46, 0.32] |0.06 [-0.16, 0.28] |0.14 [-0.02, 0.31] |0.20 [0.06, 0.34] |0.23 [0.04, 0.44] |
-|Open Science |Permanent |0.01 [-0.17, 0.19] |0.03 [-0.09, 0.14] |0.01 [-0.11, 0.13] |-0.03 [-0.16, 0.11] |-0.10 [-0.33, 0.16] |
-|Rigorous Science |PhD / Student |-0.02 [-0.37, 0.41] |0.01 [-0.21, 0.32] |0.04 [-0.11, 0.22] |0.08 [-0.04, 0.20] |0.12 [-0.05, 0.28] |
-|Rigorous Science |Non-permanent |0.07 [-0.28, 0.41] |0.10 [-0.11, 0.32] |0.13 [-0.03, 0.31] |0.17 [0.02, 0.32] |0.21 [0.02, 0.41] |
-|Rigorous Science |Permanent |-0.18 [-0.36, 0.00] |-0.18 [-0.29, -0.05] |-0.17 [-0.29, -0.02] |-0.17 [-0.31, -0.01] |-0.17 [-0.45, 0.12] |
-|Green Science |PhD / Student |-0.22 [-0.63, 0.20] |-0.15 [-0.42, 0.11] |-0.07 [-0.26, 0.09] |0.01 [-0.12, 0.12] |0.10 [-0.07, 0.28] |
-|Green Science |Non-permanent |0.10 [-0.31, 0.51] |0.02 [-0.24, 0.26] |-0.05 [-0.23, 0.12] |-0.10 [-0.26, 0.05] |-0.13 [-0.36, 0.08] |
-|Green Science |Permanent |0.02 [-0.18, 0.20] |0.00 [-0.12, 0.13] |0.02 [-0.12, 0.14] |0.06 [-0.09, 0.23] |0.14 [-0.14, 0.42] |
-|Slow Science |PhD / Student |-0.35 [-0.75, 0.08] |-0.31 [-0.56, -0.03] |-0.23 [-0.43, -0.03] |-0.12 [-0.26, 0.01] |0.02 [-0.17, 0.19] |
-|Slow Science |Non-permanent |0.03 [-0.34, 0.40] |-0.05 [-0.28, 0.19] |-0.07 [-0.24, 0.11] |-0.01 [-0.16, 0.14] |0.11 [-0.13, 0.31] |
-|Slow Science |Permanent |0.09 [-0.10, 0.30] |0.09 [-0.05, 0.22] |0.08 [-0.05, 0.21] |0.06 [-0.09, 0.22] |0.04 [-0.24, 0.35] |
-|Ethical Science |PhD / Student |-0.02 [-0.33, 0.29] |0.03 [-0.20, 0.24] |0.09 [-0.07, 0.23] |0.16 [0.05, 0.27] |0.25 [0.11, 0.40] |
-|Ethical Science |Non-permanent |0.00 [-0.32, 0.32] |-0.03 [-0.21, 0.17] |-0.03 [-0.18, 0.12] |0.00 [-0.13, 0.13] |0.05 [-0.12, 0.22] |
-|Ethical Science |Permanent |-0.17 [-0.33, -0.01] |-0.14 [-0.24, -0.04] |-0.11 [-0.21, 0.00] |-0.06 [-0.19, 0.07] |-0.01 [-0.27, 0.24] |
+|Open Science |PhD / Student |-0.06 [-0.45, 0.33] |-0.08 [-0.33, 0.16] |-0.11 [-0.28, 0.06] |-0.16 [-0.28, -0.04] |-0.21 [-0.38, -0.06] |
+|Open Science |Non-permanent |0.01 [-0.38, 0.37] |0.08 [-0.14, 0.29] |0.15 [-0.01, 0.31] |0.20 [0.06, 0.34] |0.24 [0.02, 0.44] |
+|Open Science |Permanent |0.03 [-0.14, 0.22] |0.04 [-0.07, 0.16] |0.02 [-0.10, 0.16] |-0.04 [-0.24, 0.12] |-0.13 [-0.62, 0.14] |
+|Rigorous Science |PhD / Student |-0.17 [-0.64, 0.27] |-0.09 [-0.38, 0.17] |-0.02 [-0.20, 0.15] |0.05 [-0.08, 0.17] |0.10 [-0.07, 0.28] |
+|Rigorous Science |Non-permanent |-0.03 [-0.43, 0.39] |0.05 [-0.19, 0.31] |0.12 [-0.05, 0.30] |0.18 [0.04, 0.33] |0.23 [0.02, 0.46] |
+|Rigorous Science |Permanent |-0.13 [-0.31, 0.06] |-0.13 [-0.25, -0.01] |-0.15 [-0.27, -0.02] |-0.17 [-0.33, -0.03] |-0.22 [-0.49, 0.07] |
+|Green Science |PhD / Student |-0.20 [-0.61, 0.30] |-0.14 [-0.38, 0.12] |-0.07 [-0.28, 0.11] |0.01 [-0.18, 0.15] |0.10 [-0.13, 0.31] |
+|Green Science |Non-permanent |0.12 [-0.25, 0.46] |0.03 [-0.19, 0.25] |-0.04 [-0.21, 0.16] |-0.10 [-0.26, 0.07] |-0.14 [-0.36, 0.06] |
+|Green Science |Permanent |0.03 [-0.16, 0.22] |0.00 [-0.12, 0.13] |0.02 [-0.12, 0.14] |0.06 [-0.10, 0.23] |0.15 [-0.17, 0.42] |
+|Slow Science |PhD / Student |-0.35 [-0.80, 0.05] |-0.31 [-0.59, -0.04] |-0.24 [-0.41, -0.05] |-0.14 [-0.30, -0.01] |-0.02 [-0.18, 0.17] |
+|Slow Science |Non-permanent |0.03 [-0.38, 0.39] |-0.05 [-0.31, 0.18] |-0.07 [-0.25, 0.12] |-0.01 [-0.16, 0.15] |0.11 [-0.15, 0.32] |
+|Slow Science |Permanent |0.10 [-0.09, 0.28] |0.10 [-0.03, 0.22] |0.09 [-0.05, 0.21] |0.07 [-0.11, 0.24] |0.06 [-0.26, 0.42] |
+|Ethical Science |PhD / Student |-0.02 [-0.36, 0.29] |0.02 [-0.19, 0.23] |0.08 [-0.06, 0.22] |0.16 [0.05, 0.26] |0.26 [0.11, 0.40] |
+|Ethical Science |Non-permanent |-0.01 [-0.32, 0.33] |-0.04 [-0.22, 0.15] |-0.04 [-0.18, 0.11] |-0.01 [-0.13, 0.10] |0.04 [-0.12, 0.22] |
+|Ethical Science |Permanent |-0.17 [-0.33, -0.01] |-0.14 [-0.24, -0.03] |-0.11 [-0.22, 0.00] |-0.07 [-0.20, 0.08] |-0.02 [-0.29, 0.23] |
 
 Table: Parameters
 
 |Outcome |Parameter |Median [95% CI] |pd |
 |:----------------|:----------------------------------------------------|:--------------------|:------|
-|Open Science |Intercept |-0.12 [-0.26, 0.02] |94.70% |
-|Open Science |Work_Career_StageNonMpermanent |0.26 [0.07, 0.45] |99.70% |
-|Open Science |Work_Career_StagePermanent |0.09 [-0.08, 0.27] |85.47% |
-|Open Science |polyWB_Carrer_worry21 |-1.45 [-5.58, 2.66] |74.20% |
-|Open Science |polyWB_Carrer_worry22 |-0.33 [-1.67, 1.02] |67.73% |
-|Open Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |3.97 [-1.50, 9.19] |91.70% |
-|Open Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |0.41 [-4.56, 5.71] |55.43% |
-|Open Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |-0.16 [-1.76, 1.69] |58.33% |
-|Open Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |-0.18 [-1.66, 1.32] |58.33% |
-|Rigorous Science |Intercept |0.06 [-0.07, 0.22] |79.23% |
-|Rigorous Science |Work_Career_StageNonMpermanent |0.08 [-0.09, 0.27] |84.50% |
-|Rigorous Science |Work_Career_StagePermanent |-0.22 [-0.42, -0.06] |99.17% |
-|Rigorous Science |polyWB_Carrer_worry21 |1.30 [-2.95, 5.11] |74.47% |
-|Rigorous Science |polyWB_Carrer_worry22 |0.08 [-1.28, 1.38] |53.77% |
-|Rigorous Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |-0.15 [-4.55, 5.43] |52.33% |
-|Rigorous Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |-1.34 [-5.62, 4.47] |70.07% |
-|Rigorous Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |-0.09 [-1.71, 1.69] |53.70% |
-|Rigorous Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |-0.11 [-2.23, 1.71] |55.50% |
-|Green Science |Intercept |-0.04 [-0.19, 0.11] |71.23% |
-|Green Science |Work_Career_StageNonMpermanent |-0.01 [-0.22, 0.18] |51.37% |
-|Green Science |Work_Career_StagePermanent |0.10 [-0.11, 0.28] |84.57% |
-|Green Science |polyWB_Carrer_worry21 |2.81 [-1.38, 6.24] |89.97% |
-|Green Science |polyWB_Carrer_worry22 |0.18 [-1.19, 1.60] |58.87% |
-|Green Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |-4.83 [-10.21, 1.09] |94.77% |
-|Green Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |-1.73 [-6.17, 3.51] |76.27% |
-|Green Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |0.19 [-1.56, 1.99] |60.33% |
-|Green Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |0.50 [-1.17, 2.03] |71.63% |
-|Slow Science |Intercept |-0.17 [-0.32, -0.01] |97.77% |
-|Slow Science |Work_Career_StageNonMpermanent |0.18 [-0.04, 0.37] |94.83% |
-|Slow Science |Work_Career_StagePermanent |0.25 [0.04, 0.44] |98.83% |
-|Slow Science |polyWB_Carrer_worry21 |3.30 [-0.87, 7.00] |93.07% |
-|Slow Science |polyWB_Carrer_worry22 |0.59 [-0.93, 2.04] |76.07% |
-|Slow Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |-2.45 [-7.91, 2.61] |80.43% |
-|Slow Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |-3.54 [-8.68, 1.57] |92.63% |
-|Slow Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |0.65 [-1.01, 2.39] |77.53% |
-|Slow Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |-0.68 [-2.21, 0.88] |79.07% |
-|Ethical Science |Intercept |0.12 [-0.01, 0.24] |97.03% |
-|Ethical Science |Work_Career_StageNonMpermanent |-0.12 [-0.28, 0.06] |91.63% |
-|Ethical Science |Work_Career_StagePermanent |-0.21 [-0.37, -0.05] |99.47% |
-|Ethical Science |polyWB_Carrer_worry21 |2.33 [-0.72, 5.26] |92.43% |
-|Ethical Science |polyWB_Carrer_worry22 |0.30 [-0.98, 1.49] |68.07% |
-|Ethical Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |-1.66 [-5.99, 2.45] |80.60% |
-|Ethical Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |-0.98 [-4.79, 2.86] |67.77% |
-|Ethical Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |0.22 [-1.37, 1.73] |59.13% |
-|Ethical Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |-0.13 [-1.64, 1.58] |56.27% |
+|Open Science |Intercept |-0.14 [-0.27, 0.01] |97.00% |
+|Open Science |Work_Career_StageNonMpermanent |0.29 [0.10, 0.49] |99.97% |
+|Open Science |Work_Career_StagePermanent |0.11 [-0.07, 0.30] |85.97% |
+|Open Science |polyWB_Carrer_worry21 |-1.25 [-5.42, 2.16] |74.10% |
+|Open Science |polyWB_Carrer_worry22 |-0.23 [-1.70, 1.29] |63.00% |
+|Open Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |3.45 [-2.57, 8.03] |89.33% |
+|Open Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |-0.14 [-5.39, 4.32] |52.23% |
+|Open Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |0.06 [-1.55, 1.62] |52.23% |
+|Open Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |-0.41 [-2.04, 1.12] |68.30% |
+|Rigorous Science |Intercept |0.00 [-0.18, 0.15] |51.30% |
+|Rigorous Science |Work_Career_StageNonMpermanent |0.13 [-0.06, 0.37] |89.63% |
+|Rigorous Science |Work_Career_StagePermanent |-0.16 [-0.36, 0.04] |93.97% |
+|Rigorous Science |polyWB_Carrer_worry21 |2.24 [-1.79, 6.46] |85.60% |
+|Rigorous Science |polyWB_Carrer_worry22 |-0.10 [-1.80, 1.33] |55.70% |
+|Rigorous Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |0.04 [-7.12, 5.05] |50.60% |
+|Rigorous Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |-3.20 [-8.34, 2.34] |87.23% |
+|Rigorous Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |-0.04 [-1.76, 1.65] |51.63% |
+|Rigorous Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |-0.09 [-1.74, 1.55] |55.43% |
+|Green Science |Intercept |-0.03 [-0.21, 0.11] |65.73% |
+|Green Science |Work_Career_StageNonMpermanent |-0.02 [-0.22, 0.22] |56.60% |
+|Green Science |Work_Career_StagePermanent |0.09 [-0.11, 0.38] |80.50% |
+|Green Science |polyWB_Carrer_worry21 |2.63 [-1.16, 6.70] |87.60% |
+|Green Science |polyWB_Carrer_worry22 |0.12 [-1.28, 2.28] |56.53% |
+|Green Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |-4.94 [-9.61, 0.22] |97.00% |
+|Green Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |-1.63 [-7.05, 3.35] |70.80% |
+|Green Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |0.15 [-1.74, 1.90] |55.50% |
+|Green Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |0.51 [-1.07, 2.19] |74.20% |
+|Slow Science |Intercept |-0.18 [-0.34, -0.02] |99.07% |
+|Slow Science |Work_Career_StageNonMpermanent |0.19 [-0.04, 0.39] |94.33% |
+|Slow Science |Work_Career_StagePermanent |0.26 [0.05, 0.50] |99.37% |
+|Slow Science |polyWB_Carrer_worry21 |2.86 [-0.90, 7.61] |88.53% |
+|Slow Science |polyWB_Carrer_worry22 |0.46 [-0.94, 1.83] |72.03% |
+|Slow Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |-1.92 [-7.57, 3.15] |75.17% |
+|Slow Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |-3.34 [-8.88, 1.95] |87.30% |
+|Slow Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |0.80 [-0.98, 2.41] |82.67% |
+|Slow Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |-0.49 [-2.33, 1.46] |71.57% |
+|Ethical Science |Intercept |0.12 [-0.01, 0.23] |97.10% |
+|Ethical Science |Work_Career_StageNonMpermanent |-0.13 [-0.29, 0.04] |93.77% |
+|Ethical Science |Work_Career_StagePermanent |-0.21 [-0.36, -0.06] |99.53% |
+|Ethical Science |polyWB_Carrer_worry21 |2.46 [-0.77, 5.71] |90.73% |
+|Ethical Science |polyWB_Carrer_worry22 |0.36 [-1.05, 1.76] |67.47% |
+|Ethical Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry21 |-2.02 [-6.49, 2.20] |79.23% |
+|Ethical Science |Work_Career_StagePermanent:polyWB_Carrer_worry21 |-1.14 [-5.65, 3.21] |70.80% |
+|Ethical Science |Work_Career_StageNonMpermanent:polyWB_Carrer_worry22 |0.18 [-1.33, 1.88] |59.33% |
+|Ethical Science |Work_Career_StagePermanent:polyWB_Carrer_worry22 |-0.23 [-1.82, 1.36] |58.77% |
 
 :::
 
@@ -3953,6 +4024,7 @@ Start sampling
 ::: {.cell-output .cell-output-stdout}
 
 ```
+Pareto k value (0.81) is greater than 0.7. Importance resampling was not able to improve the approximation, which may indicate that the approximation itself is poor. 
 Finished in  0.1 seconds.
 ```
 
@@ -4007,7 +4079,6 @@ Start sampling
 ::: {.cell-output .cell-output-stdout}
 
 ```
-Pareto k value (0.71) is greater than 0.7. Importance resampling was not able to improve the approximation, which may indicate that the approximation itself is poor. 
 Finished in  0.1 seconds.
 ```
 
@@ -4059,121 +4130,121 @@ Table: Posterior draws
 
 |Outcome | Draws| Unique draws|
 |:----------------|-----:|------------:|
-|Open Science | 3000| 2130|
-|Rigorous Science | 3000| 2080|
-|Green Science | 3000| 2209|
-|Slow Science | 3000| 2215|
-|Ethical Science | 3000| 2053|
+|Open Science | 3000| 2065|
+|Rigorous Science | 3000| 2054|
+|Green Science | 3000| 2146|
+|Slow Science | 3000| 1991|
+|Ethical Science | 3000| 2103|
 
 Table: Marginal means (continuous predictor at its mean)
 
 |Outcome |Work_Career_Stage |Median [95% CI] |pd |
 |:----------------|:-----------------|:--------------------|:------|
-|Open Science |PhD / Student |-0.15 [-0.32, -0.01] |98.47% |
-|Open Science |Non-permanent |0.19 [0.03, 0.33] |99.53% |
-|Open Science |Permanent |0.02 [-0.10, 0.14] |62.10% |
-|Rigorous Science |PhD / Student |0.12 [-0.02, 0.24] |94.10% |
-|Rigorous Science |Non-permanent |0.21 [0.04, 0.35] |99.70% |
-|Rigorous Science |Permanent |-0.16 [-0.29, -0.04] |99.37% |
-|Green Science |PhD / Student |-0.03 [-0.18, 0.12] |66.30% |
-|Green Science |Non-permanent |-0.18 [-0.35, -0.02] |98.90% |
-|Green Science |Permanent |-0.04 [-0.17, 0.09] |72.50% |
-|Slow Science |PhD / Student |-0.07 [-0.22, 0.07] |81.37% |
-|Slow Science |Non-permanent |-0.02 [-0.20, 0.15] |60.03% |
-|Slow Science |Permanent |0.11 [-0.03, 0.24] |93.00% |
-|Ethical Science |PhD / Student |0.15 [0.02, 0.26] |98.77% |
-|Ethical Science |Non-permanent |-0.09 [-0.23, 0.05] |86.53% |
-|Ethical Science |Permanent |-0.15 [-0.27, -0.04] |99.70% |
+|Open Science |PhD / Student |-0.16 [-0.30, -0.03] |99.40% |
+|Open Science |Non-permanent |0.21 [0.06, 0.37] |99.80% |
+|Open Science |Permanent |0.04 [-0.09, 0.16] |73.53% |
+|Rigorous Science |PhD / Student |0.07 [-0.07, 0.21] |82.97% |
+|Rigorous Science |Non-permanent |0.22 [0.05, 0.39] |99.80% |
+|Rigorous Science |Permanent |-0.12 [-0.25, 0.00] |97.37% |
+|Green Science |PhD / Student |-0.03 [-0.17, 0.12] |65.37% |
+|Green Science |Non-permanent |-0.18 [-0.35, -0.02] |98.63% |
+|Green Science |Permanent |-0.03 [-0.16, 0.11] |67.10% |
+|Slow Science |PhD / Student |-0.08 [-0.21, 0.07] |85.77% |
+|Slow Science |Non-permanent |-0.03 [-0.20, 0.14] |64.37% |
+|Slow Science |Permanent |0.11 [-0.03, 0.25] |93.97% |
+|Ethical Science |PhD / Student |0.15 [0.02, 0.27] |99.30% |
+|Ethical Science |Non-permanent |-0.09 [-0.23, 0.06] |88.33% |
+|Ethical Science |Permanent |-0.15 [-0.26, -0.04] |99.17% |
 
 Table: Contrasts between groups (continuous predictor at its mean)
 
 |Outcome |Contrast |Median [95% CI] |pd |
 |:----------------|:-----------------------------|:--------------------|:-------|
-|Open Science |Non-permanent - PhD / Student |0.33 [0.14, 0.58] |100.00% |
-|Open Science |Permanent - PhD / Student |0.17 [0.00, 0.35] |97.40% |
-|Open Science |Permanent - Non-permanent |-0.17 [-0.36, 0.02] |96.00% |
-|Rigorous Science |Non-permanent - PhD / Student |0.09 [-0.10, 0.28] |81.67% |
-|Rigorous Science |Permanent - PhD / Student |-0.28 [-0.45, -0.11] |99.93% |
-|Rigorous Science |Permanent - Non-permanent |-0.37 [-0.56, -0.18] |100.00% |
-|Green Science |Non-permanent - PhD / Student |-0.15 [-0.36, 0.05] |93.13% |
-|Green Science |Permanent - PhD / Student |-0.01 [-0.20, 0.18] |52.83% |
-|Green Science |Permanent - Non-permanent |0.14 [-0.06, 0.35] |92.30% |
-|Slow Science |Non-permanent - PhD / Student |0.05 [-0.17, 0.24] |68.27% |
-|Slow Science |Permanent - PhD / Student |0.17 [-0.01, 0.38] |96.50% |
-|Slow Science |Permanent - Non-permanent |0.13 [-0.07, 0.34] |88.63% |
-|Ethical Science |Non-permanent - PhD / Student |-0.24 [-0.40, -0.05] |99.53% |
-|Ethical Science |Permanent - PhD / Student |-0.30 [-0.45, -0.15] |100.00% |
-|Ethical Science |Permanent - Non-permanent |-0.07 [-0.25, 0.13] |75.37% |
+|Open Science |Non-permanent - PhD / Student |0.37 [0.17, 0.56] |100.00% |
+|Open Science |Permanent - PhD / Student |0.20 [0.03, 0.37] |99.20% |
+|Open Science |Permanent - Non-permanent |-0.17 [-0.36, 0.03] |95.77% |
+|Rigorous Science |Non-permanent - PhD / Student |0.15 [-0.05, 0.34] |92.90% |
+|Rigorous Science |Permanent - PhD / Student |-0.19 [-0.38, -0.02] |98.83% |
+|Rigorous Science |Permanent - Non-permanent |-0.34 [-0.54, -0.14] |100.00% |
+|Green Science |Non-permanent - PhD / Student |-0.15 [-0.38, 0.05] |93.10% |
+|Green Science |Permanent - PhD / Student |0.00 [-0.18, 0.18] |50.53% |
+|Green Science |Permanent - Non-permanent |0.15 [-0.05, 0.35] |93.23% |
+|Slow Science |Non-permanent - PhD / Student |0.04 [-0.15, 0.25] |64.03% |
+|Slow Science |Permanent - PhD / Student |0.19 [0.00, 0.36] |97.43% |
+|Slow Science |Permanent - Non-permanent |0.14 [-0.07, 0.34] |90.90% |
+|Ethical Science |Non-permanent - PhD / Student |-0.23 [-0.40, -0.06] |99.70% |
+|Ethical Science |Permanent - PhD / Student |-0.30 [-0.46, -0.14] |100.00% |
+|Ethical Science |Permanent - Non-permanent |-0.06 [-0.23, 0.11] |76.40% |
 
 Table: Predictions (Median [95% CI])
 
 |Outcome |Work_Career_Stage |WB_Time_research = 0 |WB_Time_research = 0.25 |WB_Time_research = 0.5 |WB_Time_research = 0.75 |WB_Time_research = 1 |
 |:----------------|:-----------------|:--------------------|:-----------------------|:----------------------|:-----------------------|:--------------------|
-|Open Science |PhD / Student |-0.26 [-0.56, 0.00] |-0.19 [-0.38, -0.04] |-0.15 [-0.31, -0.01] |-0.12 [-0.26, 0.02] |-0.11 [-0.33, 0.09] |
-|Open Science |Non-permanent |0.14 [-0.15, 0.44] |0.18 [0.01, 0.34] |0.19 [0.03, 0.34] |0.18 [0.02, 0.34] |0.15 [-0.11, 0.40] |
-|Open Science |Permanent |-0.09 [-0.31, 0.12] |-0.04 [-0.15, 0.07] |0.02 [-0.10, 0.14] |0.08 [-0.07, 0.24] |0.14 [-0.17, 0.45] |
-|Rigorous Science |PhD / Student |0.06 [-0.19, 0.32] |0.10 [-0.06, 0.25] |0.11 [-0.02, 0.24] |0.09 [-0.05, 0.23] |0.03 [-0.20, 0.25] |
-|Rigorous Science |Non-permanent |0.14 [-0.15, 0.44] |0.19 [0.02, 0.36] |0.20 [0.05, 0.35] |0.17 [0.01, 0.34] |0.09 [-0.17, 0.37] |
-|Rigorous Science |Permanent |-0.21 [-0.42, 0.00] |-0.18 [-0.30, -0.07] |-0.17 [-0.29, -0.04] |-0.16 [-0.32, 0.00] |-0.17 [-0.45, 0.14] |
-|Green Science |PhD / Student |0.10 [-0.17, 0.36] |0.00 [-0.18, 0.17] |-0.03 [-0.18, 0.12] |0.01 [-0.14, 0.16] |0.11 [-0.11, 0.33] |
-|Green Science |Non-permanent |-0.22 [-0.54, 0.10] |-0.25 [-0.43, -0.07] |-0.17 [-0.34, -0.01] |0.01 [-0.16, 0.18] |0.30 [0.02, 0.58] |
-|Green Science |Permanent |0.17 [-0.05, 0.40] |0.02 [-0.10, 0.13] |-0.04 [-0.18, 0.09] |0.01 [-0.16, 0.18] |0.16 [-0.16, 0.54] |
-|Slow Science |PhD / Student |0.18 [-0.12, 0.46] |0.04 [-0.14, 0.22] |-0.08 [-0.23, 0.06] |-0.19 [-0.34, -0.04] |-0.30 [-0.55, -0.07] |
-|Slow Science |Non-permanent |-0.01 [-0.31, 0.34] |-0.03 [-0.24, 0.17] |-0.02 [-0.19, 0.15] |0.04 [-0.14, 0.21] |0.13 [-0.14, 0.44] |
-|Slow Science |Permanent |-0.04 [-0.26, 0.20] |0.04 [-0.09, 0.16] |0.11 [-0.03, 0.25] |0.19 [-0.01, 0.38] |0.27 [-0.07, 0.61] |
-|Ethical Science |PhD / Student |0.33 [0.10, 0.56] |0.21 [0.06, 0.36] |0.14 [0.02, 0.26] |0.13 [0.01, 0.26] |0.18 [0.00, 0.37] |
-|Ethical Science |Non-permanent |0.02 [-0.25, 0.30] |-0.08 [-0.24, 0.07] |-0.08 [-0.23, 0.06] |0.02 [-0.12, 0.17] |0.24 [0.01, 0.46] |
-|Ethical Science |Permanent |-0.06 [-0.26, 0.13] |-0.13 [-0.24, -0.03] |-0.15 [-0.27, -0.04] |-0.11 [-0.25, 0.04] |0.00 [-0.26, 0.28] |
+|Open Science |PhD / Student |-0.19 [-0.43, 0.07] |-0.17 [-0.33, -0.01] |-0.16 [-0.29, -0.03] |-0.17 [-0.30, -0.04] |-0.18 [-0.37, 0.01] |
+|Open Science |Non-permanent |0.27 [-0.03, 0.57] |0.25 [0.09, 0.42] |0.20 [0.05, 0.36] |0.14 [-0.02, 0.29] |0.04 [-0.20, 0.31] |
+|Open Science |Permanent |-0.08 [-0.29, 0.13] |-0.01 [-0.12, 0.10] |0.04 [-0.09, 0.16] |0.07 [-0.08, 0.23] |0.08 [-0.21, 0.41] |
+|Rigorous Science |PhD / Student |0.07 [-0.14, 0.30] |0.08 [-0.07, 0.24] |0.07 [-0.07, 0.21] |0.02 [-0.11, 0.16] |-0.05 [-0.26, 0.15] |
+|Rigorous Science |Non-permanent |0.28 [-0.02, 0.60] |0.27 [0.10, 0.45] |0.21 [0.05, 0.38] |0.10 [-0.06, 0.28] |-0.06 [-0.32, 0.23] |
+|Rigorous Science |Permanent |-0.21 [-0.45, 0.01] |-0.15 [-0.27, -0.04] |-0.12 [-0.25, 0.00] |-0.11 [-0.27, 0.06] |-0.13 [-0.44, 0.20] |
+|Green Science |PhD / Student |0.11 [-0.18, 0.42] |0.00 [-0.18, 0.19] |-0.03 [-0.16, 0.11] |0.01 [-0.14, 0.16] |0.12 [-0.12, 0.35] |
+|Green Science |Non-permanent |-0.23 [-0.54, 0.09] |-0.26 [-0.44, -0.07] |-0.17 [-0.34, -0.01] |0.01 [-0.15, 0.17] |0.30 [0.04, 0.59] |
+|Green Science |Permanent |0.17 [-0.05, 0.39] |0.02 [-0.10, 0.14] |-0.03 [-0.17, 0.11] |0.01 [-0.17, 0.17] |0.15 [-0.18, 0.46] |
+|Slow Science |PhD / Student |0.17 [-0.13, 0.49] |0.04 [-0.16, 0.22] |-0.09 [-0.22, 0.06] |-0.20 [-0.35, -0.05] |-0.30 [-0.57, -0.06] |
+|Slow Science |Non-permanent |-0.03 [-0.36, 0.31] |-0.05 [-0.22, 0.15] |-0.03 [-0.19, 0.14] |0.03 [-0.15, 0.21] |0.12 [-0.17, 0.44] |
+|Slow Science |Permanent |-0.03 [-0.25, 0.22] |0.04 [-0.08, 0.17] |0.11 [-0.02, 0.26] |0.19 [0.01, 0.37] |0.27 [-0.05, 0.59] |
+|Ethical Science |PhD / Student |0.32 [0.08, 0.58] |0.21 [0.06, 0.36] |0.14 [0.02, 0.27] |0.13 [0.02, 0.26] |0.18 [0.00, 0.36] |
+|Ethical Science |Non-permanent |0.02 [-0.24, 0.30] |-0.08 [-0.23, 0.07] |-0.08 [-0.22, 0.06] |0.01 [-0.12, 0.16] |0.21 [-0.02, 0.44] |
+|Ethical Science |Permanent |-0.06 [-0.25, 0.13] |-0.13 [-0.23, -0.03] |-0.15 [-0.26, -0.03] |-0.11 [-0.25, 0.03] |-0.01 [-0.28, 0.28] |
 
 Table: Parameters
 
 |Outcome |Parameter |Median [95% CI] |pd |
 |:----------------|:-----------------------------------------------------|:--------------------|:-------|
-|Open Science |Intercept |-0.16 [-0.33, -0.04] |99.17% |
-|Open Science |Work_Career_StageNonMpermanent |0.34 [0.15, 0.54] |100.00% |
-|Open Science |Work_Career_StagePermanent |0.18 [0.02, 0.36] |98.33% |
-|Open Science |polyWB_Time_research21 |1.11 [-1.40, 3.92] |78.30% |
-|Open Science |polyWB_Time_research22 |-0.32 [-1.62, 1.18] |68.23% |
-|Open Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |-1.03 [-4.64, 2.78] |71.33% |
-|Open Science |Work_Career_StagePermanent:polyWB_Time_research21 |0.80 [-3.22, 4.27] |64.50% |
-|Open Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |-0.04 [-1.70, 1.66] |52.23% |
-|Open Science |Work_Career_StagePermanent:polyWB_Time_research22 |0.34 [-1.33, 1.86] |66.67% |
-|Rigorous Science |Intercept |0.09 [-0.03, 0.21] |92.53% |
-|Rigorous Science |Work_Career_StageNonMpermanent |0.09 [-0.09, 0.27] |81.87% |
-|Rigorous Science |Work_Career_StagePermanent |-0.27 [-0.42, -0.10] |100.00% |
-|Rigorous Science |polyWB_Time_research21 |-0.23 [-2.96, 2.29] |56.73% |
-|Rigorous Science |polyWB_Time_research22 |-0.51 [-1.86, 0.75] |78.43% |
-|Rigorous Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |-0.35 [-3.93, 3.86] |56.63% |
-|Rigorous Science |Work_Career_StagePermanent:polyWB_Time_research21 |0.49 [-3.25, 4.83] |59.53% |
-|Rigorous Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |-0.20 [-1.82, 1.52] |59.63% |
-|Rigorous Science |Work_Career_StagePermanent:polyWB_Time_research22 |0.33 [-1.23, 1.85] |65.70% |
-|Green Science |Intercept |0.02 [-0.11, 0.15] |62.77% |
-|Green Science |Work_Career_StageNonMpermanent |-0.13 [-0.33, 0.06] |90.53% |
-|Green Science |Work_Career_StagePermanent |0.01 [-0.16, 0.19] |56.57% |
-|Green Science |polyWB_Time_research21 |0.12 [-2.67, 3.13] |52.77% |
-|Green Science |polyWB_Time_research22 |1.15 [-0.27, 2.45] |94.33% |
-|Green Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |3.95 [-0.51, 8.37] |96.20% |
-|Green Science |Work_Career_StagePermanent:polyWB_Time_research21 |-0.23 [-4.32, 4.06] |54.07% |
-|Green Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |0.61 [-1.22, 2.28] |74.63% |
-|Green Science |Work_Career_StagePermanent:polyWB_Time_research22 |0.53 [-1.31, 2.16] |73.77% |
-|Slow Science |Intercept |-0.06 [-0.21, 0.06] |82.03% |
-|Slow Science |Work_Career_StageNonMpermanent |0.07 [-0.13, 0.25] |76.83% |
-|Slow Science |Work_Career_StagePermanent |0.17 [0.00, 0.37] |97.20% |
-|Slow Science |polyWB_Time_research21 |-3.57 [-6.76, -0.69] |99.10% |
-|Slow Science |polyWB_Time_research22 |0.16 [-1.27, 1.54] |58.90% |
-|Slow Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |4.72 [0.17, 9.50] |98.23% |
-|Slow Science |Work_Career_StagePermanent:polyWB_Time_research21 |5.98 [1.95, 10.18] |99.80% |
-|Slow Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |0.50 [-1.27, 2.29] |71.67% |
-|Slow Science |Work_Career_StagePermanent:polyWB_Time_research22 |-0.06 [-1.79, 1.44] |53.60% |
-|Ethical Science |Intercept |0.18 [0.07, 0.30] |100.00% |
-|Ethical Science |Work_Career_StageNonMpermanent |-0.20 [-0.34, -0.04] |99.33% |
-|Ethical Science |Work_Career_StagePermanent |-0.30 [-0.43, -0.15] |100.00% |
-|Ethical Science |polyWB_Time_research21 |-1.10 [-3.27, 1.62] |80.87% |
-|Ethical Science |polyWB_Time_research22 |0.92 [-0.35, 2.03] |91.27% |
-|Ethical Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |2.91 [-0.64, 6.29] |94.10% |
-|Ethical Science |Work_Career_StagePermanent:polyWB_Time_research21 |1.63 [-1.88, 4.60] |81.17% |
-|Ethical Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |0.81 [-0.91, 2.33] |83.03% |
-|Ethical Science |Work_Career_StagePermanent:polyWB_Time_research22 |0.11 [-1.50, 1.64] |55.20% |
+|Open Science |Intercept |-0.17 [-0.30, -0.04] |99.87% |
+|Open Science |Work_Career_StageNonMpermanent |0.37 [0.17, 0.54] |100.00% |
+|Open Science |Work_Career_StagePermanent |0.19 [0.04, 0.36] |99.37% |
+|Open Science |polyWB_Time_research21 |0.06 [-2.63, 2.43] |52.07% |
+|Open Science |polyWB_Time_research22 |-0.19 [-1.53, 1.07] |61.83% |
+|Open Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |-1.76 [-5.65, 1.73] |80.37% |
+|Open Science |Work_Career_StagePermanent:polyWB_Time_research21 |1.16 [-2.01, 4.41] |74.10% |
+|Open Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |-0.18 [-1.93, 1.46] |59.63% |
+|Open Science |Work_Career_StagePermanent:polyWB_Time_research22 |-0.13 [-1.66, 1.49] |55.23% |
+|Rigorous Science |Intercept |0.05 [-0.07, 0.18] |77.23% |
+|Rigorous Science |Work_Career_StageNonMpermanent |0.13 [-0.06, 0.31] |92.40% |
+|Rigorous Science |Work_Career_StagePermanent |-0.19 [-0.37, -0.03] |99.07% |
+|Rigorous Science |polyWB_Time_research21 |-0.96 [-3.06, 1.08] |78.03% |
+|Rigorous Science |polyWB_Time_research22 |-0.46 [-1.79, 0.90] |72.40% |
+|Rigorous Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |-1.71 [-5.52, 2.17] |80.57% |
+|Rigorous Science |Work_Career_StagePermanent:polyWB_Time_research21 |1.60 [-1.58, 4.85] |82.10% |
+|Rigorous Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |-0.38 [-2.25, 1.28] |68.33% |
+|Rigorous Science |Work_Career_StagePermanent:polyWB_Time_research22 |0.04 [-1.69, 1.66] |51.47% |
+|Green Science |Intercept |0.02 [-0.11, 0.17] |61.23% |
+|Green Science |Work_Career_StageNonMpermanent |-0.13 [-0.34, 0.06] |91.13% |
+|Green Science |Work_Career_StagePermanent |0.02 [-0.15, 0.18] |58.50% |
+|Green Science |polyWB_Time_research21 |0.22 [-2.86, 2.99] |55.30% |
+|Green Science |polyWB_Time_research22 |1.16 [-0.26, 2.49] |94.73% |
+|Green Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |4.02 [-0.19, 8.76] |97.00% |
+|Green Science |Work_Career_StagePermanent:polyWB_Time_research21 |-0.30 [-4.47, 3.40] |56.07% |
+|Green Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |0.53 [-1.20, 2.35] |74.53% |
+|Green Science |Work_Career_StagePermanent:polyWB_Time_research22 |0.48 [-1.35, 2.04] |70.00% |
+|Slow Science |Intercept |-0.07 [-0.19, 0.07] |84.50% |
+|Slow Science |Work_Career_StageNonMpermanent |0.06 [-0.13, 0.25] |71.90% |
+|Slow Science |Work_Career_StagePermanent |0.18 [0.00, 0.35] |98.23% |
+|Slow Science |polyWB_Time_research21 |-3.65 [-6.87, -0.52] |99.13% |
+|Slow Science |polyWB_Time_research22 |0.18 [-1.36, 1.80] |60.40% |
+|Slow Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |4.88 [0.23, 9.12] |97.90% |
+|Slow Science |Work_Career_StagePermanent:polyWB_Time_research21 |5.79 [1.54, 10.94] |99.67% |
+|Slow Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |0.47 [-1.31, 2.13] |67.27% |
+|Slow Science |Work_Career_StagePermanent:polyWB_Time_research22 |-0.14 [-2.03, 1.47] |55.47% |
+|Ethical Science |Intercept |0.18 [0.07, 0.29] |99.97% |
+|Ethical Science |Work_Career_StageNonMpermanent |-0.20 [-0.36, -0.05] |99.57% |
+|Ethical Science |Work_Career_StagePermanent |-0.29 [-0.44, -0.15] |100.00% |
+|Ethical Science |polyWB_Time_research21 |-1.08 [-3.36, 1.41] |80.77% |
+|Ethical Science |polyWB_Time_research22 |0.86 [-0.48, 2.13] |90.93% |
+|Ethical Science |Work_Career_StageNonMpermanent:polyWB_Time_research21 |2.66 [-0.89, 5.81] |92.43% |
+|Ethical Science |Work_Career_StagePermanent:polyWB_Time_research21 |1.44 [-1.74, 4.78] |80.73% |
+|Ethical Science |Work_Career_StageNonMpermanent:polyWB_Time_research22 |0.74 [-0.77, 2.46] |81.87% |
+|Ethical Science |Work_Career_StagePermanent:polyWB_Time_research22 |0.07 [-1.47, 1.73] |53.87% |
 
 :::
 
@@ -4296,6 +4367,268 @@ fig_landscape
 :::
 
 
+
+
+### Facets
+
+
+::: {.cell}
+
+```{.r .cell-code}
+# Figure "facets" of the manuscript: EFA loadings next to the item correlations
+# (same item order), facet correlations (CFA) and structure of quality criteria
+movement_colors <- c("Open Science" = "#2196F3", "Slow Science" = "#FF9800",
+                     "Green Science" = "#4CAF50", "Ethical Science" = "#9C27B0")
+facet_colors <- c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Slow Science" = "#FF9800",
+                  "Green Science" = "#4CAF50", "Ethical Science" = "#9C27B0")
+item_labels <- c(
+  "Open Science - Importance"               = "Importance of open science",
+  "Endorsement - Open Data"                 = "Open data",
+  "Endorsement - Open Materials"            = "Open materials",
+  "Endorsement - Open Access"               = "Open access",
+  "Endorsement - Preregistration"           = "Preregistration",
+  "Endorsement - Registered Reports"        = "Registered reports",
+  "Endorsement - Replication Studies"       = "Replication studies",
+  "Endorsement - Participatory Research"    = "Participatory research",
+  "Endorsement - Open Peer Review"          = "Open peer review",
+  "Slow Science - Familiarity"              = "Familiarity with slow science",
+  "Slow Science - Importance"               = "Importance of slow science",
+  "Green Science - Ecofriendly Practices"   = "Importance in conducting research",
+  "Green Science - Ecofriendly Topics"      = "Importance in choosing topics",
+  "Green Science - Changed Practices"       = "Changed research practices",
+  "Green Science - Changed Communication"   = "Changed communication (e.g., travel)",
+  "Green Science - Change Willingness"      = "Willing to change practices",
+  "Green Science - Belief Relation"         = "Link between research and environment",
+  "Ethical Science - Team Diversity"        = "Importance of team diversity",
+  "Ethical Science - Societal Consequences" = "Care for societal consequences"
+)
+stopifnot(setequal(names(item_labels), names(df_resprac)))
+diverging <- scale_fill_gradient2(low = "#D6604D", mid = "white", high = "#4D4D4D", limits = c(-1, 1), na.value = "white",
+                                  name = "Loading / r", breaks = c(-1, -0.5, 0, 0.5, 1))
+theme_heat <- theme_minimal(base_size = 10) +
+  theme(panel.grid = element_blank(), plot.title = element_text(face = "bold", size = 11),
+        plot.subtitle = element_text(color = "grey40", size = 9), plot.title.position = "plot")
+
+# Items ordered by the facet they load most on, then by loading
+facet_names <- setNames(str_replace_all(names(efa_ids), "\n", " "), efa_ids)
+efa_long <- as.data.frame(f) |>
+  select(Variable, all_of(unname(efa_ids))) |>
+  pivot_longer(-Variable, names_to = "Factor", values_to = "Loading") |>
+  mutate(Facet = factor(facet_names[Factor], levels = names(facet_colors)))
+efa_main <- slice_max(efa_long, abs(Loading), by = Variable, with_ties = FALSE) |>
+  arrange(Facet, desc(abs(Loading)))
+item_order <- efa_main$Variable
+item_levels <- rev(unname(item_labels[item_order]))  # First item on top
+efa_long <- mutate(efa_long, Item = factor(item_labels[Variable], levels = item_levels))
+
+p_strip <- tibble(Variable = item_order) |>
+  mutate(Item = factor(item_labels[Variable], levels = item_levels),
+         Movement = case_when(str_starts(Variable, "Open Science|Endorsement") ~ "Open Science",
+                              str_starts(Variable, "Slow") ~ "Slow Science",
+                              str_starts(Variable, "Green") ~ "Green Science",
+                              .default = "Ethical Science"),
+         Movement = factor(Movement, levels = names(movement_colors))) |>
+  ggplot(aes(x = 1, y = Item, fill = Movement)) +
+  geom_tile(width = 0.9, height = 0.9) +
+  scale_fill_manual(values = movement_colors, name = "Movement") +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_heat +
+  theme(axis.text.x = element_blank()) +
+  labs(x = NULL, y = NULL, tag = "A", title = "Facets (Exploratory Factor Analysis)",
+       subtitle = "Loadings of each item, by the movement it was asked under")
+
+p_loadings <- efa_long |>
+  ggplot(aes(x = Facet, y = Item)) +
+  geom_tile(aes(fill = Loading), color = "white", linewidth = 0.5) +
+  geom_text(aes(label = str_replace(sprintf("%.2f", Loading), "^(-?)0", "\\1"),
+                color = ifelse(abs(Loading) >= 0.5, "white", "grey20"), fontface = ifelse(abs(Loading) >= 0.3, "bold", "plain")),
+            size = 2.6, show.legend = FALSE) +
+  geom_point(data = tibble(Facet = factor(names(facet_colors), levels = names(facet_colors))),
+             aes(x = Facet, y = length(item_levels) + 0.85, color = facet_colors[as.character(Facet)]), inherit.aes = FALSE,
+             shape = 15, size = 3.5, show.legend = FALSE) +
+  diverging +
+  scale_color_identity() +
+  scale_x_discrete(position = "top", labels = \(x) str_remove(x, " Science")) +
+  coord_cartesian(clip = "off") +
+  theme_heat +
+  theme(axis.text.y = element_blank(), axis.text.x.top = element_text(size = 8, angle = 45, hjust = 0, vjust = 0, margin = margin(b = 10))) +
+  labs(x = NULL, y = NULL)
+
+# Item correlations, in the same order, with the items of each facet framed
+cor_long <- as.data.frame(as.table(cor(df_resprac, use = "pairwise.complete.obs"))) |>
+  transmute(Row = factor(item_labels[as.character(Var1)], levels = item_levels),
+            Col = factor(item_labels[as.character(Var2)], levels = rev(item_levels)),
+            r = ifelse(Var1 == Var2, NA, Freq))
+n_items <- length(item_order)
+facet_blocks <- efa_main |>
+  mutate(k = row_number()) |>
+  summarise(xmin = min(k) - 0.5, xmax = max(k) + 0.5, .by = Facet) |>
+  mutate(ymin = n_items - xmax + 1, ymax = n_items - xmin + 1)
+p_cor_items <- cor_long |>
+  ggplot(aes(x = Col, y = Row)) +
+  geom_tile(aes(fill = r), color = "white", linewidth = 0.3) +
+  geom_text(aes(label = ifelse(!is.na(r) & abs(r) >= 0.3, str_replace(sprintf("%.2f", r), "^(-?)0", "\\1"), ""),
+                color = ifelse(!is.na(r) & abs(r) >= 0.5, "white", "grey20")), size = 2.2, show.legend = FALSE) +
+  geom_rect(data = facet_blocks, aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, color = facet_colors[as.character(Facet)]),
+            inherit.aes = FALSE, fill = NA, linewidth = 1, show.legend = FALSE) +
+  diverging +
+  scale_color_identity() +
+  theme_heat +
+  theme(axis.text = element_blank()) +
+  labs(x = NULL, y = NULL, tag = "B", title = "Item Correlations",
+       subtitle = "Items in the same order as in A; |r| ≥ .30 labelled; facets framed")
+
+# Facet correlations (CFA), significant ones only
+facet_pos <- tibble(Facet = c("Slow Science", "Green Science", "Ethical Science", "Rigorous Science", "Open Science"),
+                    angle = (90 - 72 * 0:4) * pi / 180) |>
+  mutate(x = cos(angle), y = sin(angle), Latent = str_replace(Facet, " ", "_"))
+cfa_cor <- lavaan::parameterEstimates(fit_cfa) |>
+  filter(op == "~~", lhs != rhs) |>
+  left_join(select(facet_pos, lhs = Latent, x, y), by = "lhs") |>
+  left_join(select(facet_pos, rhs = Latent, xend = x, yend = y), by = "rhs")
+p_cor_facets <- cfa_cor |>
+  filter(ci.lower > 0 | ci.upper < 0) |>
+  ggplot() +
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend, linewidth = abs(est)), color = "grey55", alpha = 0.8) +
+  geom_label(aes(x = (x + xend) / 2, y = (y + yend) / 2, label = str_replace(sprintf("%.2f", est), "^(-?)0", "\\1")),
+             size = 3, fill = "white", label.size = 0, label.padding = unit(0.15, "lines"), color = "grey20") +
+  geom_point(data = facet_pos, aes(x = x, y = y, color = Facet), size = 23) +
+  geom_text(data = facet_pos, aes(x = x, y = y, label = str_replace(Facet, " ", "\n")),
+            color = "white", fontface = "bold", size = 3, lineheight = 0.9) +
+  scale_color_manual(values = facet_colors, guide = "none") +
+  scale_linewidth_continuous(range = c(0.5, 4), guide = "none") +
+  coord_equal(xlim = c(-1.25, 1.25), ylim = c(-1.1, 1.25)) +
+  theme_void(base_size = 10) +
+  theme(plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(color = "grey40", size = 9),
+        plot.title.position = "plot") +
+  labs(tag = "C", title = "Correlations between Facets",
+       subtitle = "Latent correlations (CFA) whose 95% CI excludes 0")
+
+# Quality criteria: loadings on the two principal components
+pca_var <- as.data.frame(summary(pca_criteria)) |> filter(Parameter == "Variance") |> select(-Parameter) |> unlist()
+p_pca_criteria <- as.data.frame(pca_criteria) |>
+  select(Variable, PC1, PC2) |>
+  left_join(p_criteria$data, by = c("Variable" = "Criterion")) |>
+  # Labels beside their point, on the side with room (neighbours on the other)
+  mutate(side = case_when(Variable %in% c("Originality / Innovation", "High Impact Factor Journal", "Replication") ~ "left",
+                          Variable == "Significance / Impact" ~ "below",
+                          .default = "right"),
+         offset = 0.04 + 0.08 * sqrt(pct),
+         label_x = PC1 + case_when(side == "left" ~ -offset, side == "right" ~ offset, .default = 0),
+         label_y = PC2 - ifelse(side == "below", offset, 0),
+         hjust = case_when(side == "left" ~ 1, side == "right" ~ 0, .default = 0.5)) |>
+  ggplot(aes(x = PC1, y = PC2)) +
+  geom_hline(yintercept = 0, color = "grey80") +
+  geom_vline(xintercept = 0, color = "grey80") +
+  geom_point(aes(size = pct), color = "#546E7A", alpha = 0.8) +
+  geom_text(aes(x = label_x, y = label_y, label = Variable, hjust = hjust), size = 2.9, color = "grey20") +
+  scale_size_area(max_size = 9, guide = "none") +
+  scale_x_continuous(limits = c(-0.8, 0.9), breaks = c(-0.5, 0, 0.5)) +
+  scale_y_continuous(limits = c(-0.7, 0.7)) +
+  theme_minimal(base_size = 10) +
+  theme(panel.grid.minor = element_blank(), plot.title = element_text(face = "bold", size = 11),
+        plot.subtitle = element_text(color = "grey40", size = 9), plot.title.position = "plot",
+        axis.title = element_text(size = 8.5)) +
+  labs(tag = "D", title = "Structure of Quality Criteria",
+       subtitle = "Loadings on the principal components (point size: % selecting)",
+       x = sprintf("PC1 (%.0f%%): rigour and transparency (−) vs. novelty and impact (+)", 100 * pca_var[1]),
+       y = sprintf("PC2 (%.0f%%): transparency and inclusivity (−) vs. rigour and innovation (+)", 100 * pca_var[2]))
+
+fig_facets <- ((p_strip | p_loadings | p_cor_items) + plot_layout(widths = c(0.35, 5, 19))) /
+  ((p_cor_facets | p_pca_criteria) + plot_layout(widths = c(1, 1.25))) +
+  plot_layout(heights = c(1.55, 1), guides = "collect") &
+  theme(legend.position = "bottom", plot.tag = element_text(face = "bold", size = 14))
+ggsave("../paper/figures/fig_facets.png", fig_facets, width = 10.5, height = 12.5, dpi = 300, bg = "white")
+fig_facets
+```
+
+::: {.cell-output-display}
+![](analysis_files/figure-html/fig_facets-1.png){width=1008}
+:::
+:::
+
+
+
+::: {.cell}
+
+```{.r .cell-code}
+# Numbers the manuscript reports on the facets (read by ../paper/manuscript.qmd)
+cfa_params <- lavaan::parameterEstimates(fit_cfa, standardized = TRUE)
+dir.create("../paper/results", showWarnings = FALSE)
+saveRDS(list(
+  n_factors = as.data.frame(summary(rez_resprac)),
+  efa_loadings = efa_long |> select(Variable, Facet, Loading),
+  efa_variance = as_tibble(as.data.frame(summary(f))) |> rename_with(\(n) coalesce(facet_names[n], n)),
+  efa_cor = attributes(f)$model$Phi |> (\(m) `dimnames<-`(m, list(facet_names[rownames(m)], facet_names[colnames(m)])))(),
+  cfa_fit = as.data.frame(performance::model_performance(fit_cfa)),
+  cfa_loadings = filter(cfa_params, op == "=~") |> select(Facet = lhs, Item = rhs, est = std.all, ci.lower, ci.upper),
+  cfa_cor = filter(cfa_params, op == "~~", lhs != rhs, lhs %in% facet_pos$Latent) |>
+    select(Facet1 = lhs, Facet2 = rhs, r = est, ci.lower, ci.upper),
+  item_cor = cor(df_resprac, use = "pairwise.complete.obs"),
+  cfa_comparison = cfa_comparison,
+  criteria_cor = as_tibble(cor_pairs(df_quality_num)),
+  criteria_n_components = as.data.frame(summary(rez_criteria)),
+  criteria_pca = as_tibble(as.data.frame(pca_criteria)) |> select(Variable, PC1, PC2),
+  criteria_pca_variance = pca_var
+), "../paper/results/facets.rds")
+```
+:::
+
+
+
+::: {.cell}
+::: {.cell-output-display}
+::: {.callout-note collapse="true" title="Facets: confirmatory factor analysis (Markdown table, for text readers)"}
+
+Table: CFA fit
+
+| Chi2| Chi2_df| CFI| NNFI| RMSEA| RMSEA_CI_low| RMSEA_CI_high| SRMR|
+|------:|-------:|----:|----:|-----:|------------:|-------------:|----:|
+| 526.21| 142| 0.89| 0.87| 0.06| 0.06| 0.07| 0.06|
+
+Table: CFA standardized loadings
+
+|Facet |Item | est| ci.lower| ci.upper|
+|:----------------|:-----------------------------------|----:|--------:|--------:|
+|Open_Science |OS_Importance | 0.39| 0.07| 0.11|
+|Open_Science |OS_Open_Data | 0.67| 0.16| 0.21|
+|Open_Science |OS_Open_Materials | 0.69| 0.18| 0.23|
+|Open_Science |OS_Open_Access_Publication | 0.55| 0.11| 0.15|
+|Rigorous_Science |OS_Study_Preregistration | 0.78| 0.29| 0.35|
+|Rigorous_Science |OS_Registered_Reports | 0.77| 0.25| 0.30|
+|Rigorous_Science |OS_Replication_Studies | 0.53| 0.15| 0.21|
+|Rigorous_Science |OS_Participatory_Research | 0.36| 0.11| 0.17|
+|Rigorous_Science |OS_Open_Peer_Review | 0.38| 0.11| 0.17|
+|Green_Science |GS_Importance_conducting | 0.80| 0.20| 0.24|
+|Green_Science |GS_Importance_topic | 0.71| 0.19| 0.24|
+|Green_Science |GS_Changes_practices | 0.58| 0.16| 0.20|
+|Green_Science |GS_Changes_communication_practices | 0.54| 0.16| 0.21|
+|Green_Science |GS_Relation_Research_Sustainability | 0.54| 0.14| 0.18|
+|Green_Science |GS_Change_practices_agreeing | 0.68| 0.15| 0.19|
+|Slow_Science |SS_Importance | 0.92| 0.32| 0.39|
+|Slow_Science |SS_Familiar | 0.86| 0.25| 0.31|
+|Ethical_Science |ES_Importance_research_team | 0.63| 0.14| 0.20|
+|Ethical_Science |ES_Consequences_society | 0.49| 0.08| 0.12|
+
+Table: CFA latent correlations
+
+|Facet1 |Facet2 | r| ci.lower| ci.upper|
+|:----------------|:----------------|-----:|--------:|--------:|
+|Open_Science |Rigorous_Science | 0.53| 0.45| 0.61|
+|Open_Science |Green_Science | 0.05| -0.04| 0.15|
+|Open_Science |Slow_Science | 0.35| 0.26| 0.43|
+|Open_Science |Ethical_Science | 0.14| 0.01| 0.27|
+|Rigorous_Science |Green_Science | -0.10| -0.19| -0.01|
+|Rigorous_Science |Slow_Science | 0.22| 0.13| 0.31|
+|Rigorous_Science |Ethical_Science | 0.06| -0.06| 0.18|
+|Green_Science |Slow_Science | 0.21| 0.12| 0.29|
+|Green_Science |Ethical_Science | 0.60| 0.49| 0.70|
+|Slow_Science |Ethical_Science | 0.18| 0.07| 0.29|
+
+:::
+
+:::
+:::
 
 
 ### Structure of Research Values
