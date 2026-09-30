@@ -22,9 +22,9 @@ see
 patchwork
 ggside
 ggdist
+ggraph
+tidygraph
 Rcpp
 brms
-tidygraph
-ggraph
 lavaan
 tidySEM

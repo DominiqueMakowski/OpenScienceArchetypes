@@ -1,0 +1,264 @@
+---
+title: "Open, Slow, Green and Inclusive Science: Adoption and Barriers to New Research Practices [TENTATIVE TITLE]"
+shorttitle: "Reform-Oriented Research Practices"
+# TO CONFIRM: corresponding author, and ORCIDs, emails and CRediT roles of all authors
+author:
+  - name: Dominique Makowski
+    orcid: 0000-0001-5375-9967
+    email: D.Makowski@sussex.ac.uk
+    corresponding: true
+    affiliations:
+      - id: "sussex"
+        name: "University of Sussex"
+        department: "School of Psychology"
+        city: "Brighton"
+        country: "UK"
+  - name: Julia Ayache
+    affiliations:
+      - id: "incc"
+        name: "Université Paris Cité"
+        department: "INCC"
+        country: "France"
+  - name: Axel Garnier
+    affiliations:
+      - name: "Inserm UMR1322"
+        department: "LINC – Laboratoire de recherches Intégratives en Neurosciences et psychologie Cognitive"
+        city: "Besançon"
+        country: "France"
+  - name: Louise Kirsch
+    affiliations:
+      - ref: "incc"
+  - name: Marco Sperduti
+    affiliations:
+      - name: "University of Rome Tor Vergata"
+        country: "Italy"
+      - name: "Université Paris Cité"
+        department: "LMC2 (Laboratoire Mémoire, Cerveau et Cognition)"
+        country: "France"
+  - name: Klara Kovarski
+    affiliations:
+      - name: "CNRS & Université Paris Cité"
+        department: "LaPsyDé"
+        country: "France"
+      - name: "Sorbonne Université"
+        department: "Faculté de Lettres, INSPE"
+        country: "France"
+abstract: |
+  TODO.
+keywords:
+  - open science
+  - slow science
+  - sustainable science
+  - inclusive science
+  - research practices
+  - career stage
+supplemental-materials:
+  - "https://github.com/DominiqueMakowski/OpenScienceArchetypes"
+  - "https://osf.io/2es9b"
+date: today
+titlepage:
+  type: Research Article
+  server: PsyArXiv
+  # doi: 10.31234/osf.io/abcde
+  version: 1
+  status: Not peer reviewed
+  license: CC BY 4.0
+  # TO CONFIRM: data/ must be committed and pushed for the open data link to work;
+  # "-tc" (transparent changes) as the sample fell short of the preregistered target
+  badges:
+    open-data: "https://github.com/DominiqueMakowski/OpenScienceArchetypes/tree/main/data"
+    open-materials: "https://github.com/DominiqueMakowski/OpenScienceArchetypes/blob/main/items.pdf"
+    open-code: "https://github.com/DominiqueMakowski/OpenScienceArchetypes/tree/main/analysis"
+    preregistered-tc: "https://osf.io/2es9b"
+floatsintext: true
+bibliography: bibliography.bib
+format:
+  apaquasi-pdf: default
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Sample description, from the data used by ../analysis/analysis.qmd (same renaming)
+library(tidyverse)
+
+question_labels <- readxl::read_xlsx("../data/MapResPrac_correspondance.xlsx")
+df <- read.csv("../data/MapResPrac-130726-N682.csv")
+names(df) <- as.character(as.vector(question_labels[1,])) |>
+  str_replace_all(fixed(".  "), "_") |>
+  str_replace_all(fixed(". "), "_") |>
+  str_replace_all(fixed("."), "_") |>
+  str_replace_all(fixed(" "), "_") |>
+  str_replace_all(fixed("/"), "_")
+
+# Free-text country of workplace (respondents naming France and another country count as France)
+clean_country <- function(x) {
+  x <- str_to_title(str_trim(x))
+  case_when(
+    !str_detect(x, "[A-Za-z]") ~ NA_character_,
+    str_detect(x, "France|Feance|Frabce|Dijon|Grenoble") ~ "France",
+    str_detect(x, "^Brazil") ~ "Brazil",
+    str_detect(x, "^Uk|United Kingdom|England|Wales") ~ "United Kingdom",
+    x %in% c("Italia", "Roma") ~ "Italy",
+    str_detect(x, "^Spain") ~ "Spain",
+    x %in% c("Be", "Belgique") ~ "Belgium",
+    x %in% c("Nl", "The Netherlands") ~ "Netherlands",
+    x == "Suisse" ~ "Switzerland",
+    str_detect(x, "^Usa$|^United States") ~ "United States",
+    .default = x
+  )
+}
+non_european <- c("Australia", "Brazil", "Canada", "China", "Puerto Rico", "United States")
+
+df <- mutate(df,
+  Country = clean_country(Work_Country),
+  Age = ifelse(Dem_Age < 18, NA, Dem_Age),
+  Time = Time / 60
+)
+
+n <- nrow(df)
+fmt <- function(x, digits = 1) sprintf(paste0("%.", digits, "f"), x)
+pct <- function(x) fmt(100 * mean(x, na.rm = TRUE))
+n_gender <- function(g) sum(df$Dem_Gender == g)
+pct_position <- function(p) pct(df$Work_Position %in% p)
+pct_discipline <- function(d) pct(df$Work_Discipline == d)
+pct_country <- function(c) pct(df$Country[!is.na(df$Country)] == c)
+countries <- unique(na.omit(df$Country))
+dates <- as.Date(df$submitdate_Date_submitted)
+fmt_date <- function(d) paste(month.name[as.integer(format(d, "%m"))], format(d, "%Y"))
+
+# Results, landscape: percentages are of all respondents (unticked boxes of the
+# slow science feasibility grid are empty); sliders are on their 0-100 scale
+yes <- function(x) pct(x == "Yes")
+ticked <- function(x) pct(replace_na(x, 0) == 1)
+use_answers <- c(used = "I know it and I used it",
+                 plan = "I haven't used it yet, but I plan to do it in the future",
+                 unfamiliar = "I am not familiar with it",
+                 no = "I haven't used it yet, and I don't plan to do it in the future")
+pct_use <- function(x, answer) pct(x == use_answers[[answer]])
+m_sd <- function(x) paste0("*M* = ", fmt(mean(x, na.rm = TRUE)), ", *SD* = ", fmt(sd(x, na.rm = TRUE)))
+crit <- function(x) yes(df[[paste0("Work_Criteria_quality_science_", x)]])
+ss_def_none <- rowSums(select(df, starts_with("SS_Definition_"), -SS_Definition_Other) == "Yes") == 0
+```
+
+# Introduction
+
+Over the past two decades, scientific research has undergone a growing concern regarding the reliability, transparency, and social responsibility of its practices. Considerations about the reproducibility of published findings have been particularly salient in psychology, the social sciences, and biomedicine, where large-scale initiatives and critical reviews have highlighted limitations in the robustness of empirical evidence. This "replication crisis" has not only raised methodological issues, but has also prompted broader reflections on the organization of research, including publication systems, evaluation criteria, and career incentives. In most experimental disciplines, considerations about open science, environmental consequences and ethical and inclusive practices in recruitment and research management have become crucial in the research processes, starting from funding, frequently asking for statements in these domains.
+
+As a result, there is increasing recognition that improving research quality requires changes at multiple levels of the scientific ecosystem, but also researchers training plays a crucial role in acculturation.
+
+One major response to these concerns has been the development of open science, which promotes transparency across the research cycle through practices such as preregistration, data and code sharing, and open access publishing, but also encourages popularization practices to translate science to a general audience.
+
+These practices are supported by international initiatives aiming to reform research assessment and to shift the emphasis from quantity to quality of scientific production. Open science is expected to enhance reproducibility, facilitate cumulative knowledge, and strengthen trust in science. However, despite its growing visibility and institutional support, its actual implementation remains heterogeneous, and barriers to its adoption are still insufficiently characterized.
+
+At the same time, additional concerns about the functioning of the scientific system have emerged. In particular, the pressure to publish rapidly and frequently---the "publish or perish" dynamic---has been criticized for potentially undermining research quality and well-being. In response, the slow science movement advocates for a more reflective, in-depth, and qualitatively oriented approach to research, emphasizing the importance of time and intellectual rigor, and arguing that a slower and more deliberate pace may ultimately foster more reliable and impactful scientific progress than the current fast-paced model [@frith2020fast]. At the institutional level, these practices are partly supported by international initiatives such as the San Francisco Declaration on Research Assessment (DORA), which calls for moving away from journal-based metrics (e.g., impact factors) toward assessing the actual content and merit of research outputs [@dora2012].
+
+In parallel, in recent years, sustainable (or green) science has highlighted the environmental and societal impacts of research activities, promoting practices that reduce ecological costs while maximizing societal benefits. Finally, ethical and inclusive science focuses on issues of equity, diversity, and representation, aiming to ensure that research environments and outputs are accessible and relevant to diverse populations.
+
+Although these movements are often discussed independently, they are likely to be interconnected. They share common concerns related to research quality, responsibility, and societal impact, but they may also involve tensions or trade-offs. For instance, increasing transparency through open science may require additional time and resources, potentially conflicting with existing productivity pressures. Similarly, efforts to reduce environmental impact or to promote inclusivity may not always align with dominant evaluation criteria. Understanding how these different practices are perceived, articulated, and implemented by researchers is therefore essential.
+
+In this article, we refer to open, slow, sustainable, and ethical and inclusive science as reform *movements*, i.e., the frameworks under which reform-oriented practices are promoted and discussed. We refer to the dimensions along which researchers' attitudes and practices actually vary as the *facets* of reform-oriented science. Facets and movements need not coincide: a movement may split into several facets if its practices are adopted independently of one another, and several movements may merge into a single facet if the same researchers endorse them together. Whether reform-oriented science is one project with several facets, or a set of separate movements, is thus an empirical question.
+
+Career stage and employment conditions are likely to play a central role in these dynamics. Early-career researchers are often identified as key drivers of change in research practices, yet they are also disproportionately exposed to precarious employment, strong evaluation pressures, and limited autonomy. These constraints may affect both their attitudes toward reform-oriented practices and their capacity to adopt them. Conversely, more established researchers may benefit from greater stability but may be more embedded in existing norms. Examining how research practices vary according to career stage, status, and precariousness is thus critical for understanding the conditions that facilitate or hinder their diffusion.
+
+## The present study
+
+The present study aims to investigate researchers' knowledge, attitudes, and self-reported use of the practices promoted by four reform movements: open science, slow science, sustainable science, and ethical and inclusive science. <!-- From the preregistration, no longer true: "No data has been collected at the time of writing." --> Using an online survey, the study adopts a descriptive and exploratory approach to assess how these practices are known, valued, and implemented across research profiles. It further explores the relationships between these practices, to identify the facets that structure them, and examines how these facets relate to career stage, employment status, and perceived precariousness. The survey targeted researchers working in Europe, with a particular focus on France, where most of the authors are based.
+
+More specifically, the study pursues four main objectives: (i) to map attitudes toward and adoption of these research practices; (ii) to identify perceived barriers to their implementation within the French scientific landscape in comparison with broader international dynamics; (iii) to examine how their diffusion varies as a function of career stage and employment status; and (iv) to investigate the articulation between open science and the other reform movements, namely slow, sustainable, and ethical and inclusive science. In line with its exploratory nature, the study focuses on identifying general patterns and associations rather than testing narrowly specified hypotheses.
+
+Exploratory hypotheses concern (i) the effect of career stage on attitudes toward and adoption of research practices, (ii) the effect of career stage on perceived barriers to their adoption **[TO TEST: barriers are only described so far, not modelled by career stage]**, (iii) the identification of potential mediating factors such as training in meta-scientific topics **[TO TEST: no mediation analysis of training yet]**, and (iv) the relationships between different practices, examining whether they co-occur within a single orientation or form distinct facets. By combining descriptive, comparative, and correlational analyses, this study aims to contribute to a better understanding of the current transformation of research practices and to identify potential levers for promoting more transparent, rigorous, sustainable, and inclusive science.
+
+# Methods
+
+## Survey
+
+Data were collected using an online survey (LimeSurvey from Sorbonne Université) targeting researchers currently involved in experimental research, either in permanent or non-permanent positions. The survey took a median of `r fmt(median(df$Time))` minutes to complete (interquartile range: `r fmt(quantile(df$Time, 0.25))`--`r fmt(quantile(df$Time, 0.75))`) **[TO CONFIRM: median and interquartile range rather than *M* ± *SD*, as completion times are right-skewed (*M* = `r fmt(mean(df$Time))`, *SD* = `r fmt(sd(df$Time))`)]** and was distributed anonymously; data were collected with the intention of open sharing with the scientific community. Ethical approval was obtained from Université Paris Cité (IRB: **[TO CONFIRM: IRB number]**). The study and analyses plan were pre-registered on OSF platform (<https://osf.io/2es9b>).
+
+The questionnaire included about 38 items **[TO CONFIRM: exact number]** (this depended on some cases leading to additional questions) organized into the following sections: i) *Demographics and career information*: age, gender, country of workplace, academic affiliation, discipline (i.e., Social Sciences & Humanities, Physical Sciences & Engineering, Life Sciences) and subdiscipline (not mandatory), highest diploma obtained, PhD starting year, current contract type (e.g., PhD student, postdoc, permanent position), additional professional activities (e.g., clinical, committees), and the approximate distribution of working time across research, teaching, administration, popularization, and other activities. ii) *Career perceptions*: intention to pursue an academic career (for non-permanent researchers only), estimated probability of obtaining a permanent position within an acceptable timeframe, publication number, job title (for permanent researchers), estimated likelihood of career progression, and satisfaction with the number and quality of one's publications. iii) *Criteria for research quality*: participants selected up to three criteria they considered most important for assessing the quality of scientific work (e.g., innovation, methodological rigor, transparency, replication, environmental impact, inclusivity).
+
+Then, three randomized blocks, one per reform movement, were presented **[TO CONFIRM: three or four blocks? Four movements are listed below, and were the sustainable and ethical/inclusive blocks part of the randomization?]**.
+
+#### Open science
+
+Participants rated their familiarity with the open science movement and its perceived importance, and indicated whether they had taken part in a related training. They then reported their knowledge and use of specific practices (preregistration, registered reports, open materials, open data, open peer review, open access, replication studies, participatory research), choosing between "I am not familiar with it", "I haven't used it yet, and I don't plan to do it in the future", "I haven't used it yet, but I plan to do it in the future" and "I know it and I used it". Finally, they selected up to five factors that would facilitate their further adoption of open research practices.
+
+#### Slow science
+
+Participants rated their familiarity with the slow science movement and its perceived importance, indicated whether they had taken part in a related training, and selected up to three statements that best define slow science for them (e.g., quality over quantity, longer timescales, fewer publications). They then rated the feasibility (at the individual level, at the institutional level, or not feasible) of specific measures (e.g., limiting the number of submitted articles, replicating before publishing, valuing teamwork over individual output).
+
+#### Sustainable science
+
+Participants rated the importance of environmental sustainability in how they conduct their research and in how they choose their topics, the extent to which they had changed their research practices (e.g., experimental design, material) and their communication practices (e.g., professional travel) for environmental reasons, the link they perceive between scientific production and environmental sustainability, and their willingness to change their practices for environmental reasons.
+
+#### Ethical and inclusive science
+
+Participants rated the importance they attribute to the diversity of the research team (e.g., in terms of neurodiversity, disability, ethnicity or gender), and to being careful about the direct consequences (e.g., benefits or harms) of their research for participants and society.
+
+As a conclusion, general wellbeing and alignment questions were presented: overall agreement with statements regarding job fulfillment, alignment between research practices and personal principles, sufficiency of time for research, work/life balance satisfaction, and career-related worry.
+
+Most attitudinal items were rated on continuous sliders ranging from 0 ("not at all") to 100 ("extremely"), while categorical items used single- or multiple-choice formats. Depending on hypotheses and research questions, some questions were presented as one choice questions, while others as multi-answers (but with constraints, e.g., selecting up to 3 choices).
+
+## Procedure
+
+The survey was shared through multiple channels to reach a broad and diverse sample of researchers. First, it was distributed within the universities and research institutes affiliated with the authors. Second, it was shared through several academic mailing lists and domain groups. Third, European researchers working in the fields under investigation (open science, environmental research, slow science...) were directly contacted and asked to relay the survey within their own professional networks. Because this survey investigated several reform movements, we believe that this reduced the self-selection of participants interested in one specific movement.
+
+The initial target sample size was set at 3,000 participants. However, after one year of active dissemination **[TO CONFIRM: responses were submitted between `r fmt_date(min(dates))` and `r fmt_date(max(dates))`, i.e., over about `r round(as.numeric(difftime(max(dates), min(dates), units = "days")) / 30.44)` months]**, the research team encountered substantial recruitment difficulties and was unable to reach this target. The team therefore decided to proceed with the planned analyses after verifying that the collected sample met three minimal criteria: a sufficient number of participants across the three research domains (Social Sciences & Humanities, Physical Sciences & Engineering, and Life Sciences), a satisfactory balance between permanent and non-permanent researchers, and a satisfactory balance between men and women, allowing to test most hypotheses.
+
+## Participants
+
+A total of `r n` participants completed the survey. Participants had a mean age of `r fmt(mean(df$Age, na.rm = TRUE))` years (*SD* = `r fmt(sd(df$Age, na.rm = TRUE))`) **[TO CONFIRM: `r sum(df$Dem_Age < 18, na.rm = TRUE)` implausible ages (below 18) were set to missing, as in the analysis script, rather than excluding these participants]** and included `r n_gender("Female")` women, `r n_gender("Male")` men, `r n_gender("Non-binary")` non-binary participants and `r n_gender("Other")` participant who reported another gender. Due to the small sample of non binary participants, analyses on gender were carried on only male and female participants. Participants worked in `r length(countries)` countries, `r sum(!countries %in% non_european)` of them in Europe (`r pct(!df$Country[!is.na(df$Country)] %in% non_european)`% of participants): mostly in France (`r pct_country("France")`%), followed by the United Kingdom (`r pct_country("United Kingdom")`%), Italy (`r pct_country("Italy")`%) and Germany (`r pct_country("Germany")`%). They worked across the three research domains (Social Sciences & Humanities: `r pct_discipline("Social Sciences & Humanities")`%; Physical Sciences & Engineering: `r pct_discipline("Physical Sciences & Engineering")`%; Life Sciences: `r pct_discipline("Life Sciences")`%). Regarding career stage, `r pct_position("Permanent position")`% held a permanent position, `r pct_position(c("PhD candidate (scholarship, other funding)", "PhD candidate (no funding/self funded)"))`% were PhD students (funded or self-funded), `r pct_position("Postdoc (fixed term)")`% were postdoctoral researchers, `r pct_position("Researcher/lecturer (fixed term)")`% were researchers or lecturers on fixed-term contracts, `r pct_position("Engineer (fixed term)")`% were engineers on fixed-term contracts, `r pct_position("Master student/Research assistant")`% were master students or research assistants, and `r pct_position("Other")`% reported another position.
+
+## Data analysis
+
+The analysis followed three axes. First, we described how participants answered each item, to draw the landscape of research practices: for multiple-choice questions, we report the percentage of all participants selecting each option, and for sliders, the mean (*M*) and standard deviation (*SD*) on their 0--100 scale. Second, we examined the structure of these practices, i.e., how they relate to one another, to identify the facets of reform-oriented science. Third, we identified researcher profiles based on these facets, and modelled the determinants of the facets and of the profiles. TODO: describe the methods of the second and third axes (correlations, EFA, CFA, clustering, Bayesian models).
+
+# Results
+
+The results are organised along three axes: a survey of the landscape of the four reform movements, the facets that structure researchers' attitudes and practices, and the profiles of researchers together with their determinants.
+
+## The Landscape of Research Practices
+
+![Survey Responses on the Quality of Science and on Open, Slow, Green and Ethical Science](figures/fig_landscape.png){#fig-landscape apa-twocolumn="true" apa-note="**A**: Percentage of participants selecting each criterion among the three most important to assess the quality of scientific work. **B**: Distribution of the 0--100 slider ratings (histograms), with their mean (point) and interquartile range (line). **C**: Knowledge and use of open science practices. **D**: Percentage of participants selecting each avenue (up to five) that would help them further adopt open science practices. **E**: Percentage of participants selecting each definition of slow science (up to three). **F**: Percentage of participants judging each slow science measure feasible at the individual level, at the institutional level (both could be selected), or not feasible. Percentages are of all participants."}
+
+### What makes good science?
+
+Asked to select the three most important criteria to assess the quality of scientific work (@fig-landscape A), participants overwhelmingly chose a rigorous methodology (`r crit("Rigorous_meth")`%), well ahead of transparency and open science (`r crit("Transparence")`%), appropriate statistical analyses (`r crit("Relevance-data-analyses")`%), originality and innovation (`r crit("Originality")`%), and significance and impact (`r crit("Significance")`%). Replication was chosen by `r crit("Replication")`%. Publication in high impact factor journals was chosen by only `r crit("high-IF")`% of participants, as rarely as inclusivity and diversity (`r crit("Inclusivity")`%) or environmental impact (`r crit("Environmental-impact")`%). Participants thus located the quality of science in the soundness of its process rather than in the prestige of its outlets. By contrast, the social and environmental aspects of research, although highly rated elsewhere in the survey (see below), were rarely considered criteria of its quality.
+
+### Four movements, unequally known
+
+The four movements differed first in how well they were known (@fig-landscape B). Open science was familiar to most participants (`r m_sd(df$OS_Familiar)`) and was rated as important (`r m_sd(df$OS_Importance)`), with `r pct(df$OS_Importance == 100)`% of participants giving it the maximum rating; `r yes(df$OS_Workshops)`% had attended a training or workshop on open science. Slow science was much less known (`r m_sd(df$SS_Familiar)`): `r pct(df$SS_Familiar == 0)`% of participants reported no familiarity at all with the movement, and only `r yes(df$SS_Workshops)`% had been trained in it. Ratings of its importance were polarised (`r m_sd(df$SS_Importance)`; `r pct(df$SS_Importance == 0)`% rated it 0), which largely reflects this lack of familiarity: participants who were not at all familiar with slow science rated its importance at *M* = `r fmt(mean(df$SS_Importance[df$SS_Familiar == 0]))` **[TO CONFIRM: whether these ratings reflect a judgement or a default answer; if the latter, they could be treated as missing]**.
+
+Environmental sustainability was endorsed in principle more than in practice. Participants were willing to change their research practices for environmental reasons (`r m_sd(df$GS_Change_practices_agreeing)`), saw a link between scientific production and environmental sustainability (`r m_sd(df$GS_Relation_research_sustanability)`), and considered sustainability important in how they conduct research (`r m_sd(df$GS_Importance_conducting)`), less so in how they choose their topics (`r m_sd(df$GS_Importance_topic)`). However, the changes they reported having made were more modest, especially regarding research practices such as experimental design or material (`r m_sd(df$GS_Changes_practices)`; `r pct(df$GS_Changes_practices == 0)`% reported no change at all) than regarding communication practices such as professional travel (`r m_sd(df$GS_Changes_communication_practices)`). Finally, ethical considerations were highly rated, in particular being careful about the consequences of one's research for participants and society (`r m_sd(df$ES_Consequences_society)`), and to a lesser extent the diversity of the research team (`r m_sd(df$ES_Importance_research_team)`).
+
+### Open science: sharing outputs is mainstream, reforming procedures is not
+
+The adoption of open science practices depended on whether they concern the outputs or the process of research (@fig-landscape C). Practices of sharing outputs were widespread: `r pct_use(df$OS_Open_Access_Publication, "used")`% of participants had already published in open access, `r pct_use(df$OS_Open_Materials, "used")`% had shared their materials and `r pct_use(df$OS_Open_Data, "used")`% their data. Practices that change how research is conducted and evaluated were less common: preregistration (`r pct_use(df$OS_Study_Preregistration, "used")`%), open peer review (`r pct_use(df$OS_Open_Peer_Review, "used")`%), replication studies (`r pct_use(df$OS_Replication_Studies, "used")`%), participatory research (`r pct_use(df$OS_Participatory_Research, "used")`%) and, least of all, registered reports (`r pct_use(df$OS_Registered_Reports, "used")`%). This gap reflected unfamiliarity and unrealised intentions more than rejection. Registered reports and preregistration were unknown to `r pct_use(df$OS_Registered_Reports, "unfamiliar")`% and `r pct_use(df$OS_Study_Preregistration, "unfamiliar")`% of participants respectively, and `r pct_use(df$OS_Registered_Reports, "plan")`% planned to use registered reports in the future. Few participants did not plan to use a practice they knew, the highest rates concerning replication studies (`r pct_use(df$OS_Replication_Studies, "no")`%) and registered reports (`r pct_use(df$OS_Registered_Reports, "no")`%), against `r pct_use(df$OS_Open_Access_Publication, "no")`% for open access.
+
+When asked what would help them further adopt open science practices (@fig-landscape D), participants mostly pointed to structural levers: career recognition, i.e., considering open science practices in recruitment and promotion (`r yes(df$OS_Help_Recognition_promotion_recruitment)`%), incentives from funders and institutions (`r yes(df$OS_Help_Incentives_fund_institutions)`%), dedicated funding (`r yes(df$OS_Help_Funding)`%) and time (`r yes(df$OS_Help_time)`%). Support came next, in the form of technical infrastructure (`r yes(df$OS_Help_infrastructure)`%) and of support from senior researchers (`r yes(df$OS_Help_Support_seniors)`%), whereas training (`r yes(df$OS_Help__training)`%) and information (`r yes(df$OS_Help_More_information)`%) were selected less often. Only `r yes(df$OS_Help_Nothing)`% of participants reported that nothing would help, and `r yes(df$OS_Help_No_plan_Use_OS)`% that they did not plan to use open science practices. The barriers to open science are thus perceived as lying in the incentive structure of research rather than in a lack of knowledge or of motivation, even though a sizeable minority of participants were unfamiliar with procedural practices such as preregistration.
+
+### Slow science: quality over quantity, a task for institutions
+
+Asked what best describes slow science (@fig-landscape E), most participants chose "quality over quantity" (`r yes(df$SS_Definition_Quality_over_quantity)`%), followed by favouring slow processes over short-term goals (`r yes(df[["SS_Definition__slow_process_over_short-term"]])`%) and changing assessment metrics (`r yes(df$SS_Definition_Changing_metrics)`%). Fewer associated it with increasing the time dedicated to research (`r yes(df$SS_Definition_Increase_research_time)`%), a better work/life balance (`r yes(df[["SS_Definition_work-life_balance"]])`%), or publishing less (`r yes(df$SS_Definition_Diminishing_publications)`%) **[TO CONFIRM: `r pct(ss_def_none)`% of participants selected no definition, possibly those who did not know the movement; percentages are of all participants]**.
+
+For every slow science measure, more participants judged it feasible at the institutional than at the individual level (@fig-landscape F). The gap was largest for assessing the quality rather than the quantity of research (institutional: `r ticked(df$SS_Quality_Feasible_institution)`%, individual: `r ticked(df$SS_Quality_Feasible_individual)`%) and for thinking in longer timescales (`r ticked(df$SS_Longertime_Feasible_institution)`% vs. `r ticked(df$SS_Longertime_Feasible_individual)`%). Measures concerning one's own ways of working were more often seen as within individual reach, such as valuing teamwork over individual work (`r ticked(df$SS_Teamwork_Feasible_individual)`%) and providing models for the next generation (`r ticked(df$SS_Models_Feasible_individual)`%). Measures that cap research output were the most contested: limiting the number of submitted articles, publishing only one article per year, and applying for only one grant per year were judged not feasible by `r ticked(df$SS_Limit_publication_Not_Feasible)`%, `r ticked(df$SS_Onepublication_Not_Feasible)`% and `r ticked(df$SS_Onegrant_Not_Feasible)`% of participants respectively, as was replicating one's results before publishing them (`r ticked(df$SS_Replicate_Not_Feasible)`%), against `r ticked(df$SS_Models_Not_Feasible)`--`r ticked(df$SS_Teamwork_Not_Feasible)`% for the other measures. Slow science is thus understood as a change in how research is valued, to be carried by institutions, rather than as a reduction of output to be achieved by individuals.
+
+TODO: compare France with the other countries (objective ii of the preregistration).
+
+## The Facets of Reform-Oriented Science
+
+TODO. Correlations between items; EFA and CFA (five facets from four movements: Open, Rigorous, Slow, Green and Ethical Science, open science splitting into open outputs and procedural rigour); structure of the quality criteria (novelty and impact vs. rigour and transparency).
+
+## Researcher Profiles and their Determinants
+
+TODO. Effects of gender and age, career stage, career worry and research time on the five facets; researcher profiles (clustering) and their stability; profiles by gender and age.
+
+# Discussion
+
+TODO.
+
+# References
+
+::: {#refs}
+:::

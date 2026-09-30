@@ -1,0 +1,4 @@
+# Per-machine cluster account (see analysis/server/README.md)
+analysis/server/hpc.local
+# Model data and fits exchanged with the cluster (./hpc push / ./hpc pull)
+analysis/models/

@@ -1,5 +1,5 @@
 ---
-title: "MapResPrac - Data Cleaning"
+title: "MapResPrac - Data Analysis"
 editor: source
 editor_options:
   chunk_output_type: console
@@ -8,11 +8,43 @@ format:
     code-fold: true
     self-contained: false
     toc: true
-execute: 
+    keep-md: true
+execute:
   cache: true
 ---
 
+## Headline Findings
+
+<!-- Written from the N = 682 data (MapResPrac-130726-N682.csv, 2026-09-30): update when the data change. -->
+
+Researchers (N = 682; 57% women; 72% working in France; 44% on permanent contracts). Model estimates are posterior medians [95% CI], in factor-score units.
+
+- **Rigour is the consensus criterion of quality, prestige is not.** Asked for the three most important criteria of scientific quality, 83% chose rigorous methodology, against 46% transparency / open science, 41% originality and 40% impact; only 7% chose publication in high impact factor journals, as few as chose inclusivity or environmental impact.
+- **Novelty and rigour are traded off, and the balance shifts with age.** Choices oppose novelty and impact to rigour and transparency (e.g., originality vs. transparency, r = -.40). The novelty end gains ground with age (women: -0.67 [-0.88, -0.47] at 25, +0.49 [0.26, 0.73] at 55) and is stronger in men (+0.40 [0.17, 0.68] at the mean age). Part of this opposition is built into the forced choice of three criteria.
+- **Barriers to open science are seen as structural.** Career recognition (51%), institutional incentives (44%), dedicated funding (42%) and time (40%) come well ahead of information (21%) or training (28%); 4% say nothing would help.
+- **Slow science means quality over quantity, and is a job for institutions.** 81% define it as quality over quantity. Its measures are assigned to institutions far more than to individuals (assessing quality rather than quantity: 87% vs. 45%), and hard caps (one article, or one grant, per year) are judged not feasible by 28%.
+- **Research values are multidimensional.** Five weakly to moderately correlated factors (largest: green-ethical, .46) separate green, slow and ethical science, and split open science into open outputs (Open Science: open data, materials, access) and procedural reforms (Rigorous Science: preregistration, registered reports, replication, participatory research). The five-factor CFA fits only moderately (CFI = .88, RMSEA = .062, SRMR = .056).
+- **Gender and career stage split these dimensions differently.** At the mean age, men score lower than women on Ethical (-0.47 [-0.60, -0.34]), Green (-0.27 [-0.42, -0.11]) and Rigorous Science (-0.15 [-0.30, -0.01]), but not on Open or Slow Science, and the green and ethical gaps widen with age. Rigorous Science declines with age and is lowest among permanent staff (-0.33 [-0.51, -0.13] vs. non-permanent), Open Science peaks among non-permanent researchers (+0.27 [0.09, 0.47] vs. PhD students), whereas permanent staff value Slow Science more (+0.26 [0.04, 0.47] vs. PhD students): reforming *how* research is done is carried by early-career researchers, slowing it down by those in secure positions.
+- **Discrete archetypes are fragile.** Five profiles can be described (A, 26%: high on Open, Rigorous, Slow and Ethical; B, 24%: low on Slow; C, 20%: low on Rigorous, high on Green, Slow and Ethical; D, 16%: low on Green and Ethical; E, 13%: low on all), but bootstrap agreement with the full-sample partition is modest (median ARI = .75, 95% range .32-.91), and only a two-cluster split is reasonably stable (.83). Continuous value dimensions may be a sounder basis than named archetypes.
+
 ## Data Preparation
+
+```{r}
+#| label: packages
+#| cache: false
+#| warning: false
+#| message: false
+
+# Uncached: knitr does not re-attach packages when cached chunks are loaded
+library(tidyverse)
+library(easystats)
+library(patchwork)
+library(ggside)
+library(ggdist)
+library(ggraph)
+library(tidygraph)
+library(brms)
+```
 
 ```{r init}
 #| warning: false
@@ -20,23 +52,17 @@ execute:
 #| error: false
 #| message: false
 
-library(tidyverse)
-library(easystats)
-library(patchwork)
-library(ggside)
-library(ggdist)
-library(brms)
-
-question_labels <- readxl::read_xlsx("MapResPrac_correspondance.xlsx")
+question_labels <- readxl::read_xlsx("../data/MapResPrac_correspondance.xlsx")
 # names(question_labels)  # Question long names
 
-df <- read.csv("MapResPrac-080426-557.csv")
+df <- read.csv("../data/MapResPrac-130726-N682.csv")
 names(df) <- as.character(as.vector(question_labels[1,])) |>
   str_replace_all(fixed(".  "), "_") |>
   str_replace_all(fixed(". "), "_") |>
   str_replace_all(fixed("."), "_") |>
   str_replace_all(fixed(" "), "_") |>
   str_replace_all(fixed("/"), "_")
+dictionary <- data.frame(Variable = names(df), Question = names(question_labels))
 
 format_binary <- function(x) {
   case_when(x == "Yes" ~ 1, x == "No" ~ 0, .default = NA)
@@ -119,7 +145,13 @@ df <- df |>
          # Does the researcher value impact-factor journals as a quality criterion?
          Work_IF_Values = as.numeric(`Work_Criteria_quality_science_high-IF` == "Yes"),
          Work_Time_Research = Work_Time_Research / 100,
-         Work_Satisfaction_numb_publications = Work_Satisfaction_numb_publications / 100
+         Work_Time_Teaching = Work_Time_Teaching / 100,
+         Work_Time_Administration = Work_Time_Administration / 100,
+         Work_Time_Popularization = Work_Time_Popularization / 100,
+         Work_Time_Other = Work_Time_Other / 100,
+         Work_Satisfaction_numb_publications = Work_Satisfaction_numb_publications / 100,
+         Work_Satisfaction_quality_publications = Work_Satisfaction_quality_publications / 100,
+         Work_Probability_permanent_position = Work_Probability_permanent_position / 100
          ) |>
   select(-OS_Help__training,
          -OS_Help_More_information,
@@ -146,12 +178,6 @@ df <- df |>
 
 ```{r}
 #| message: false
-# Load the required packages
-library(parameters)
-library(datawizard) 
-library(tidygraph)
-library(ggraph)
-library(ggplot2)
 
 plot_graph <- function(fa_res, 
                        threshold = 0.3, 
@@ -370,7 +396,7 @@ plot_graph <- function(fa_res,
     scale_x_continuous(expand = expansion(add = expand)) +
     coord_cartesian(clip = "off") + 
     
-    theme_graph() +
+    theme_graph(base_family = "sans") +  # Default "Arial Narrow" is often not installed
     theme(
       plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
       plot.margin = margin(20, 20, 20, 20) 
@@ -379,8 +405,156 @@ plot_graph <- function(fa_res,
 }
 ```
 
+```{r}
+#| label: md_helpers
+#| echo: false
+#| cache: false
+
+# Markdown twins: each figure is followed by a folded callout with the numbers it
+# shows, for text readers of analysis.html.md (md_* chunks, uncached)
+
+make_asis <- function(...) knitr::asis_output(paste(unlist(list(...)), collapse = "\n"))
+
+# A folded callout with one table, or several (a named list: names = captions)
+make_markdown <- function(tables, title) {
+  if (is.data.frame(tables)) tables <- list(tables)
+  body <- purrr::imap_chr(tables, \(t, caption) {
+    t <- as.data.frame(t)
+    t[] <- lapply(t, \(x) if (is.character(x) || is.factor(x)) str_replace_all(x, "\n", " ") else x)
+    names(t) <- str_replace_all(names(t), "\n", " ")
+    caption <- if (is.character(caption)) caption else NULL
+    knitr::kable(t, format = "pipe", caption = caption, digits = 2, row.names = FALSE) |>
+      str_replace_all(c(" {2,}\\|" = " |", "\\| {2,}" = "| ")) |>  # Drop the alignment padding
+      paste(collapse = "\n")
+  })
+  make_asis(
+    sprintf('::: {.callout-note collapse="true" title="%s (Markdown table, for text readers)"}', title),
+    "", paste(body, collapse = "\n\n"), "", ":::", ""
+  )
+}
+
+# N and % of each answer (missing and empty answers left out)
+count_levels <- function(data, vars) {
+  purrr::map_dfr(vars, \(v) {
+    tibble(Variable = v, Level = as.character(data[[v]])) |>
+      filter(!is.na(Level), Level != "") |>
+      count(Variable, Level, name = "N", sort = TRUE) |>
+      mutate(Percentage = format_percent(N / sum(N)))
+  })
+}
+
+describe_vars <- function(data) {
+  describe_distribution(data) |>
+    as.data.frame() |>
+    select(Variable, Mean, SD, Min, Max, n, n_Missing)
+}
+
+# The pairs labelled in a correlation heatmap (Holm-adjusted p < .001), strongest first
+cor_pairs <- function(data, method = "pearson") {
+  correlation(data, method = method) |>
+    as.data.frame() |>
+    filter(p < .001) |>
+    arrange(desc(abs(r))) |>
+    transmute(Variable1 = Parameter1, Variable2 = Parameter2, r, `95% CI` = format_ci(CI_low, CI_high, ci = NULL))
+}
+
+# Loadings, explained variance and (oblique rotations) factor correlations;
+# `names_factors` = c("MR1" = "Green Science", ...) relabels the factors
+loadings_tables <- function(x, names_factors = NULL) {
+  relabel <- \(n) if (is.null(names_factors)) n else str_replace_all(n, names_factors)
+  loadings <- as.data.frame(x)
+  variance <- as.data.frame(summary(x))
+  names(loadings) <- relabel(names(loadings))
+  names(variance) <- relabel(names(variance))
+  out <- list("Loadings" = loadings, "Explained variance" = variance)
+  phi <- attributes(x)$model$Phi
+  if (!is.null(phi)) {
+    out[["Factor correlations"]] <- data.frame(Factor = relabel(rownames(phi)), phi, check.names = FALSE) |>
+      rename_with(relabel)
+  }
+  out
+}
+
+# "Median [95% CI]" in one cell
+format_estimate <- function(est, low, high) {
+  paste(format_value(est, zap_small = TRUE), format_ci(low, high, ci = NULL, zap_small = TRUE))
+}
+
+# Pathfinder can collapse onto a handful of distinct draws, making CIs unreliable
+draws_info <- function(m) {
+  draws <- as.data.frame(m)
+  data.frame(Draws = nrow(draws), `Unique draws` = nrow(unique(draws)), check.names = FALSE)
+}
+
+# MCMC diagnostics
+mcmc_info <- function(m) {
+  np <- nuts_params(m)
+  data.frame(Chains = nchains(m), Draws = ndraws(m), Divergent = sum(np$Value[np$Parameter == "divergent__"]),
+             `Max Rhat` = format_value(max(rhat(m), na.rm = TRUE), digits = 3), `Min ESS` = round(min(neff_ratio(m), na.rm = TRUE) * ndraws(m)),
+             check.names = FALSE)
+}
+
+# Predictions at a few values of `x` (columns), one row per group (and Outcome / Response)
+predictions_wide <- function(pred, x) {
+  as.data.frame(pred) |>
+    mutate(Estimate = format_estimate(Predicted, CI_low, CI_high),
+           across(all_of(x), \(v) paste0(x, " = ", v))) |>
+    select(-any_of(c("Row", "Predicted", "SE", "CI_low", "CI_high"))) |>
+    pivot_wider(names_from = all_of(x), values_from = Estimate)
+}
+
+# Everything the Markdown twin of a brms model needs, computed once (and cached
+# with the model's chunk) so that the fit itself need not be kept. `group` = the
+# factor compared, `at` = values of the continuous predictor ("Dem_Age=c(25, 45)")
+summarize_model <- function(m, group, at, outcome) {
+  list(
+    draws = draws_info(m),
+    means = estimate_means(m, by = group),
+    contrasts = estimate_contrasts(m, contrast = group),
+    predictions = estimate_relation(m, by = c(at, group)),
+    parameters = model_parameters(m, component = "conditional")
+  ) |>
+    lapply(\(x) cbind(Outcome = outcome, as.data.frame(x))) |>
+    c(list(group = group, x = sub("=.*", "", at)))
+}
+
+# Display tables from a list of summarize_model() outputs (one per outcome)
+model_tables <- function(summaries) {
+  get <- \(what) bind_rows(lapply(summaries, `[[`, what))
+  list(
+    "Posterior draws" = get("draws"),
+    "Marginal means (continuous predictor at its mean)" = get("means") |>
+      transmute(Outcome, pick(all_of(summaries[[1]]$group)),
+                `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
+    "Contrasts between groups (continuous predictor at its mean)" = get("contrasts") |>
+      transmute(Outcome, Contrast = paste(Level1, "-", Level2),
+                `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
+    "Predictions (Median [95% CI])" = predictions_wide(get("predictions"), summaries[[1]]$x),
+    "Parameters" = get("parameters") |>
+      transmute(Outcome, Parameter = str_remove(Parameter, "^b_"),
+                `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd))
+  )
+}
+```
+
+### Data Dictionary
+
+```{r}
+#| label: md_dictionary
+#| echo: false
+#| cache: false
+
+dictionary |>
+  filter(!str_detect(Variable, ":"), !Variable %in% c("Consent", "Consent2")) |>  # Timing and consent columns
+  mutate(Question = str_replace_all(Question, "\\[\\|([^|\\]]*)\\|([^|\\]]*)\\]", "[0-100 slider: \\1 to \\2]") |>
+           str_squish()) |>
+  make_markdown("Data dictionary")
+```
+
 
 ## Descriptive
+
+TODO: Add "Sussex" group of Sussex vs. rest to make alternative plots for Sussex presentation
 
 ### Demographics
 
@@ -518,42 +692,80 @@ clean_country <- function(x) {
 }
 
 normalize_affil <- function(x) {
-  x <- str_trim(x)
-  case_when(
-    x == "" | is.na(x)                                                              ~ "Missing",
-    str_detect(x, regex("^cnrs", ignore_case = TRUE))                               ~ "CNRS",
-    str_detect(x, regex("^inserm", ignore_case = TRUE))                             ~ "INSERM",
-    str_detect(x, regex("^inrae", ignore_case = TRUE))                              ~ "INRAE",
-    str_detect(x, regex("^cea$", ignore_case = TRUE))                               ~ "CEA",
-    str_detect(x, regex("^ens$", ignore_case = TRUE))                               ~ "ENS",
-    str_detect(x, regex("^ucl$", ignore_case = TRUE))                               ~ "UCL",
-    str_detect(x, regex("sorbonne univ|^sorbonne universit", ignore_case = TRUE))   ~ "Sorbonne Univ.",
-    str_detect(x, regex("paris cit|upcit", ignore_case = TRUE))                     ~ "Univ. Paris Cité",
-    str_detect(x, regex("sussex", ignore_case = TRUE))                              ~ "Univ. of Sussex",
-    str_detect(x, regex("^ghent|universiteit gent", ignore_case = TRUE))            ~ "Ghent University",
-    str_detect(x, regex("eth zurich|eth zürich|^eth$", ignore_case = TRUE))         ~ "ETH Zurich",
-    str_detect(x, regex("^psl$|psl research|psl univ", ignore_case = TRUE))         ~ "PSL",
-    str_detect(x, regex("toulouse", ignore_case = TRUE))                            ~ "Univ. de Toulouse",
-    str_detect(x, regex("lille", ignore_case = TRUE))                               ~ "Univ. de Lille",
-    str_detect(x, regex("grenoble", ignore_case = TRUE))                            ~ "Univ. Grenoble Alpes",
-    str_detect(x, regex("bordeaux", ignore_case = TRUE))                            ~ "Univ. de Bordeaux",
-    str_detect(x, regex("lyon", ignore_case = TRUE))                                ~ "Univ. de Lyon",
-    str_detect(x, regex("strasbourg", ignore_case = TRUE))                          ~ "Univ. de Strasbourg",
-    str_detect(x, regex("aix.marseille|aix marseille", ignore_case = TRUE))         ~ "Aix-Marseille Univ.",
-    str_detect(x, regex("^bcbl$|basque center on cognition", ignore_case = TRUE))   ~ "BCBL",
-    str_detect(x, regex("clermont", ignore_case = TRUE))                            ~ "Univ. Clermont",
-    str_detect(x, regex("montpellier", ignore_case = TRUE))                         ~ "Univ. de Montpellier",
-    str_detect(x, regex("paris.saclay|paris saclay", ignore_case = TRUE))           ~ "Univ. Paris-Saclay",
-    str_detect(x, regex("paris 8", ignore_case = TRUE))                             ~ "Univ. Paris 8",
-    str_detect(x, regex("^ulb$|ulb,|libre de bruxelles", ignore_case = TRUE))       ~ "ULB",
-    str_detect(x, regex("leiden", ignore_case = TRUE))                              ~ "Leiden University",
-    str_detect(x, regex("picardie", ignore_case = TRUE))                            ~ "Univ. Picardie",
-    str_detect(x, regex("côte d.azur|cote d.azur", ignore_case = TRUE))             ~ "Univ. Côte d'Azur",
-    str_detect(x, regex("rennes", ignore_case = TRUE))                              ~ "Univ. de Rennes",
-    str_detect(x, regex("groningen", ignore_case = TRUE))                           ~ "Univ. of Groningen",
-    str_detect(x, regex("caen", ignore_case = TRUE))                                ~ "Univ. de Caen",
-    str_detect(x, regex("minho", ignore_case = TRUE))                               ~ "Univ. of Minho",
-    str_detect(x, regex("turin", ignore_case = TRUE))                               ~ "Univ. of Turin",
+  x <- stringr::str_squish(x)
+
+  dplyr::case_when(
+    is.na(x) | x == "" ~ "Missing",
+
+    # National research organisations
+    stringr::str_detect(x, stringr::regex("^c\\.?n\\.?r\\.?s\\.?", ignore_case = TRUE)) ~ "CNRS",
+    stringr::str_detect(x, stringr::regex("^inserm", ignore_case = TRUE)) ~ "INSERM",
+    stringr::str_detect(x, stringr::regex("inrae", ignore_case = TRUE)) ~ "INRAE",
+    stringr::str_detect(x, stringr::regex("^cea\\b", ignore_case = TRUE)) ~ "CEA",
+    stringr::str_detect(x, stringr::regex("^inria\\b", ignore_case = TRUE)) ~ "Inria",
+    stringr::str_detect(x, stringr::regex("^igbmc", ignore_case = TRUE)) ~ "IGBMC",
+
+    # Grandes écoles / institutes
+    stringr::str_detect(x, stringr::regex("^ens\\b|ecole normale sup|école normale sup", ignore_case = TRUE)) ~ "ENS",
+    stringr::str_detect(x, stringr::regex("^psl\\b|psl research|psl univ", ignore_case = TRUE)) ~ "PSL",
+
+    # UK
+    stringr::str_detect(x, stringr::regex("^ucl$|university college london", ignore_case = TRUE)) ~ "UCL",
+    stringr::str_detect(x, stringr::regex("university of sussex|^sussex$", ignore_case = TRUE)) ~ "Univ. of Sussex",
+
+    # Belgium / Netherlands / Switzerland
+    stringr::str_detect(x, stringr::regex("^ghent|universiteit gent", ignore_case = TRUE)) ~ "Ghent University",
+    stringr::str_detect(x, stringr::regex("^ulb$|ulb,|libre de bruxelles", ignore_case = TRUE)) ~ "ULB",
+    stringr::str_detect(x, stringr::regex("leiden", ignore_case = TRUE)) ~ "Leiden University",
+    stringr::str_detect(x, stringr::regex("groningen", ignore_case = TRUE)) ~ "University of Groningen",
+    stringr::str_detect(x, stringr::regex("eth zurich|eth zürich|^eth$", ignore_case = TRUE)) ~ "ETH Zurich",
+
+    # France
+    stringr::str_detect(x, stringr::regex("sorbonne univ|sorbonne universit|sorbone", ignore_case = TRUE)) ~ "Sorbonne Univ.",
+    stringr::str_detect(x, stringr::regex("paris cit|upcit", ignore_case = TRUE)) ~ "Univ. Paris Cité",
+    stringr::str_detect(x, stringr::regex("paris nanterre", ignore_case = TRUE)) ~ "Univ. Paris Nanterre",
+    stringr::str_detect(x, stringr::regex("paris.?saclay", ignore_case = TRUE)) ~ "Univ. Paris-Saclay",
+    stringr::str_detect(x, stringr::regex("paris 8", ignore_case = TRUE)) ~ "Univ. Paris 8",
+
+    stringr::str_detect(x, stringr::regex("aix.?marseille|^amu$", ignore_case = TRUE)) ~ "Aix-Marseille Univ.",
+    stringr::str_detect(x, stringr::regex("bordeaux", ignore_case = TRUE)) ~ "Univ. de Bordeaux",
+    stringr::str_detect(x, stringr::regex("grenoble|^uga$", ignore_case = TRUE)) ~ "Univ. Grenoble Alpes",
+    stringr::str_detect(x, stringr::regex("lyon", ignore_case = TRUE)) ~ "Univ. de Lyon",
+    stringr::str_detect(x, stringr::regex("strasbourg|louis pasteur", ignore_case = TRUE)) ~ "Univ. de Strasbourg",
+    stringr::str_detect(x, stringr::regex("toulouse", ignore_case = TRUE)) ~ "Univ. de Toulouse",
+    stringr::str_detect(x, stringr::regex("lille", ignore_case = TRUE)) ~ "Univ. de Lille",
+    stringr::str_detect(x, stringr::regex("clermont", ignore_case = TRUE)) ~ "Univ. Clermont",
+    stringr::str_detect(x, stringr::regex("montpellier", ignore_case = TRUE)) ~ "Univ. de Montpellier",
+    stringr::str_detect(x, stringr::regex("picardie|^upjv$", ignore_case = TRUE)) ~ "Univ. Picardie",
+    stringr::str_detect(x, stringr::regex("côte d.?azur|cote d.?azur", ignore_case = TRUE)) ~ "Univ. Côte d'Azur",
+    stringr::str_detect(x, stringr::regex("rennes", ignore_case = TRUE)) ~ "Univ. de Rennes",
+    stringr::str_detect(x, stringr::regex("caen", ignore_case = TRUE)) ~ "Univ. de Caen",
+    stringr::str_detect(x, stringr::regex("poitiers", ignore_case = TRUE)) ~ "Univ. de Poitiers",
+    stringr::str_detect(x, stringr::regex("reims", ignore_case = TRUE)) ~ "Univ. de Reims",
+    stringr::str_detect(x, stringr::regex("rouen", ignore_case = TRUE)) ~ "Univ. de Rouen",
+    stringr::str_detect(x, stringr::regex("tours", ignore_case = TRUE)) ~ "Univ. de Tours",
+    stringr::str_detect(x, stringr::regex("nantes", ignore_case = TRUE)) ~ "Université de Nantes",
+
+    # Germany
+    stringr::str_detect(x, stringr::regex("darmstadt|tuda", ignore_case = TRUE)) ~ "TU Darmstadt",
+    stringr::str_detect(x, stringr::regex("jena", ignore_case = TRUE)) ~ "Friedrich Schiller University Jena",
+
+    # Italy
+    stringr::str_detect(x, stringr::regex("sapienza", ignore_case = TRUE)) ~ "La Sapienza",
+    stringr::str_detect(x, stringr::regex("tor vergata", ignore_case = TRUE)) ~ "Tor Vergata",
+    stringr::str_detect(x, stringr::regex("genoa|genova", ignore_case = TRUE)) ~ "University of Genoa",
+    stringr::str_detect(x, stringr::regex("turin", ignore_case = TRUE)) ~ "University of Turin",
+    stringr::str_detect(x, stringr::regex("milano.?bicocca", ignore_case = TRUE)) ~ "University of Milano-Bicocca",
+
+    # Portugal
+    stringr::str_detect(x, stringr::regex("minho", ignore_case = TRUE)) ~ "University of Minho",
+
+    # Austria
+    stringr::str_detect(x, stringr::regex("vienna", ignore_case = TRUE)) ~ "University of Vienna",
+
+    # Spain
+    stringr::str_detect(x, stringr::regex("^bcbl$|basque center on cognition", ignore_case = TRUE)) ~ "BCBL",
+
     .default = x
   )
 }
@@ -584,7 +796,7 @@ country_palette_ext <- c(
 named_affils <- df_country_aff_all |>
   filter(Affiliation != "Missing") |>
   count(Affiliation, sort = TRUE) |>
-  filter(n >= 2) |>
+  filter(n >= 3) |>
   pull(Affiliation)
 
 df_plot_affil <- df_country_aff_all |>
@@ -595,10 +807,10 @@ df_plot_affil <- df_country_aff_all |>
       .default                          = "Other"
     ),
     Country_fill = case_when(
-      Affiliation_cat %in% c("Missing", "Other") ~ "—",
-      Country %in% names(country_palette_ext)     ~ Country,
-      .default                                     = "Other country"
-    )
+  Affiliation_cat == "Missing" ~ "—",
+  Country %in% names(country_palette_ext) ~ Country,
+  .default = "Other country"
+)
   ) |>
   count(Affiliation_cat, Country_fill)
 
@@ -640,6 +852,43 @@ p_country <- df_plot_affil |>
 p_position + p_country
 ```
 
+```{r p_coutnries}
+#| fig-width: 9
+#| fig-height: 6
+
+p_map <- df_plot_affil |>
+  mutate(region = Country_fill) |>
+  group_by(region) |>
+  summarize(N = sum(n)) |>
+  filter(!region %in% c("—", "Other country")) |>
+  mutate(region = ifelse(region == "United Kingdom", "UK", region)) |>
+  right_join(map_data("world"), by = "region") 
+
+p_map |>
+  # mutate(n = replace_na(n, 0)) |>
+  ggplot(aes(long, lat)) +
+  geom_polygon(aes(fill = N, group = group)) +
+  geom_text(data = p_map |>
+              summarize(lat = mean(lat, na.rm = TRUE),
+                 long = mean(long, na.rm = TRUE),
+                 label = paste0("N=", mean(N, na.rm = TRUE), " (", format_percent(mean(N, na.rm = TRUE) / nrow(df)), ")"), 
+                 .by = "region") |> 
+              mutate(label = str_replace(label, fixed("N=NaN ()"), "")), aes(label = label), size = 2) +
+  scale_fill_gradientn(colors = c("#FFF8E1", "#FFB74D", "#FF9800", "#FF5722", "#F44336", "#E91E63", "#C2185B", "#cc66cc")) +
+  labs(fill = "N") +
+  theme_void() +
+  labs(title = "Number of participants by country")  +
+  theme(
+    plot.title = element_text(size = rel(1.2), face = "bold", hjust = 0),
+    plot.subtitle = element_text(size = rel(1.2))
+  ) + 
+  coord_fixed(xlim = c(-9, 60), ylim = c(35, 69)) # Focus on Europe
+```
+
+
+#### Careers 
+
+
 ```{r}
 # Time allocation across research activities
 p_activities <- df |>
@@ -653,8 +902,7 @@ p_activities <- df |>
   pivot_longer(everything(), names_to = "Activity", values_to = "Percentage") |>
   filter(!is.na(Percentage)) |>
   mutate(Activity = factor(Activity,
-    levels = c("Research", "Teaching", "Administration", "Popularization", "Other")),
-    Percentage = Percentage / 100) |>
+    levels = c("Research", "Teaching", "Administration", "Popularization", "Other"))) |>
   ggplot(aes(x = Activity, y = Percentage, fill = Activity)) +
   geom_violin(alpha = 0.6, trim = TRUE) +
   geom_boxplot(width = 0.1, fill = "white", outlier.size = 0.5) +
@@ -666,7 +914,7 @@ p_activities <- df |>
 p_activities
 ```
 
-#### Careers 
+
 
 ```{r}
 # Career perceptions: scatterplot matrix with ggside marginals
@@ -676,9 +924,9 @@ df_career <- df |>
   filter(!is.na(Work_Publication)) |>
   transmute(
     Published = Work_Publication,
-    Prob_Perm = Work_Probability_permanent_position / 100,
-    Sat_Numb  = Work_Satisfaction_numb_publications  / 100,
-    Sat_Qual  = Work_Satisfaction_quality_publications / 100
+    Prob_Perm = Work_Probability_permanent_position,
+    Sat_Numb  = Work_Satisfaction_numb_publications,
+    Sat_Qual  = Work_Satisfaction_quality_publications
   )
 
 make_scatter_side <- function(data, xv, yv, xl, yl) {
@@ -744,7 +992,38 @@ p_clinical <- df |>
   labs(title = "Clinical Activity", x = "", y = "Count")
 
 
-(p_commit + p_clinical) 
+(p_commit + p_clinical)
+```
+
+```{r}
+#| label: md_sample
+#| echo: false
+#| cache: false
+
+career_vars <- c("Prob_Perm", "Sat_Numb", "Sat_Qual")
+make_markdown(list(
+  "Categorical variables" = count_levels(df, c("Dem_Gender", "Dem_Child_numb", "Dem_Parental_leave", "Work_Discipline",
+                                                "Work_Diploma", "Work_Position", "Work_Career_Stage", "Work_Publication",
+                                                "Work_Committees", "Work_Clinical_activity")),
+  "Age by gender" = df |>
+    filter(!is.na(Dem_Age)) |>
+    summarise(n = n(), Mean = mean(Dem_Age), SD = sd(Dem_Age), Median = median(Dem_Age),
+              Min = min(Dem_Age), Max = max(Dem_Age), .by = Dem_Gender),
+  "Country of workplace (fewer than 3 pooled into Other)" = df_country_aff_all |>
+    mutate(Country = fct_lump_min(Country, min = 3)) |>
+    count_levels("Country"),
+  "Affiliations" = affil_totals |>
+    arrange(desc(rank)) |>
+    select(Affiliation = Affiliation_cat, N = total),
+  "Time allocation" = p_activities$data |>
+    summarise(n = n(), Mean = mean(Percentage), SD = sd(Percentage), Median = median(Percentage), .by = Activity),
+  "Career perceptions" =
+    describe_vars(df_career[career_vars]),
+  "Career perceptions: correlations" = correlation(df_career[career_vars]) |>
+    as.data.frame() |>
+    transmute(Variable1 = Parameter1, Variable2 = Parameter2, r,
+              `95% CI` = format_ci(CI_low, CI_high, ci = NULL), p = format_p(p), n = n_Obs)
+), "Sample")
 ```
 
 ### Science Quality Criteria
@@ -786,6 +1065,17 @@ p_criteria
 ```
 
 ```{r}
+#| label: md_criteria
+#| echo: false
+#| cache: false
+
+p_criteria$data |>
+  arrange(desc(pct)) |>
+  transmute(Criterion, Endorsed = format_percent(pct)) |>
+  make_markdown("Endorsement of quality criteria")
+```
+
+```{r}
 df_quality_num <- df_quality |>
   mutate(across(everything(), ~as.numeric(. == "Yes")))
 
@@ -807,7 +1097,7 @@ p_criteria_cor
 rez_criteria <- n_components(df_quality_num)
 plot(rez_criteria)
 
-pca_criteria <- principal_components(df_quality_num, n = 8)
+pca_criteria <- principal_components(df_quality_num, n = 2)
 plot(pca_criteria)
 
 # Extract loadings
@@ -817,8 +1107,20 @@ as.data.frame(pca_criteria) |>
                 "Rigorous and Innovative vs. Virtuous" = "PC2")) |> 
   pivot_longer(-Variable, names_to = "Component", values_to = "Loading") 
  # TODO: Make loading plot
-  
 
+
+```
+
+```{r}
+#| label: md_criteria_structure
+#| echo: false
+#| cache: false
+
+make_markdown(c(
+  list("Co-endorsement (phi correlations)" = cor_pairs(df_quality_num),
+       "Number of components: agreement between methods" = as.data.frame(summary(rez_criteria))),
+  loadings_tables(pca_criteria)
+), "Structure of quality criteria")
 ```
 
 #### Predictors
@@ -833,13 +1135,15 @@ m_criteria1 <- brms::brm(Criteria1 ~ Dem_Gender * poly(Dem_Age, 2),
                        mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |> 
                        filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 70),
                      backend = "cmdstanr",
-                     algorithm = "pathfinder")
+                     algorithm = "pathfinder",
+                     seed = 123)
 m_criteria2 <- brms::brm(Criteria2 ~ Dem_Gender * poly(Dem_Age, 2), 
                      data = df_quality2 |> 
                        mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |> 
                        filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 70),
                      backend = "cmdstanr",
-                     algorithm = "pathfinder")
+                     algorithm = "pathfinder",
+                     seed = 123)
 
 
 p_criteria_pred1 <- rbind(
@@ -862,8 +1166,25 @@ p_criteria_pred1 <- rbind(
 p_criteria_pred1
 ```
 
+```{r}
+#| label: md_criteria_models
+#| echo: false
+#| cache: false
+
+list(
+  summarize_model(m_criteria1, "Dem_Gender", "Dem_Age=c(25, 35, 45, 55, 65)",
+                  "Criteria1: Novel and Impactful vs. Rigourous and Transparent"),
+  summarize_model(m_criteria2, "Dem_Gender", "Dem_Age=c(25, 35, 45, 55, 65)",
+                  "Criteria2: Rigorous and Innovative vs. Virtuous")
+) |>
+  model_tables() |>
+  make_markdown("Quality criteria by gender and age")
+```
+
 
 ### Open Science
+
+TODO: If OS_Familiar == 0, Then NA to OS_Importance
 
 #### Overview
 
@@ -908,19 +1229,82 @@ p_os_prac2 <- plot_graph(f, threshold = 0.2, arrow_end_gap = 0.12, expand = c(1.
 p_os_prac2
 ```
 
+```{r}
+#| label: md_os_practices
+#| echo: false
+#| cache: false
+
+make_markdown(c(
+  list("Descriptive statistics" = describe_vars(df_os_practices),
+       "Correlations" = cor_pairs(df_os_practices),
+       "Number of factors: agreement between methods" = as.data.frame(summary(rez))),
+  loadings_tables(f)
+), "Open science practices")
+```
+
+#### Adoption
+
+```{r}
+#| label: os_adoption
+
+# The four answers, which the 0-1 "use" score above orders by assumption
+os_use_levels <- c("Used" = 3, "Plan to use" = 2, "Not familiar" = 1, "Do not plan to use" = 0)
+os_use_colors <- c("Used" = "#1565C0", "Plan to use" = "#90CAF9", "Not familiar" = "#BDBDBD", "Do not plan to use" = "#E57373")
+
+df_os_adoption <- df |>
+  select(Preregistration = OS_Study_Preregistration, `Registered reports` = OS_Registered_Reports,
+         `Open materials` = OS_Open_Materials, `Open data` = OS_Open_Data,
+         `Open peer review` = OS_Open_Peer_Review, `Open access` = OS_Open_Access_Publication,
+         `Replication studies` = OS_Replication_Studies, `Participatory research` = OS_Participatory_Research) |>
+  pivot_longer(everything(), names_to = "Practice", values_to = "Use") |>
+  filter(!is.na(Use)) |>
+  mutate(Response = factor(names(os_use_levels)[match(round(Use * 3), os_use_levels)], levels = names(os_use_levels))) |>
+  count(Practice, Response, .drop = FALSE) |>
+  mutate(Proportion = n / sum(n), .by = Practice) |>
+  mutate(Practice = fct_reorder(Practice, ifelse(Response == "Used", Proportion, 0), .fun = sum))
+
+p_os_adoption <- df_os_adoption |>
+  ggplot(aes(x = Proportion, y = Practice, fill = Response)) +
+  geom_col(position = position_stack(reverse = TRUE), width = 0.75, color = "white", linewidth = 0.5) +
+  geom_text(aes(label = ifelse(Proportion >= 0.08, scales::percent(Proportion, accuracy = 1), ""),
+                color = Response == "Used", group = Response),
+            position = position_stack(vjust = 0.5, reverse = TRUE), size = 2.8, show.legend = FALSE) +
+  scale_x_continuous(labels = scales::percent_format(), expand = c(0, 0)) +
+  scale_fill_manual(values = os_use_colors) +
+  scale_color_manual(values = c("TRUE" = "white", "FALSE" = "grey15"), guide = "none") +
+  theme_minimal() +
+  theme(legend.position = "bottom", panel.grid = element_blank()) +
+  labs(title = "Adoption of Open Science Practices", x = NULL, y = NULL, fill = NULL)
+p_os_adoption
+```
+
+```{r}
+#| label: md_os_adoption
+#| echo: false
+#| cache: false
+
+df_os_adoption |>
+  mutate(Proportion = format_percent(Proportion)) |>
+  select(-n) |>
+  pivot_wider(names_from = Response, values_from = Proportion) |>
+  arrange(desc(Practice)) |>
+  make_markdown("Adoption of open science practices")
+```
+
 #### Open Science Help
 
 
 ```{r}
+# TODO: Add subtitlte "Select up to 5" 
 df_os_help <- select(df, starts_with("OS_Help"), -OS_Help_Other)
 names(df_os_help) <- str_replace(names(df_os_help), "OS_Help_", "") |>
   str_replace_all(fixed("_"), " ") |>
   recode(
-    "Ethical issues"                  = "Data sharing\nethics",
+    "Data sharing"                  = "Data sharing\nethics",   # Knowledge about ethical considerations
     "Workload"                         = "Dedicated OS\nworkload",
     "Infrastructure"                   = "Technical\ninfrastructure",
     "Funding"                          = "Dedicated\nfunding",
-    "Incentives Fund Institutions"     = "Institutional\nincentives",
+    "Incentives Fund Institutions"     = "Institutional\nincentives",  
     "Recognition Promotion Recruitment" = "Career\nrecognition",
     "Support Seniors"                  = "Senior researcher\nsupport",
     "Support Juniors"                  = "Junior researcher\nsupport",
@@ -950,7 +1334,7 @@ p_os_help <- df_os_help |>
            name %in% c("Career\nrecognition") ~ "Recognition",
            name %in% c("Institutional\nincentives", "Dedicated\nfunding") ~ "Money",
            name %in% c("Time", "Dedicated OS\nworkload") ~ "Time",
-           name %in% c("Technical\ninfrastructure", "Senior researcher\nsupport", "OS training", "Junior researcher\nsupport") ~ "Support",
+           name %in% c("Technical\ninfrastructure", "Senior researcher\nsupport", "OS training", "Junior researcher\nsupport", "More Information") ~ "Support",
            .default = "Other"),
          Type = fct_relevel(Type, "Recognition", "Money", "Time", "Support"),
          name = fct_reorder(name, desc(Total))) |>
@@ -965,6 +1349,19 @@ p_os_help <- df_os_help |>
   theme(axis.text.x = element_text(angle = 50, hjust = 1),
         plot.title = element_text(size = 12, face = "bold", hjust = 0))
 p_os_help
+```
+
+```{r}
+#| label: md_os_help
+#| echo: false
+#| cache: false
+
+make_markdown(list(
+  "Proportion selecting each avenue" = p_os_help$data |>
+    arrange(desc(Total)) |>
+    transmute(Avenue = name, Type, Selected = format_percent(Total)),
+  "Co-selection (phi correlations)" = cor_pairs(df_os_help)
+), "Open science help")
 ```
 
 
@@ -994,9 +1391,19 @@ df_ss_scales |>
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+```{r}
+#| label: md_ss_scales
+#| echo: false
+#| cache: false
+
+make_markdown(list("Descriptive statistics" = describe_vars(df_ss_scales),
+                   "Correlations" = cor_pairs(df_ss_scales)), "Slow science scales")
+```
+
 ### Slow Science Definition
 
 ```{r}
+# TODO: Add subtitle: "Select up to 3" 
 df_ss_def <- select(df, starts_with("SS_Definition_"), -SS_Definition_Other)
 names(df_ss_def) <- str_replace(names(df_ss_def), "SS_Definition_", "") |>
   str_replace_all(fixed("_"), " ")
@@ -1027,9 +1434,22 @@ ss_def <- df_ss_def |>
 ss_def
 ```
 
+```{r}
+#| label: md_ss_definition
+#| echo: false
+#| cache: false
+
+ss_def$data |>
+  arrange(desc(Total)) |>
+  transmute(Definition = name, Selected = format_percent(Total)) |>
+  make_markdown("Slow science definition")
+```
+
 ### Slow Science Feasibility
 
 ```{r}
+# TODO: If Not_Feasible, then remove "Feasible_individual" and "Feasible_institution" for that practice for that participant
+# TODO: Add "Both" column for joint Individual & Institutional
 ss_feas <- select(df, matches("^SS_.*Feasible_individual$|^SS_.*Feasible_institution$|^SS_.*Not_Feasible$")) |>
   mutate(participant = paste0("S", seq_len(n()))) |>
   pivot_longer(-participant, names_to = "Variable", values_to = "value") |>
@@ -1059,16 +1479,88 @@ ss_feas <- select(df, matches("^SS_.*Feasible_individual$|^SS_.*Feasible_institu
   scale_y_continuous(labels = scales::percent_format()) +
   scale_fill_manual(values = c("Individual" = "#4CAF50", "Institution" = "#1E88E5", "Not Feasible" = "#E53935")) +
   theme_minimal() +
-  labs(title = "Who Can Help Slow Science?",
+  labs(title = "What Can Help Slow Science and Who's Responsability is it?",
        x = "", y = "", fill = NULL) +
   theme(axis.text.x = element_text(angle = 40, hjust = 1),
         plot.title = element_text(size = 12, face = "bold", hjust = 0))
 ss_feas
 ```
 
+```{r}
+#| label: md_ss_feasibility
+#| echo: false
+#| cache: false
+
+ss_feas$data |>
+  mutate(Proportion = format_percent(Proportion)) |>
+  pivot_wider(names_from = Level, values_from = Proportion) |>
+  arrange(Practice) |>
+  make_markdown("Slow science feasibility")
+```
+
+### Ratings Across Movements
+
+```{r}
+#| label: sliders
+
+domain_colors <- c("Open Science" = "#2196F3", "Slow Science" = "#FF9800",
+                   "Green Science" = "#4CAF50", "Ethical Science" = "#9C27B0")
+slider_items <- c(
+  "OS_Familiar"                         = "Familiarity with the movement",
+  "OS_Importance"                       = "Importance of the movement",
+  "SS_Familiar"                         = "Familiarity with the movement",
+  "SS_Importance"                       = "Importance of the movement",
+  "GS_Importance_conducting"            = "Importance in conducting research",
+  "GS_Importance_topic"                 = "Importance in choosing topics",
+  "GS_Relation_Research_Sustainability" = "Link between research and environment",
+  "GS_Change_practices_agreeing"        = "Willing to change practices",
+  "GS_Changes_communication_practices"  = "Changed communication (e.g., travel)",
+  "GS_Changes_practices"                = "Changed research practices",
+  "ES_Consequences_society"             = "Care for societal consequences",
+  "ES_Importance_research_team"         = "Importance of team diversity"
+)
+
+df_sliders <- df |>
+  select(all_of(names(slider_items))) |>
+  pivot_longer(everything(), names_to = "Variable", values_to = "Score") |>
+  filter(!is.na(Score)) |>
+  mutate(Domain = case_when(str_starts(Variable, "OS_") ~ "Open Science", str_starts(Variable, "SS_") ~ "Slow Science",
+                            str_starts(Variable, "GS_") ~ "Green Science", str_starts(Variable, "ES_") ~ "Ethical Science"),
+         Domain = factor(Domain, levels = names(domain_colors)),
+         Domain_label = fct_relabel(Domain, \(x) str_replace(x, " ", "\n")),
+         Item = factor(slider_items[Variable], levels = rev(unique(slider_items))))
+
+p_sliders <- df_sliders |>
+  ggplot(aes(x = Score, y = Item, fill = Domain)) +
+  ggdist::stat_histinterval(breaks = ggdist::breaks_fixed(width = 0.05), align = ggdist::align_boundary(at = 0),
+                            outline_bars = FALSE, slab_alpha = 0.6, height = 0.9, normalize = "xy",
+                            point_interval = "mean_qi", .width = 0.5, point_size = 1.5,
+                            interval_size_range = c(0.8, 0.8), justification = -0.05, show.legend = FALSE) +
+  scale_x_continuous(limits = c(0, 1), labels = \(x) x * 100, expand = c(0.01, 0)) +
+  scale_fill_manual(values = domain_colors) +
+  facet_grid(Domain_label ~ ., scales = "free_y", space = "free_y", switch = "y") +
+  theme_minimal() +
+  theme(strip.placement = "outside", strip.text.y.left = element_text(angle = 0, face = "bold", hjust = 1),
+        panel.grid.minor = element_blank(), panel.grid.major.y = element_blank()) +
+  labs(title = "Familiarity, Importance and Engagement", x = "Rating (0-100)", y = NULL)
+p_sliders
+```
+
+```{r}
+#| label: md_sliders
+#| echo: false
+#| cache: false
+
+df_sliders |>
+  summarise(Mean = mean(Score) * 100, SD = sd(Score) * 100, Median = median(Score) * 100,
+            `At 0` = format_percent(mean(Score == 0)), `At 100` = format_percent(mean(Score == 1)),
+            n = n(), .by = c(Domain, Item)) |>
+  make_markdown("Ratings across movements (0-100 sliders)")
+```
 
 
-## Structure of Science Practices
+
+## Science Attitudes
 
 Alternative names:
 - Agathic Science
@@ -1128,9 +1620,9 @@ p_cor <- df_resprac |>
   geom_text(aes(label=label), color="black", size=1.5) +
   annotate(geom="rect", xmin=0.5, xmax=8.5, ymin=0.5, ymax=8.5, alpha=0, color="#9C27B0", linewidth = 2) +
   annotate(geom="rect", xmin=0.55, xmax=4.5, ymin=0.55, ymax=4.5, alpha=0, color="#4CAF50", linewidth = 2) +
-  annotate(geom="rect", xmin=8.5, xmax=11.5, ymin=8.5, ymax=11.5, alpha=0, color="#3F51B5", linewidth = 2) +
-  annotate(geom="rect", xmin=17.5, xmax=19.5, ymin=17.5, ymax=19.5, alpha=0, color="#FF9800", linewidth = 2) +
-  annotate(geom="rect", xmin=13.5, xmax=17.5, ymin=13.5, ymax=17.5, alpha=0, color="#2196F3", linewidth = 2) +
+  annotate(geom="rect", xmin=9.5, xmax=12.5, ymin=9.5, ymax=12.5, alpha=0, color="#3F51B5", linewidth = 2) +
+  annotate(geom="rect", xmin=13.5, xmax=15.5, ymin=13.5, ymax=15.5, alpha=0, color="#FF9800", linewidth = 2) +
+  annotate(geom="rect", xmin=12.5, xmax=19.5, ymin=12.5, ymax=19.5, alpha=0, color="#2196F3", linewidth = 2) +
   scale_fill_gradientn(colours = c("darkblue", "blue", "#2196F3","white", "#FFC107", "#F44336", "darkred"), limits = c(-1, 1)) +
   theme_minimal() +
   labs(title = "Correlation Matrix of Research Values",
@@ -1140,6 +1632,15 @@ p_cor <- df_resprac |>
         plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
         legend.position = "none")
 p_cor
+```
+
+```{r}
+#| label: md_resprac_cor
+#| echo: false
+#| cache: false
+
+make_markdown(list("Descriptive statistics" = describe_vars(df_resprac),
+                   "Correlations" = cor_pairs(df_resprac)), "Research values")
 ```
 
 
@@ -1161,34 +1662,64 @@ color_vars_resprac <- c(
   "Green Science - Changed Communication" = "#4CAF50",
   "Green Science - Belief Relation" = "#4CAF50",
   "Green Science - Change Willingness" =  "#4CAF50",
+  
+  # ES variables (purple)
+  "Ethical Science - Team Diversity"        = "#9C27B0",
+  "Ethical Science - Societal Consequences" = "#9C27B0",
+  
   # OS variables (blue)
   "Endorsement - Open Data"                 = "#2196F3",
   "Endorsement - Open Materials"            = "#2196F3",
   "Endorsement - Open Access"               = "#2196F3",
   "Open Science - Importance"               = "#2196F3",
-  "Endorsement - Open Peer Review"          = "#2196F3",
   
+  "Endorsement - Open Peer Review"          = "#3F51B5",
   "Endorsement - Preregistration"           = "#3F51B5",
   "Endorsement - Registered Reports"        = "#3F51B5",
   "Endorsement - Replication Studies"       = "#3F51B5",
   "Endorsement - Participatory Research"    = "#3F51B5",
   
+  
   # SS variable (teal)
   "Slow Science - Importance"               = "#FF9800",
-  "Slow Science - Familiarity"              = "#FF9800",
+  "Slow Science - Familiarity"              = "#FF9800"
   
-  # ES variables (purple)
-  "Ethical Science - Team Diversity"        = "#9C27B0",
-  "Ethical Science - Societal Consequences" = "#9C27B0"
+  
 )
 
+# Each factor is named after its marker item (psych's MR numbering changes with the data)
+efa_markers <- c("Green Science" = "Green Science - Ecofriendly Practices",
+                 "Ethical\nScience" = "Ethical Science - Team Diversity",
+                 "Open\nScience" = "Endorsement - Open Data",
+                 "Rigorous\nScience" = "Endorsement - Registered Reports",
+                 "Slow Science" = "Slow Science - Familiarity")
+efa_loadings <- as.data.frame(f) |> select(Variable, starts_with("MR"))
+efa_ids <- sapply(efa_markers, \(v) {
+  l <- unlist(efa_loadings[efa_loadings$Variable == v, -1])
+  names(l)[which.max(abs(l))]
+})
+stopifnot(!anyDuplicated(efa_ids))  # One marker per factor
+
 p_resprac <- plot_graph(f, threshold = 0.2, arrow_end_gap = 0.12, expand = c(1, 0.5),
-                        names_factors = list("Green Science" = "MR1", "Rigorous\nScience" = "MR2", "Ethical\nScience" = "MR5", 
-                                             "Slow Science" = "MR3", "Open\nScience" = "MR4"),
-                        color_factors = c("MR1" = "#4CAF50", "MR4" = "#2196F3", "MR2" = "#3F51B5",
-                                          "MR3" = "#FF9800", "MR5" = "#9C27B0"),
+                        names_factors = as.list(efa_ids),
+                        color_factors = setNames(c("#4CAF50", "#9C27B0", "#2196F3", "#3F51B5", "#FF9800"), efa_ids),
                         color_variables = color_vars_resprac)
 p_resprac
+```
+
+```{r}
+#| label: md_resprac_efa
+#| echo: false
+#| cache: false
+
+# Factor names as shown in the figure (e.g., MR1 -> "Green Science")
+names_resprac <- p_resprac$data |>
+  filter(type == "Factor") |>
+  mutate(label = str_remove(label_text, "\n\\(.*\\)$") |> str_replace_all("\n", " "))
+make_markdown(c(
+  list("Number of factors: agreement between methods" = as.data.frame(summary(rez_resprac))),
+  loadings_tables(f, names_factors = setNames(names_resprac$label, paste0("\\b", names_resprac$name, "\\b")))
+), "EFA of research values")
 ```
 
 ### CFA
@@ -1232,7 +1763,7 @@ cfa_node_colors <- c(
   "OS_Open_Data"               = "#2196F3",
   "OS_Open_Materials"          = "#2196F3",
   "OS_Open_Access_Publication" = "#2196F3",
-  "OS_Open_Peer_Review"        = "#2196F3",
+  "OS_Open_Peer_Review"        = "#3F51B5",
   "OS_Study_Preregistration"   = "#3F51B5",
   "OS_Registered_Reports"      = "#3F51B5",
   "OS_Replication_Studies"     = "#3F51B5",
@@ -1254,12 +1785,12 @@ cfa_model <- "
   Open_Science     =~ OS_Importance +
                       OS_Open_Data +
                       OS_Open_Materials +
-                      OS_Open_Access_Publication +
-                      OS_Open_Peer_Review
+                      OS_Open_Access_Publication 
   Rigorous_Science =~ OS_Study_Preregistration +
                       OS_Registered_Reports +
                       OS_Replication_Studies +
-                      OS_Participatory_Research
+                      OS_Participatory_Research +
+                      OS_Open_Peer_Review
   Green_Science    =~ GS_Importance_conducting +
                       GS_Importance_topic +
                       GS_Changes_practices +
@@ -1277,6 +1808,10 @@ library(tidySEM)
 
 fit_cfa <- cfa(cfa_model, data = df, std.lv = TRUE)
 
+# modificationIndices(fit_cfa, standardized = TRUE, sort = TRUE) |>
+#   dplyr::filter(mi > 10) |>
+#   dplyr::arrange(desc(mi))
+
 model_parameters(fit_cfa, standardize = TRUE) 
 model_performance(fit_cfa)
 
@@ -1291,13 +1826,13 @@ cfa_pos <- tribble(
   "OS_Replication_Studies",      2,   10,
   "OS_Participatory_Research",   3,   9,
   "Rigorous_Science",            1,   8,
+  "OS_Open_Peer_Review",         3.3,    8,
   # Open Science factor + vars (left, bottom half)
   "Open_Science",                1,    2.5,
   "OS_Open_Materials",           0,    1,
   "OS_Open_Data",                1,    0,
   "OS_Open_Access_Publication",  2,    0,
   "OS_Importance",               3,    1,
-  "OS_Open_Peer_Review",         4,    2,
   # Slow Science factor + vars (centre)
   "SS_Importance",               6,   10,
   "Slow_Science",                6,    5,
@@ -1396,26 +1931,40 @@ p_cfa
 ```{r}
 df_resprac_fac <- as.data.frame(predict(fit_cfa))
 
-n_clusters(df_resprac_fac) |>
-  plot()
+rez_nclust <- n_clusters(df_resprac_fac, package = c("NbClust"))
+plot(rez_nclust)
 
 rez <- cluster_analysis(df_resprac_fac, n=5, method="hkmeans")
 plot(rez)
 rez
 
-df_resprac_fac$Profile <- predict(rez)
-df_resprac_fac <- mutate(df_resprac_fac, Profile = case_when(
-           Profile == 1 ~ "Cluster 1\nIdealists",
-           Profile == 2 ~ "Cluster 2\nEthical Productivists",
-           Profile == 3 ~ "Cluster 3\nQuality Champions",
-           Profile == 4 ~ "Cluster 4\nEthical Radicalists",
-           .default = "Cluster 5\nTraditionalists"
-         ))
+# Cluster numbers (and so hand-given names) change with the sample: profiles are
+# lettered by size and labelled by the factors on which their mean is above (+)
+# or below (-) 0.3 SD
+profile_labels <- df_resprac_fac |>
+  mutate(Cluster = predict(rez)) |>
+  summarise(across(everything(), mean), n = n(), .by = Cluster) |>
+  arrange(desc(n)) |>
+  pivot_longer(-c(Cluster, n), names_to = "Factor", values_to = "Mean") |>
+  mutate(Factor = str_remove(Factor, "_Science"),
+         Sign = case_when(Mean > 0.3 ~ "+", Mean < -0.3 ~ "-", .default = NA)) |>
+  summarise(Pattern = paste0(Sign[!is.na(Sign)], Factor[!is.na(Sign)], collapse = " "), .by = c(Cluster, n)) |>
+  mutate(Label = paste0("Profile ", LETTERS[row_number()], "\n", ifelse(Pattern == "", "Average", Pattern)))
+df_resprac_fac$Profile <- profile_labels$Label[match(predict(rez), profile_labels$Cluster)]
 ```
 
 ```{r}
-cluster_vars <- names(as.data.frame(predict(fit_cfa)))
-labels <- tibble(Variable = cluster_vars, label = str_replace(cluster_vars, "_", "\n"))
+#| label: md_nclusters
+#| echo: false
+#| cache: false
+
+make_markdown(as.data.frame(summary(rez_nclust)), "Number of clusters: agreement between methods")
+```
+
+```{r}
+# cluster_vars <- names(as.data.frame(predict(fit_cfa)))
+cluster_vars <- c("Rigorous_Science", "Open_Science", "Slow_Science", "Green_Science", "Ethical_Science")
+labels <- tibble(Variable = cluster_vars, label = str_replace(cluster_vars, "_", "\n")) 
 
 
 
@@ -1456,7 +2005,7 @@ spokes <- tibble(Variable = cluster_vars, angle = angles) |>
 # Use left_join instead of named-vector indexing to avoid NA from tibble column lookup
 axis_labels <- spokes |>
   left_join(labels, by = "Variable") |>
-  mutate(lx = 1.25 * sin(angle), ly = 1.25 * cos(angle))
+  mutate(lx = 1.25 * sin(angle), ly = 1.25 * cos(angle))  
 
 # Profile counts and percentages for annotation
 profile_counts <- df_resprac_fac |>
@@ -1540,21 +2089,72 @@ p_radar <- ggplot() +
 p_radar
 ```
 
+```{r}
+#| label: md_profiles
+#| echo: false
+#| cache: false
+
+df_resprac_fac |>
+  summarise(N = n(), across(all_of(cluster_vars), mean), .by = Profile) |>
+  mutate(Percentage = format_percent(N / sum(N)), .after = N) |>
+  arrange(Profile) |>
+  list() |>
+  setNames("Mean CFA factor score per profile") |>
+  make_markdown("Researcher profiles")
+```
+
+#### Stability
+
+```{r}
+#| label: cluster_stability
+
+# Bootstrap: cluster resampled respondents, assign everyone to the nearest
+# resampled centroid, and compare with the full-sample solution (adjusted Rand
+# index; 1 = same partition)
+cluster_data <- select(df_resprac_fac, -Profile)
+z <- as.matrix(standardize(cluster_data))  # The space cluster_analysis() clusters in
+nearest <- \(x, centers) apply(x, 1, \(r) which.min(colSums((t(centers) - r)^2)))
+
+set.seed(123)
+cluster_stability <- map_dfr(2:6, \(k) {
+  full <- predict(cluster_analysis(cluster_data, n = k, method = "hkmeans"))
+  ari <- replicate(100, {
+    boot <- factoextra::hkmeans(z[sample(nrow(z), replace = TRUE), ], k, hc.method = "complete", iter.max = 100)
+    mclust::adjustedRandIndex(full, nearest(z, boot$centers))
+  })
+  tibble(Clusters = k, `Median ARI` = median(ari), `2.5%` = quantile(ari, 0.025), `97.5%` = quantile(ari, 0.975))
+})
+knitr::kable(cluster_stability, format = "pipe", digits = 2,
+             caption = "Bootstrap stability of the hkmeans solutions (100 resamples each)")
+```
+
 ### Predictors
 
 ```{r}
+#| cache: false
+
 data <- cbind(df, df_resprac_fac)
 
-m <- brms::brm(Profile ~ s(Dem_Age, by = Dem_Gender),
-               family = brms::categorical(),
-               data = data |>
-                 mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |>
-                 filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 65),
-               draws = 3000,
-               single_path_draws  = 3000,
-               backend = "cmdstanr",
-               algorithm = "pathfinder")
+# Fitted with MCMC on the cluster (model "Profile" in server/models.R): this chunk
+# writes its data; `./hpc push && ./hpc fit Profile`, then `./hpc pull`, in
+# analysis/server/ bring back the fit
+data_profile <- data |>
+  mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |>
+  filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 65) |>
+  select(Profile, Dem_Age, Dem_Gender)
+dir.create("models", showWarnings = FALSE)
+write.csv(data_profile, "models/data_Profile.csv", row.names = FALSE)
 
+m <- if (file.exists("models/Profile.rds")) readRDS("models/Profile.rds")
+if (!is.null(m)) attr(m$data, "data_name") <- NULL  # Else insight takes this notebook's `data` for the fit's
+as_compared <- \(d) mutate(as.data.frame(d)[names(data_profile)], across(!Dem_Age, as.character))
+if (!is.null(m) && !isTRUE(all.equal(as_compared(m$data), as_compared(data_profile), check.attributes = FALSE))) {
+  m <- NULL  # Fitted on other data
+}
+
+if (is.null(m)) {
+  knitr::asis_output("**Profile model pending**: not fitted on the current data.")
+} else {
 p_archetypes_pred1 <- estimate_relation(m, length = 40) |>
   ggplot(aes(x = Dem_Age, y = Predicted)) +
   geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill=Response,
@@ -1570,8 +2170,25 @@ p_archetypes_pred1 <- estimate_relation(m, length = 40) |>
        title = "Proportion of Profiles as a function of Gender and Age") +
   theme_minimal() +
   theme(plot.title = element_text(size = 16, face = "bold", hjust = 0.5)) +
-  facet_wrap(~Response) 
+  facet_wrap(~Response)
 p_archetypes_pred1
+}
+```
+
+```{r}
+#| label: md_profiles_models
+#| echo: false
+#| cache: false
+
+if (!is.null(m)) {
+  make_markdown(list(
+    "MCMC diagnostics" = mcmc_info(m),
+    "Predicted probability (Median [95% CI])" =
+      estimate_relation(m, by = c("Dem_Age=c(25, 35, 45, 55, 65)", "Dem_Gender")) |>
+      predictions_wide("Dem_Age") |>
+      rename(Profile = Response)
+  ), "Profiles by gender and age")
+}
 ```
 
 
@@ -1580,35 +2197,41 @@ p_archetypes_pred1
 ```{r}
 #| message: false
 
-run_models <- function(dat = data, f = "~ Dem_Gender * poly(Dem_Age, 2)", means="Dem_Gender") {
+# `at`: values of the continuous predictor for the Markdown tables (summarize_model())
+run_models <- function(dat = data, f = "~ Dem_Gender * poly(Dem_Age, 2)", means="Dem_Gender",
+                       at = "Dem_Age=c(25, 35, 45, 55, 65)") {
   models <- list()
   pred <- data.frame()
   mmeans <- data.frame()
+  tables <- list()
   for(outcome in c("Open_Science", "Rigorous_Science", "Green_Science", "Slow_Science", "Ethical_Science")) {
     m_f <- brms::bf(as.formula(paste0(outcome, f)))
+    dat_m <- drop_na(dat, all_of(all.vars(m_f$formula)))  # E.g., no career stage (brms would drop them with a warning)
     
-    params <- get_prior(m_f, data = dat)$coef
+    params <- get_prior(m_f, data = dat_m)$coef
     params <- params[str_ends(params, "22")]
     
     priors <- brms::set_prior("normal(0, 1)", class = "b", coef = params) |>
-      brms::validate_prior(m_f, data = dat)
+      brms::validate_prior(m_f, data = dat_m)
     
     m <- brms::brm(m_f,
-                   data = dat,
+                   data = dat_m,
                    refresh =  0,
                    prior = priors,
                    draws = 3000,
                    single_path_draws  = 3000,
                    backend = "cmdstanr",
-                   algorithm = "pathfinder")
+                   algorithm = "pathfinder",
+                   seed = 123)
     models[[outcome]] <- m
     
     pred <- rbind(pred, mutate(estimate_relation(m, length = 40), Outcome = str_replace(outcome, "_", " ")))
     mmeans <- rbind(mmeans, mutate(estimate_means(m, by=means), Outcome = str_replace(outcome, "_", " ")))
+    tables[[outcome]] <- summarize_model(m, group = means, at = at, outcome = str_replace(outcome, "_", " "))
   }
   pred <- mutate(pred, Outcome = factor(Outcome, levels = c("Open Science", "Rigorous Science", "Slow Science", "Green Science", "Ethical Science")))
   mmeans <- mutate(mmeans, Outcome = factor(Outcome, levels = c("Open Science", "Rigorous Science", "Slow Science", "Green Science", "Ethical Science")))
-  list(pred=pred, mmeans=mmeans)
+  list(pred=pred, mmeans=mmeans, tables=tables)
 }
  
 
@@ -1649,12 +2272,21 @@ p_resval_pred1 <- rez$pred |>
 p_resval_pred1
 ```
 
+```{r}
+#| label: md_resval_age
+#| echo: false
+#| cache: false
+
+make_markdown(model_tables(rez$tables), "Research values by gender and age")
+```
+
 #### Carrer worry
 
 
 ```{r}
-rez <- data |> 
-  run_models(f = "~ Work_Career_Stage * poly(WB_Carrer_worry, 2)", means="Work_Career_Stage")
+rez <- data |>
+  run_models(f = "~ Work_Career_Stage * poly(WB_Carrer_worry, 2)", means="Work_Career_Stage",
+             at = "WB_Carrer_worry=c(0, 0.25, 0.5, 0.75, 1)")
 
 p_resval_pred2 <- rez$pred |>
   ggplot(aes(x = WB_Carrer_worry, y = Predicted)) +
@@ -1685,11 +2317,20 @@ p_resval_pred2 <- rez$pred |>
 p_resval_pred2
 ```
 
+```{r}
+#| label: md_resval_worry
+#| echo: false
+#| cache: false
+
+make_markdown(model_tables(rez$tables), "Research values by career stage and career worry")
+```
+
 #### Research Time
 
 ```{r}
-rez <- data |> 
-  run_models(f = "~ Work_Career_Stage * poly(WB_Time_research, 2)", means="Work_Career_Stage")
+rez <- data |>
+  run_models(f = "~ Work_Career_Stage * poly(WB_Time_research, 2)", means="Work_Career_Stage",
+             at = "WB_Time_research=c(0, 0.25, 0.5, 0.75, 1)")
 
 p_resval_pred3 <- rez$pred |>
   ggplot(aes(x = WB_Time_research, y = Predicted)) +
@@ -1720,6 +2361,21 @@ p_resval_pred3 <- rez$pred |>
 p_resval_pred3
 ```
 
+```{r}
+#| label: md_resval_time
+#| echo: false
+#| cache: false
+
+make_markdown(model_tables(rez$tables), "Research values by career stage and research time")
+```
+
+
+## Practices
+
+TODO: People that answered Not Feasible for the slow science constraining practices ~ Status * Age
+
+
+
 ## Figures
 
 ### Sample
@@ -1743,16 +2399,77 @@ p_resval_pred3
 #   plot_annotation(title = "Demographics", theme = theme(plot.title = element_text(size = 18, face = "bold.italic", hjust = 0)))
 ```
 
-### Descriptive
+### Landscape
 
-```{r fig_descriptive}
-#| fig-width: 7
-#| fig-height: 10
+```{r fig_landscape}
+#| fig-width: 10.5
+#| fig-height: 13.5
 #| warning: false
 
-p_os_help / ss_def / ss_feas  + 
-  # plot_layout(heights = c(0.6, 0.4)) +
-  plot_annotation(title = "Descriptive", theme = theme(plot.title = element_text(size = 18, face = "bold.italic", hjust = 0.5)))
+# Panels redrawn from the data of the plots above as horizontal bars, with one
+# style for the paper (Figure "landscape" of the manuscript)
+theme_panel <- theme_minimal(base_size = 10) +
+  theme(plot.title = element_text(face = "bold", size = 11),
+        plot.subtitle = element_text(color = "grey40", size = 9),
+        panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        plot.title.position = "plot")
+
+bar_panel <- function(data, x, y, fill, title, subtitle = NULL) {
+  ggplot(data, aes(x = {{ x }}, y = fct_reorder({{ y }}, {{ x }}))) +
+    geom_col(fill = fill, width = 0.75) +
+    geom_text(aes(label = scales::percent({{ x }}, accuracy = 1)), hjust = -0.15, size = 2.8, color = "grey25") +
+    scale_x_continuous(labels = scales::percent_format(), expand = expansion(mult = c(0, 0.12))) +
+    theme_panel +
+    labs(title = title, subtitle = subtitle, x = NULL, y = NULL)
+}
+
+p1 <- bar_panel(p_criteria$data, pct, Criterion, "#546E7A",
+                "Criteria of Scientific Quality", "Most important criteria to assess scientific work (3 choices)")
+
+p2 <- p_sliders + theme_panel +
+  theme(strip.placement = "outside", strip.text.y.left = element_text(angle = 0, face = "bold", hjust = 1)) +
+  labs(title = "Familiarity, Importance and Engagement", subtitle = "Histograms, mean and interquartile range")
+
+p3 <- p_os_adoption + theme_panel +
+  theme(legend.position = "bottom", panel.grid.major.x = element_blank(),
+        legend.key.size = unit(0.35, "cm")) +
+  guides(fill = guide_legend(nrow = 2)) +
+  labs(subtitle = "Knowledge and use of each practice")
+
+p4 <- p_os_help$data |>
+  mutate(name = str_replace_all(name, "\n", " "),
+         Type = fct_recode(Type, "Funding" = "Money")) |>
+  bar_panel(Total, name, domain_colors[["Open Science"]],
+            "Levers for Open Science", "What would you need to further adopt open science practices? (up to 5)") +
+  facet_grid(Type ~ ., scales = "free_y", space = "free_y", switch = "y") +
+  theme(strip.placement = "outside", strip.text.y.left = element_text(angle = 0, face = "bold", hjust = 1))
+
+p5 <- ss_def$data |>
+  mutate(name = str_replace_all(name, "\n", " ")) |>
+  bar_panel(Total, name, domain_colors[["Slow Science"]],
+            "Meaning of Slow Science", "Which of these best describes slow science for you? (up to 3)")
+
+p6 <- ss_feas$data |>
+  mutate(Practice = fct_rev(fct_relabel(Practice, \(x) str_replace_all(x, "\n", " "))),
+         Level = fct_recode(Level, "Individual level" = "Individual", "Institutional level" = "Institution",
+                            "Not feasible" = "Not Feasible")) |>
+  ggplot(aes(x = Proportion, y = Practice, fill = Level)) +
+  geom_col(position = position_dodge2(reverse = TRUE, padding = 0.1), width = 0.8) +
+  scale_x_continuous(labels = scales::percent_format(), expand = expansion(mult = c(0, 0.05))) +
+  scale_fill_manual(values = c("Individual level" = "#FFB74D", "Institutional level" = "#E65100",
+                               "Not feasible" = "#9E9E9E")) +
+  theme_panel +
+  theme(legend.position = "bottom", legend.key.size = unit(0.35, "cm")) +
+  labs(title = "Feasibility of Slow Science Measures", subtitle = "At which level is each measure feasible? (several choices)",
+       x = NULL, y = NULL, fill = NULL)
+
+fig_landscape <- (p1 | p2) / (p3 | p4) / (p5 | p6) +
+  plot_layout(heights = c(11, 14, 12)) +
+  plot_annotation(tag_levels = "A") &
+  theme(plot.tag = element_text(face = "bold", size = 14))
+dir.create("../paper/figures", showWarnings = FALSE)
+ggsave("../paper/figures/fig_landscape.png", fig_landscape, width = 10.5, height = 13.5, dpi = 300, bg = "white")
+fig_landscape
 ```
 
 

@@ -1,0 +1,340 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# hpc -- drive the Artemis HPC (University of Sussex) from this repo.
+#
+#   ./hpc check                 VPN + SSH reachability, quota
+#   ./hpc setup                 create the project dirs on the cluster
+#   ./hpc push                  scripts (*.R, *.slurm; CRLF -> LF) and the models'
+#                               data (../models/data_*.csv, written by analysis.qmd)
+#   ./hpc install [pkg...]      check / build the project R library on a compute node
+#   ./hpc precompile            pre-build the CmdStan precompiled header
+#   ./hpc models                list the models defined in models.R
+#   ./hpc fit <model|all> [..]  one job per model (extra args -> sbatch)
+#   ./hpc queue                 squeue for this user
+#   ./hpc progress [model]      iteration counts + REPORT lines from the .out logs
+#   ./hpc log [jobid|model]     tail the newest .out/.err in scratch
+#   ./hpc ls                    list fitted models on the cluster
+#   ./hpc pull [pattern]        copy fits (default '*.rds') into analysis/models/
+#   ./hpc cancel <jobid|all>    scancel
+#   ./hpc sh '<cmd>'            run an arbitrary command on the login node
+#
+# Everything is overridable by OSA_* environment variables (block below). A
+# second account sets its own in analysis/server/hpc.local (gitignored).
+# Cluster-level instructions: https://github.com/RealityBending/Lab/tree/main/hpc
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Per-machine settings (e.g. OSA_HPC_USER=oc236); the environment still wins.
+if [ -f "${HERE}/hpc.local" ]; then
+  # shellcheck disable=SC1090
+  . "${HERE}/hpc.local"
+fi
+
+HPC_ALIAS="${OSA_HPC_ALIAS:-artemis}"             # Host entry in ~/.ssh/config
+HPC_USER="${OSA_HPC_USER:-dmm56}"                 # cluster account
+HPC_GROUP="${OSA_HPC_GROUP:-psych}"               # school directory on lustre
+PROJECT="${OSA_PROJECT:-OpenScienceArchetypes}"
+
+USERS_DIR="${OSA_USERS_DIR:-/mnt/lustre/users/${HPC_GROUP}/${HPC_USER}/${PROJECT}}"
+SCRATCH_DIR="${OSA_SCRATCH_DIR:-/mnt/lustre/scratch/${HPC_GROUP}/${HPC_USER}/${PROJECT}}"
+MODELS_DIR="${OSA_MODELS_DIR:-${USERS_DIR}/models}"
+MAIL_USER="${OSA_MAIL_USER:-${HPC_USER}@sussex.ac.uk}"
+
+# The lab's working stack (hub: toolchain.md). The R library is per account,
+# shared with the account's other projects.
+R_MODULE="${OSA_R_MODULE:-CmdStanR/0.7.1-foss-2023a-R-4.3.2}"
+EB_MODULES="${OSA_EB_MODULES:-/mnt/shared/easybuild/modules/all}"
+R_LIBS_DIR="${OSA_R_LIBS:-/mnt/lustre/users/${HPC_GROUP}/${HPC_USER}/cluster_R_libs/x86_64-pc-linux-gnu-library/4.3}"
+
+# brms `file_refit`: "on_change" refits when the data or formula changed.
+FILE_REFIT="${OSA_FILE_REFIT:-on_change}"
+
+LOCAL_MODELS="${HERE}/../models"
+
+# Prefer Windows OpenSSH when present (Git Bash's ssh also works).
+if [ -x /c/Windows/System32/OpenSSH/ssh.exe ]; then
+  SSH=/c/Windows/System32/OpenSSH/ssh.exe
+  SCP=/c/Windows/System32/OpenSSH/scp.exe
+else
+  SSH=ssh
+  SCP=scp
+fi
+
+die() { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
+info() { printf '\033[36m==>\033[0m %s\n' "$*"; }
+warn() { printf '\033[33mwarning:\033[0m %s\n' "$*" >&2; }
+
+remote() { "$SSH" "$HPC_ALIAS" "$@"; }
+
+require_link() {
+  remote true 2>/dev/null || die "cannot reach ${HPC_ALIAS}.
+  Is the GlobalProtect VPN connected (portal bond.sussex.ac.uk)?
+  Run './hpc check' for detail."
+}
+
+# Model names, read from models.R's declaration lines ('  <name> = list(').
+list_models() {
+  sed -n 's/^  \([A-Za-z_][A-Za-z0-9_]*\) = list($/\1/p' "${HERE}/models.R"
+}
+
+# Expand 'all'; validate anything else so a typo fails here, not in the queue.
+resolve_models() {
+  local want="${1:-}" known m found
+  known="$(list_models)"
+  [ -n "$known" ] || die "no models found in models.R"
+  [ -n "$want" ] || die "which model? one of: $(echo $known) (or 'all')"
+  if [ "$want" = all ]; then echo "$known"; return; fi
+  found=0
+  for m in $known; do [ "$m" = "$want" ] && found=1; done
+  [ "$found" = 1 ] || die "unknown model '${want}'. Known: $(echo $known)"
+  echo "$want"
+}
+
+# --- commands --------------------------------------------------------------
+
+cmd_check() {
+  info "testing SSH to '${HPC_ALIAS}'"
+  if remote 'echo "  connected as $(whoami) on $(hostname)"; echo "  quota:"; df -h '"${USERS_DIR%/$PROJECT}"' '"${SCRATCH_DIR%/$PROJECT}"' 2>/dev/null | sed "s/^/    /"'; then
+    printf '\033[32mOK\033[0m -- SSH to Artemis works.\n'
+  else
+    die "SSH failed. Check: (1) VPN connected, (2) public key in ~/.ssh/authorized_keys on Artemis."
+  fi
+}
+
+cmd_setup() {
+  require_link
+  info "creating project directories"
+  remote "mkdir -p '${USERS_DIR}/data' '${MODELS_DIR}' '${SCRATCH_DIR}' && ls -la '${USERS_DIR}'"
+}
+
+# One tar pipe (sshd rate-limits bursts of connections). Mirrors rather than
+# merges: top-level scripts and data files that no longer exist locally are
+# deleted on the cluster; models/ and the logs are never touched.
+cmd_push() {
+  require_link
+  info "pushing to ${USERS_DIR}"
+  local tmp f base names=()
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+  mkdir -p "$tmp/data"
+  for f in "$HERE"/*.R "$HERE"/*.slurm; do
+    [ -e "$f" ] || continue
+    base="$(basename "$f")"
+    sed 's/\r$//' "$f" > "$tmp/$base"   # strip CR: CRLF breaks bash/Rscript
+    names+=("$base")
+  done
+  for f in "$LOCAL_MODELS"/data_*.csv; do
+    [ -e "$f" ] || continue
+    cp "$f" "$tmp/data/"
+    names+=("data/$(basename "$f")")
+  done
+  [ ${#names[@]} -gt 0 ] || die "nothing to push"
+  case " ${names[*]} " in
+    *" data/"*) ;;
+    *) warn "no ../models/data_*.csv to push: render analysis.qmd first" ;;
+  esac
+  printf '    %s\n' "${names[@]}"
+  tar -C "$tmp" -cf - "${names[@]}" | remote "
+    mkdir -p '${USERS_DIR}/data' &&
+    tar -C '${USERS_DIR}' -xf - &&
+    chmod +x '${USERS_DIR}'/*.slurm 2>/dev/null
+    cd '${USERS_DIR}' || exit 1
+    for f in *.R *.slurm data/*.csv; do
+      [ -e \"\$f\" ] || continue
+      case ' ${names[*]} ' in
+        *\" \$f \"*) ;;
+        *) echo \"    removing stale \$f\"; rm -f \"\$f\" ;;
+      esac
+    done
+    ls -la '${USERS_DIR}' '${USERS_DIR}/data'"
+}
+
+cmd_install() {
+  require_link
+  local forced="$*"
+  info "checking the R library on a compute node${forced:+ (forcing: ${forced})}"
+  remote "cd '${USERS_DIR}' && srun \
+    --partition='${OSA_INSTALL_PARTITION:-short}' \
+    --time='${OSA_INSTALL_TIME:-02:00:00}' \
+    --cpus-per-task=4 --mem=16G \
+    --job-name=osa_install \
+    bash -c '
+      . /etc/profile.d/lmod.sh
+      module use \"${EB_MODULES}\"
+      module load \"${R_MODULE}\"
+      export OSA_R_LIBS=\"${R_LIBS_DIR}\"
+      export OSA_FORCE=\"${forced}\"
+      Rscript install_pkgs.R
+    '"
+}
+
+cmd_precompile() {
+  require_link
+  info "building the CmdStan precompiled header (one node, a few minutes)"
+  remote "cd '${USERS_DIR}' && srun \
+    --partition='${OSA_INSTALL_PARTITION:-short}' \
+    --time='${OSA_PRECOMPILE_TIME:-01:00:00}' \
+    --cpus-per-task=4 --mem=16G \
+    --job-name=osa_precompile \
+    bash -c '
+      . /etc/profile.d/lmod.sh
+      module use \"${EB_MODULES}\"
+      module load \"${R_MODULE}\"
+      export R_LIBS=\"${R_LIBS_DIR}\"
+      Rscript precompile.R
+    '"
+}
+
+cmd_models() {
+  local m
+  for m in $(list_models); do printf '  %s\n' "$m"; done
+}
+
+# One sbatch per model, all through ONE ssh connection; each line is labelled
+# and a failed submission does not stop the rest.
+cmd_fit() {
+  local want="${1:-}"; shift || true
+  local models model
+  models="$(resolve_models "$want")"
+  require_link
+  local extra="" v val
+  for v in OSA_WARMUP OSA_SAMPLES OSA_CHAINS OSA_SEED OSA_ADAPT_DELTA; do
+    eval "val=\${$v:-}"
+    [ -n "$val" ] && extra="${extra},${v}='${val}'"
+  done
+  local cmd="mkdir -p '${SCRATCH_DIR}' '${MODELS_DIR}'; cd '${USERS_DIR}' || exit 1"
+  for model in $models; do
+    info "submitting fit.slurm for ${model}"
+    cmd="${cmd}
+printf '%s: ' '${model}'
+sbatch \
+      --chdir='${USERS_DIR}' \
+      --job-name='osa_fit_${model}' \
+      --output='${SCRATCH_DIR}/fit_${model}_%j.out' \
+      --error='${SCRATCH_DIR}/fit_${model}_%j.err' \
+      --mail-user='${MAIL_USER}' \
+      --export=ALL,OSA_MODEL='${model}',OSA_USERS_DIR='${USERS_DIR}',OSA_MODELS_DIR='${MODELS_DIR}',OSA_R_MODULE='${R_MODULE}',OSA_R_LIBS='${R_LIBS_DIR}',OSA_EB_MODULES='${EB_MODULES}',OSA_FILE_REFIT='${FILE_REFIT}'${extra} \
+      $* fit.slurm || echo 'SUBMIT FAILED'"
+  done
+  remote "$cmd"
+}
+
+cmd_queue() {
+  require_link
+  remote "squeue -u '${HPC_USER}' -o '%.10i %.12P %.28j %.8T %.20S %.12M %.12L %R'"
+}
+
+# The cheap status check: latest iteration line per chain, REPORT and errors.
+cmd_progress() {
+  require_link
+  local key="${1:-}"
+  remote "cd '${SCRATCH_DIR}' 2>/dev/null || { echo 'no scratch dir yet'; exit 0; }
+    ls fit_${key}*.out >/dev/null 2>&1 || { echo 'no fit logs matching fit_${key}*.out'; exit 0; }
+    for f in \$(ls -t fit_${key}*.out); do
+      echo \"===== \$f (\$(stat -c %y \"\$f\" | cut -d. -f1)) =====\"
+      grep -h 'REPORT\|SUCCESSFUL\|FINISHED\|Error\|error:' \"\$f\" | tail -n 8
+      grep -h 'Chain [0-9]* Iteration:' \"\$f\" | awk '{c[\$2]=\$0} END {for (k in c) print c[k]}' | sort
+    done"
+}
+
+cmd_log() {
+  require_link
+  local key="${1:-}"
+  if [ -n "$key" ]; then
+    remote "for f in '${SCRATCH_DIR}'/*${key}*; do echo \"===== \$f =====\"; tail -n 40 \"\$f\"; done"
+  else
+    remote "cd '${SCRATCH_DIR}' 2>/dev/null || exit 1
+      for f in \$(ls -t *.out *.err 2>/dev/null | head -4); do
+        echo \"===== \$f (\$(stat -c %y \"\$f\" | cut -d. -f1)) =====\"; tail -n 30 \"\$f\"; echo;
+      done"
+  fi
+}
+
+cmd_ls() {
+  require_link
+  remote "ls -lh '${MODELS_DIR}'/*.rds 2>/dev/null || echo '  (no .rds yet)'"
+}
+
+# Stage OUTSIDE the repo (Dropbox holds files open while uploading, and scp
+# then truncates them), verify byte sizes against the cluster, then move.
+cmd_pull() {
+  require_link
+  local pattern="${1:-*.rds}"
+  local stage="${TMPDIR:-/tmp}/osa_pull_$$"
+  mkdir -p "$LOCAL_MODELS" "$stage"
+
+  info "pulling '${pattern}' into staging"
+  if ! "$SCP" "${HPC_ALIAS}:${MODELS_DIR}/${pattern}" "$stage/"; then
+    rm -rf "$stage"
+    die "nothing matched '${pattern}'"
+  fi
+  local sizes
+  sizes="$(remote "for f in '${MODELS_DIR}'/${pattern}; do [ -f \"\$f\" ] && echo \"\$(stat -c %s \"\$f\") \$(basename \"\$f\")\"; done" 2>/dev/null)"
+
+  local moved=0 failed=0 name want got ok attempt
+  for f in "$stage"/*; do
+    [ -f "$f" ] || continue
+    name="$(basename "$f")"
+    want="$(printf '%s\n' "$sizes" | awk -v n="$name" '$2 == n {print $1}')"
+    got="$(stat -c %s "$f" 2>/dev/null || echo 0)"
+    if [ -n "$want" ] && [ "$want" != "$got" ]; then
+      warn "${name}: staged ${got} bytes, cluster has ${want} -- keeping the existing local copy"
+      failed=$((failed + 1))
+      continue
+    fi
+    ok=0
+    for attempt in 1 2 3 4 5 6; do
+      if mv -f "$f" "${LOCAL_MODELS}/${name}" 2>/dev/null; then ok=1; break; fi
+      sleep 10
+    done
+    if [ "$ok" = 1 ]; then
+      moved=$((moved + 1))
+    else
+      warn "${name}: could not replace ${LOCAL_MODELS}/${name} (locked); left in ${stage}"
+      failed=$((failed + 1))
+    fi
+  done
+
+  info "pulled ${moved} file(s) into analysis/models/"
+  if [ "$failed" -eq 0 ]; then rm -rf "$stage"; else warn "${failed} file(s) not replaced; staged copies in ${stage}"; fi
+  ls -lh "$LOCAL_MODELS"
+  [ "$failed" -eq 0 ]
+}
+
+cmd_cancel() {
+  require_link
+  local target="${1:?usage: ./hpc cancel <jobid|all>}"
+  if [ "$target" = all ]; then
+    # This project's jobs only: the account also runs other projects' fits
+    remote "squeue -u '${HPC_USER}' -h -o '%i %j' | awk '\$2 ~ /^osa_/ {print \$1}' | xargs -r scancel && echo 'cancelled all osa_* jobs'"
+  else
+    remote "scancel '${target}' && echo 'cancelled ${target}'"
+  fi
+}
+
+cmd_sh() {
+  require_link
+  remote "${1:?usage: ./hpc sh '<command>'}"
+}
+
+# --- dispatch --------------------------------------------------------------
+
+case "${1:-}" in
+  check)      shift; cmd_check "$@" ;;
+  setup)      shift; cmd_setup "$@" ;;
+  push)       shift; cmd_push "$@" ;;
+  install)    shift; cmd_install "$@" ;;
+  precompile) shift; cmd_precompile "$@" ;;
+  models)     shift; cmd_models "$@" ;;
+  fit)        shift; cmd_fit "$@" ;;
+  queue)      shift; cmd_queue "$@" ;;
+  progress)   shift; cmd_progress "$@" ;;
+  log)        shift; cmd_log "$@" ;;
+  ls)         shift; cmd_ls "$@" ;;
+  pull)       shift; cmd_pull "$@" ;;
+  cancel)     shift; cmd_cancel "$@" ;;
+  sh)         shift; cmd_sh "$@" ;;
+  *) sed -n '2,23p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//' ;;
+esac
