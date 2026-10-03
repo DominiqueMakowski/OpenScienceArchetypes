@@ -7847,8 +7847,9 @@ Table: CFA latent correlations
 ```{.r .cell-code}
 # Figure "career" of the manuscript: use of each open science practice and
 # selection of each lever by career stage (Bernoulli models of the H2 and H3-H4
-# sections; medians and 95% CI), and facet scores by career stage. Practices are
-# grouped by the facet they load on, levers by the types of the landscape figure
+# sections; medians and 95% CI). Practices are grouped by the facet they load on,
+# levers by the types of the landscape figure. Facets by career stage are in the
+# figure "profiles" (chunk fig_stage_facets)
 stage_order <- c("PhD / Student", "Non-permanent", "Permanent")
 stage_colors <- c("PhD / Student" = "#FF7043", "Non-permanent" = "#7E57C2", "Permanent" = "#26A69A")
 stage_panel <- function(means, title, subtitle, xmax = 1) {
@@ -7899,9 +7900,29 @@ pc_levers <- h3$means |>
                               "OS training" = "Training", "Data sharing ethics" = "Ethical issues")) |>
   stage_panel("Levers for Open Science by Career Stage", "Probability of selecting each lever (up to 5; median and 95% CI)", xmax = 0.7)
 
-# Facets by career stage, from the primary career-stage models of the manuscript
-# (facet ~ career stage, chunk training_facets; the career worry and time models
-# are sensitivity analyses). Pairwise differences between stages whose 95% (*),
+fig_career <- (pc_adoption | pc_levers) +
+  plot_layout(guides = "collect") +
+  plot_annotation(tag_levels = "A") &
+  theme(legend.position = "bottom", plot.tag = element_text(face = "bold", size = 14))
+ggsave("../paper/figures/fig_career.png", fig_career, width = 10.5, height = 6.2, dpi = 300, bg = "white")
+fig_career
+```
+
+::: {.cell-output-display}
+![](analysis_files/figure-html/fig_career-1.png){width=1008}
+:::
+:::
+
+
+### Profiles
+
+
+::: {.cell}
+
+```{.r .cell-code}
+# Panel A of the figure "profiles" of the manuscript. Facets by career stage, from
+# the primary career-stage models of the manuscript (facet ~ career stage, chunk
+# training_facets; the career worry and time models are sensitivity analyses). Pairwise differences between stages whose 95% (*),
 # 99% (**) or 99.9% (***) CI excludes 0, as brackets above the points: adjacent
 # stages on a first level, PhD vs. permanent above
 facet_levels_fig <- names(facet_colors)
@@ -7935,32 +7956,24 @@ pc_facets <- stage_means_fig |>
   theme(plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(color = "grey40", size = 9),
         plot.title.position = "plot", panel.grid.minor = element_blank(), strip.text = element_text(face = "bold", size = 8.5),
         axis.text.x = element_text(size = 7.5)) +
-  labs(title = "Facets by Career Stage", subtitle = "Marginal means (median and 95% CI)", x = NULL, y = "Facet score")
-
-fig_career <- (pc_adoption | pc_levers) / pc_facets +
-  plot_layout(heights = c(1.7, 1), guides = "collect") +
-  plot_annotation(tag_levels = "A") &
-  theme(legend.position = "bottom", plot.tag = element_text(face = "bold", size = 14))
-ggsave("../paper/figures/fig_career.png", fig_career, width = 10.5, height = 9.5, dpi = 300, bg = "white")
-fig_career
+  labs(tag = "A", title = "Facets by Career Stage", subtitle = "Marginal means (median and 95% CI)", x = NULL, y = "Facet score")
+pc_facets
 ```
 
 ::: {.cell-output-display}
-![](analysis_files/figure-html/fig_career-1.png){width=1008}
+![](analysis_files/figure-html/fig_stage_facets-1.png){width=1008}
 :::
 :::
 
-
-### Profiles
 
 
 ::: {.cell}
 
 ```{.r .cell-code}
-# Figure "profiles" of the manuscript: facets by gender and age (Gaussian models
-# above), researcher profiles and their stability, and profiles by gender and age
-# (Profile model). Facets by career stage are in the figure "career". Uncached:
-# the Profile fit is read at each render
+# Figure "profiles" of the manuscript: facets by career stage (chunk
+# fig_stage_facets) and by gender and age (Gaussian models above), researcher
+# profiles and their stability, and profiles by gender and age (Profile model).
+# Uncached: the Profile fit is read at each render
 if (!is.null(m)) {
 gender_linetypes <- scale_linetype_manual(values = c(Female = "longdash", Male = "solid"), name = "Gender")
 theme_fig <- theme_minimal(base_size = 10) +
@@ -7978,7 +7991,7 @@ pp_age <- rez_age$pred |>
   guides(linetype = guide_legend(override.aes = list(color = "grey30", fill = NA))) +
   facet_wrap(~Outcome, nrow = 1) +
   theme_fig +
-  labs(tag = "A", title = "Facets by Gender and Age", subtitle = "Predicted facet score (median and 95% CI)",
+  labs(tag = "B", title = "Facets by Gender and Age", subtitle = "Predicted facet score (median and 95% CI)",
        x = "Age", y = "Facet score")
 
 # Profiles: the radar coordinates of the Clustering section, one panel per
@@ -8012,7 +8025,7 @@ pp_radar <- ggplot() +
   theme_void(base_size = 10) +
   theme(plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(color = "grey40", size = 9),
         plot.title.position = "plot", strip.text = element_text(face = "bold", size = 8.5, lineheight = 0.9)) +
-  labs(tag = "B", title = "Researcher Profiles",
+  labs(tag = "C", title = "Researcher Profiles",
        subtitle = "Mean facet scores (range of each facet), sample average dashed; stability: bootstrap median Jaccard")
 
 pp_prob <- estimate_relation(m, length = 40) |>
@@ -8024,16 +8037,16 @@ pp_prob <- estimate_relation(m, length = 40) |>
   scale_y_continuous(labels = scales::percent_format()) +
   profile_scales +
   gender_linetypes +
-  guides(linetype = "none") +  # Shown in A
+  guides(linetype = "none") +  # Shown in B
   facet_wrap(~Name, nrow = 1) +
   theme_fig +
-  labs(tag = "C", title = "Profiles by Gender and Age", subtitle = "Predicted probability of belonging to each profile (median and 95% CI)",
+  labs(tag = "D", title = "Profiles by Gender and Age", subtitle = "Predicted probability of belonging to each profile (median and 95% CI)",
        x = "Age", y = "Probability")
 
-fig_profiles <- pp_age / pp_radar / pp_prob +
-  plot_layout(heights = c(1, 1.15, 1), guides = "collect") &
+fig_profiles <- pc_facets / pp_age / pp_radar / pp_prob +
+  plot_layout(heights = c(0.95, 1, 1.15, 1), guides = "collect") &
   theme(legend.position = "bottom", legend.key.width = unit(1.2, "cm"), plot.tag = element_text(face = "bold", size = 14))
-ggsave("../paper/figures/fig_profiles.png", fig_profiles, width = 10.5, height = 9.5, dpi = 300, bg = "white")
+ggsave("../paper/figures/fig_profiles.png", fig_profiles, width = 10.5, height = 12, dpi = 300, bg = "white")
 fig_profiles
 }
 ```
