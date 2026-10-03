@@ -15,17 +15,34 @@ execute:
 
 ## Headline Findings
 
-<!-- Written from the N = 682 data (MapResPrac-130726-N682.csv, 2026-09-30), open science practices scored as engagement ("not familiar" lowest): update when the data or scoring change. -->
+<!-- Written from the N = 672 data (MapResPrac-130726-N682.csv without the 10 respondents working outside Europe, 2026-10-02), open science practices scored as engagement ("not familiar" lowest), facet scores from the CFA with the two green beliefs also on Ethical Science, profiles from k-means (best of 200 starts, 2026-10-03): update when the data, scoring, CFA or clustering change. -->
 
-Researchers (N = 682; 57% women; 72% working in France; 44% on permanent contracts). Model estimates are posterior medians [95% CI], in factor-score units.
+Researchers working in Europe (N = 672, after excluding the 10 respondents working outside Europe; 57% women; 73% working in France; 44% on permanent contracts). Model estimates are posterior medians [95% CI], in factor-score units.
 
-- **Rigour is the consensus criterion of quality, prestige is not.** Asked for the three most important criteria of scientific quality, 83% chose rigorous methodology, against 46% transparency / open science, 41% originality and 40% impact; only 7% chose publication in high impact factor journals, as few as chose inclusivity or environmental impact.
-- **Novelty and rigour are traded off, and the balance shifts with age.** Choices oppose novelty and impact to rigour and transparency (e.g., originality vs. transparency, r = -.40). The novelty end gains ground with age (women: -0.67 [-0.88, -0.47] at 25, +0.49 [0.26, 0.73] at 55) and is stronger in men (+0.40 [0.17, 0.68] at the mean age). Part of this opposition is built into the forced choice of three criteria.
+- **Rigour is the consensus criterion of quality, prestige is not.** Asked for the three most important criteria of scientific quality, 83% chose rigorous methodology, against 46% transparency / open science, 42% originality and 40% impact; only 7% chose publication in high impact factor journals, as few as chose inclusivity or environmental impact.
+- **Novelty and rigour are traded off, and the balance shifts with age.** Choices oppose novelty and impact to rigour and transparency (e.g., originality vs. transparency, r = -.41). The novelty end gains ground with age (women: -0.70 [-0.92, -0.48] at 25, +0.49 [0.25, 0.74] at 55) and is stronger in men (+0.43 [0.16, 0.70] at the mean age). Part of this opposition is built into the forced choice of three criteria.
 - **Barriers to open science are seen as structural.** Career recognition (51%), institutional incentives (44%), dedicated funding (42%) and time (40%) come well ahead of information (21%) or training (28%); 4% say nothing would help.
-- **Slow science means quality over quantity, and is a job for institutions.** 81% define it as quality over quantity. Its measures are assigned to institutions far more than to individuals (assessing quality rather than quantity: 87% vs. 45%), and hard caps (one article, or one grant, per year) are judged not feasible by 28%.
-- **Research values are multidimensional.** Five weakly to moderately correlated factors (largest: green-ethical, .42) separate green, slow and ethical science, and split open science into open outputs (Open Science: open data, materials, access) and procedural reforms (Rigorous Science: preregistration, registered reports, replication, participatory research). Two green items (link between research and sustainability, willingness to change) load on both Green and Ethical. The five-factor CFA fits only moderately (CFI = .89, RMSEA = .063, SRMR = .057); letting these two items load on Ethical too fits better (CFI = .92).
-- **Gender and career stage split these dimensions differently.** At the mean age, men score lower than women on Ethical (-0.47 [-0.60, -0.34]) and Green Science (-0.26 [-0.42, -0.11]), slightly higher on Open Science (+0.15 [0.01, 0.30]), and similar on Rigorous and Slow Science; the green and ethical gaps widen with age. Rigorous Science declines after 45 and is lowest among permanent staff (-0.30 [-0.49, -0.10] vs. non-permanent), Open Science peaks among non-permanent researchers (+0.29 [0.08, 0.49] vs. PhD students), whereas permanent staff value Slow Science more (+0.28 [0.08, 0.50] vs. PhD students): reforming *how* research is done is carried by early-career researchers, slowing it down by those in secure positions.
-- **Discrete archetypes are fragile.** Five profiles can be described (A, 28%: high on Open, Rigorous, Slow and Ethical; B, 25%: low on Slow; C, 19%: low on Rigorous, high on Green, Slow and Ethical; D, 14%: low on Open, Rigorous, Slow and Ethical; E, 13%: high on Rigorous, low on Green and Ethical), but bootstrap agreement with the full-sample partition is low (median ARI = .56, 95% range .30-.89), whereas two- and three-cluster splits are reasonably stable (.85). Continuous value dimensions may be a sounder basis than named archetypes.
+- **Slow science means quality over quantity, and is a job for institutions.** 87% of the participants familiar with it define it as quality over quantity (chunk `slow_science_ratings`: unfamiliar participants had to answer the mandatory questions, so definitions and importance are described among the familiar). Its measures are assigned to institutions far more than to individuals (assessing quality rather than quantity: 87% vs. 44%), and hard caps (one article, or one grant, per year) are judged not feasible by 28%.
+- **Research values are multidimensional.** Five weakly to moderately correlated factors (largest: green-ethical, .43) separate green, slow and ethical science, and split open science into open outputs (Open Science: open data, materials, access) and procedural reforms (Rigorous Science: preregistration, registered reports, replication, participatory research). Two green items (link between research and sustainability, willingness to change) load on both Green and Ethical, so Ethical Science is a broader sense of responsibility that includes environmental beliefs. The CFA retained lets these two items load on both factors: it fits acceptably (CFI = .92, RMSEA = .054, SRMR = .053), better than the movement-based model with all green items on Green only (CFI = .89, AIC 97 points higher). The EFA split of open science holds under three other scorings of the practices, and the facet scores barely change (r ≥ .86), except Open and Rigorous Science when not knowing a practice is treated as missing (r = .70 and .59).
+- **Gender and career stage split these dimensions differently.** At the mean age, men score lower than women on Ethical (-0.44 [-0.57, -0.31]) and Green Science (-0.20 [-0.36, -0.05]), slightly higher on Open Science (+0.16 [0.02, 0.30]), and similar on Rigorous and Slow Science; the green and ethical gaps widen with age. Rigorous Science declines after 45 and is lowest among permanent staff (-0.31 [-0.52, -0.11] vs. non-permanent), Open Science peaks among non-permanent researchers (+0.30 [0.09, 0.53] vs. PhD students), whereas permanent staff value Slow Science more (+0.25 [0.02, 0.47] vs. PhD students), and Ethical Science is highest among PhD students (permanent staff: -0.32 [-0.51, -0.13]); career worry adds nothing within career stages: reforming *how* research is done is carried by early-career researchers, slowing it down by those in secure positions.
+- **Five researcher profiles, all stable.** Five profiles can be described, named after their pattern (chunk `profile_names`): *Idealists* (A, 29%: high on Open, Rigorous, Slow and Ethical, slightly on Green), *Aspirants* (B, 21%: near average, low on Slow, which 72% have never heard of; the youngest profile, with the most plans to preregister and the most requests for senior support; chunk `profile_correlates`), *Stewards* (C, 19%: high on Green, Slow and Ethical, low on Rigorous), *Purists* (D, 15%: high on Open and Rigorous, low on Green and Ethical) and *Traditionalists* (E, 15%: low on Open, Rigorous, Slow and Ethical). The partition is reproducible (bootstrap median ARI = .86, 95% range .56-.96; two clusters: .88, three: .81) and so is every profile (median Jaccard .86-.92, dissolved in 0-7% of resamples). The indices favour two or three clusters (6 of 24 each, 5 clusters: 4), but they do so as much in data simulated without groups (2: 5.7, 3: 8.6, 5: 0.9 on average, at most 2), and the facet scores are no more clustered than such data (silhouette with five clusters .24 vs. .24; the five-cluster partition is more reproducible, .86 vs. .70, the three-cluster one less, .81 vs. .88; chunk `cluster_null`): attitudes vary along a continuum, and five is a choice of resolution, the smallest at which each combination of the epistemic and societal sides forms a profile (with four clusters, the Stewards are split between the all-round reformers and the non-adopters; chunk `profile_nesting`). Hierarchical k-means, used until 2026-10-03, stopped on a partition 5.6% worse in within-cluster sum of squares than k-means with 200 random starts: this made the profiles look unstable (ARI .50) and reshuffled them when the 10 respondents working outside Europe were excluded, whereas k-means finds nearly the same five profiles at N = 682 and N = 672 (ARI .90). Between 25 and 55, women move towards the Stewards (+19 percentage points [6, 33]) and away from the Aspirants (-18 [-30, -5]), men away from the Idealists (-17 [-30, -3]); men are more often Purists (+11 [2, 21] at 25, +24 [13, 36] at 55) and less often Idealists (35-55 years; -15 [-26, -5] at 45). These trajectories mirror those of the facets (Green Science rising with age among women only; gender gaps on Green and Ethical Science).
+
+*Robustness checks and additional analyses (2026-09-30, section "Career Stage, Training, Discipline and Country" and the sensitivity subsections of the CFA). Integrated in the manuscript on 2026-09-30 (chunk `export_career` feeds its numbers): H1-H4, training, discipline, precariousness, well-being and France in the Results, the slow science sensitivity in the "bridge" subsection, the criteria validity check and the two/three-cluster solutions as one sentence each, invariance in the Limitations. Left in the notebook only: the ordinal CFA (one pointer sentence in the Methods).*
+
+- **The facet structure is not an artefact of the ordinal practice items or of ceiling effects.** On polychoric/polyserial correlations, the EFA puts every open science item on the same facet as with Pearson correlations (loadings slightly higher). Declaring the practice items ordinal (WLSMV) fits a little worse (CFI = .89 vs. .92, RMSEA .055 vs. .054), moves no latent correlation by more than .06, and gives facet scores correlating ≥ .97 with the retained ones. Three sliders have a third of answers at the ceiling (societal consequences 33%, open science importance 32%, willingness to change 22%).
+- **Slow Science is partly knowledge, and this matters for its "bridge".** With the importance rating of unfamiliar participants set to missing, its correlations with Open (.35) and Green Science (.21) barely move, and those with Rigorous (.17) and Ethical Science (.34) change by at most .09. Among the 453 participants familiar with the movement, however, its link with Rigorous Science vanishes (.01 vs. .20) and with Open Science halves (.16 vs. .34), whereas its links with Ethical (.31) and Green Science (.14) hold. The bridge towards the epistemic side is thus mostly exposure to meta-science debates; the link with the societal side is endorsement. *(2026-10-03, chunks `slow_science_ratings` and `slow_science_profiles`)* The importance ratings of the unfamiliar participants are not judgements: 89.5% are exactly 0 and 5% exactly 50, vs. 10% exact zeros among the familiar and 1-8% on the other attitude sliders. Among the familiar, importance is *M* = 64.3. The facet is kept as is and read as engagement (knowing and valuing): with these ratings missing, unfamiliar participants still score low (-0.79 vs. -1.07 SD), scores correlate .92, CFI drops (.902 vs. .920), and the profiles change little (ARI .74; 87% of the Aspirants stay together). Without Slow Science, 61% of the Aspirants join the Idealists (four clusters, bootstrap ARI .66 vs. .86).
+- **Two clusters split the sample into more and less reform-minded (399 vs. 273); three clusters recover the two sides.** Cluster A (296, 62% women) is high on everything, most on Slow, Green and Ethical Science (Idealists + most of the Stewards); B (193, 46% women) is high on Rigorous and Open Science and low on Green and Ethical (Purists + part of the Aspirants); C (183, 61% women) is low on Open and Rigorous Science and average on the societal facets (Traditionalists + part of the Stewards and of the Aspirants). The three-cluster solution is thus "all-round reformers", "procedural reformers who set the societal side aside" and "non-adopters" (the cluster letters follow size and change with the data).
+- **H1, knowledge and training by career stage: training differs, familiarity does not.** Familiarity with open science is the same at every stage (.73-.74), its importance slightly higher among PhD students (+0.05 vs. permanent). Training is graded: 64% of PhD students, 56% of non-permanent and 44% of permanent researchers (permanent - PhD: -0.20 [-0.28, -0.11]). Familiarity with slow science is instead higher among permanent staff (+0.10 [0.04, 0.16] vs. PhD students).
+- **H2, adoption: sharing outputs comes with career progress, preregistration goes the other way.** Open access, open data, open materials and open peer review are used far more by non-permanent and permanent researchers than by PhD students (open access: 46% vs. 81-84%; +0.35 [0.26, 0.44]), even among PhD students with publications (66%). Preregistration is the exception: 46% of PhD students and 45% of non-permanent researchers vs. 31% of permanent staff (-0.15 [-0.24, -0.06]); registered reports are slightly more used by the two later stages, and replication studies do not differ. Unfamiliarity with preregistration and registered reports rises to a third among permanent staff.
+- **H3-H4, levers: structural at every stage; time and recognition are not more selected by non-permanent researchers.** Recognition (48-52%), incentives, funding and time top the list at every stage; time (42% vs. 43%) and recognition (49% vs. 52%) do not differ between non-permanent and permanent researchers (H4 not supported). What differs is support from seniors (54% of PhD students, 39% of non-permanent, 19% of permanent; permanent - PhD: -0.35 [-0.43, -0.27]) and training (39% vs. 21%), whereas permanent staff ask more for infrastructure (+0.11).
+- **Training accounts for part of the career stage effect on Rigorous Science.** Open science training goes with higher Open (+0.60 [0.47, 0.73]), Rigorous (+0.71 [0.58, 0.83]) and Slow Science (+0.34); slow science training (5% of participants) with Slow Science (+1.00) and the societal facets (+0.4). Adjusting for training shrinks the permanent - PhD gap on Rigorous Science from -0.22 to -0.09 and the permanent - non-permanent gap from -0.32 to -0.24; the stage gaps on Open and Ethical Science are unchanged.
+- **Discipline shapes procedural reform, not the gender gaps.** The social sciences are far higher on Rigorous Science (+1.09 [0.92, 1.26] vs. physical sciences, +0.52 vs. life sciences; preregistration used by 57%, 28% and 8%) and higher on Open Science, and slightly lower on Green Science (-0.16 to -0.23). With discipline as a covariate, the gender gaps on Ethical (-0.43) and Green Science (-0.25) are unchanged, and the null gap on Rigorous Science becomes slightly positive (+0.10 [-0.04, 0.24]).
+- **Precariousness proper adds nothing.** Among non-permanent researchers (mean perceived probability of a permanent position .41), the probability has no clear effect on any facet (Open: +0.28 [-0.12, 0.67]; Rigorous: +0.28 [-0.12, 0.67]; societal facets negative and uncertain). Those intending to pursue an academic career score higher on Rigorous Science (0.27 vs. -0.28 for those who do not).
+- **Reformers are not less aligned or worse off.** Rigorous Science goes with feeling more aligned with one's principles (+0.05 [0.02, 0.07] per unit) and, more tentatively, more fulfilled (+0.02 [-0.00, 0.05]), Green Science with fulfilment (+0.03 [-0.00, 0.05]); no facet relates to time for research, career worry, work-life balance or satisfaction with the number of publications (Open Science: +0.04 [0.01, 0.06] on publication quality).
+- **France vs. the rest of Europe: less open, greener, but confounded.** French respondents score lower on Open (-0.44 [-0.58, -0.30]) and Rigorous Science (-0.78 [-0.92, -0.64]; preregistration 28% vs. 68%, open science training 47% vs. 69%) and higher on Green Science (+0.33). The other European respondents are mostly non-permanent (77%) and presumably more often psychologists, so this is descriptive.
+- **Measurement invariance: metric holds by career stage, is borderline by gender and discipline, scalar fails.** Delta CFI for equal loadings: -.004 (stage), -.013 (discipline), -.016 (gender); for equal intercepts: -.016 to -.049. Latent mean comparisons across gender and discipline should be read with this caveat.
+- **The criteria of quality validate the facets.** Choosing environmental impact goes with Green (d = 1.18) and Ethical Science (.80), inclusivity with Ethical Science (.43), transparency with Open (.35) and Ethical Science (.33), high impact factor journals with low Open Science (-.63), and originality and significance with lower scores on all facets.
+- **No sign of careless responding.** Median completion 11.6 min (IQR 9.2-15.5), 0.6% under 5 min, no participant straightlining the sliders.
 
 ## Data Preparation
 
@@ -63,6 +80,12 @@ names(df) <- as.character(as.vector(question_labels[1,])) |>
   str_replace_all(fixed(" "), "_") |>
   str_replace_all(fixed("/"), "_")
 dictionary <- data.frame(Variable = names(df), Question = names(question_labels))
+
+# Inclusion criterion: researchers working in Europe (country rule shared with the manuscript)
+source("inclusion.R")
+n_raw <- nrow(df)
+df_excluded <- filter(df, works_outside_europe(Work_Country))
+df <- filter(df, !works_outside_europe(Work_Country))
 
 format_binary <- function(x) {
   case_when(x == "Yes" ~ 1, x == "No" ~ 0, .default = NA)
@@ -138,7 +161,8 @@ df <- df |>
          # Career stage (ordered: PhD/Student < Non-permanent < Permanent)
          Work_Career_Stage = fct_relevel(case_when(
            Work_Position %in% c("Master student/Research assistant",
-                                "PhD candidate (scholarship, other funding)") ~ "PhD / Student",
+                                "PhD candidate (scholarship, other funding)",
+                                "PhD candidate (no funding/self funded)") ~ "PhD / Student",
            Work_Position %in% c("Postdoc (fixed term)",
                                 "Researcher/lecturer (fixed term)",
                                 "Engineer (fixed term)")                      ~ "Non-permanent",
@@ -177,6 +201,21 @@ df <- df |>
 
 # head(df)
 # names(df)
+```
+
+```{r}
+#| label: inclusion
+#| cache: false
+
+# Respondents working outside Europe are excluded (inclusion criterion). The rule
+# is in inclusion.R; check the countries kept (Descriptive Statistics) when the data change
+df_excluded |>
+  mutate(Country = clean_country(Work_Country),
+         Position = Work_Position) |>
+  count(Country, Position, name = "N") |>
+  knitr::kable(format = "pipe",
+               caption = sprintf("Respondents working outside Europe, excluded: %i of %i (%.1f%%); %i analysed",
+                                 nrow(df_excluded), n_raw, 100 * nrow(df_excluded) / n_raw, nrow(df)))
 ```
 
 ```{r}
@@ -483,10 +522,14 @@ format_estimate <- function(est, low, high) {
   paste(format_value(est, zap_small = TRUE), format_ci(low, high, ci = NULL, zap_small = TRUE))
 }
 
-# Pathfinder can collapse onto a handful of distinct draws, making CIs unreliable
-draws_info <- function(m) {
-  draws <- as.data.frame(m)
-  data.frame(Draws = nrow(draws), `Unique draws` = nrow(unique(draws)), check.names = FALSE)
+# MCMC defaults of the brms models fitted in this notebook (Pathfinder, used
+# before 2026-09-30, collapsed onto a handful of distinct draws for some models,
+# making their CIs unreliable). `...` passes e.g. family or prior to brm()
+fit_brm <- function(formula, data, ...) {
+  m <- brms::brm(formula, data = data, chains = 4, iter = 2000, warmup = 1000, cores = 4,
+                 backend = "cmdstanr", seed = 123, refresh = 0, silent = 2, ...)
+  attr(m$data, "data_name") <- NULL  # Else insight looks for an object named `data` in the notebook, not the fit's data
+  m
 }
 
 # MCMC diagnostics
@@ -510,27 +553,36 @@ predictions_wide <- function(pred, x) {
 # with the model's chunk) so that the fit itself need not be kept. `group` = the
 # factor compared, `at` = values of the continuous predictor ("Dem_Age=c(25, 45)")
 summarize_model <- function(m, group, at, outcome) {
+  trend <- sub("=.*", "", at)
   list(
-    draws = draws_info(m),
+    draws = mcmc_info(m),
     means = estimate_means(m, by = group),
     contrasts = estimate_contrasts(m, contrast = group),
+    contrasts_at = estimate_contrasts(m, contrast = group, by = at),
+    slopes = estimate_slopes(m, trend = trend, by = group),  # Average over the observed values
     predictions = estimate_relation(m, by = c(at, group)),
     parameters = model_parameters(m, component = "conditional")
   ) |>
     lapply(\(x) cbind(Outcome = outcome, as.data.frame(x))) |>
-    c(list(group = group, x = sub("=.*", "", at)))
+    c(list(group = group, x = trend))
 }
 
 # Display tables from a list of summarize_model() outputs (one per outcome)
 model_tables <- function(summaries) {
   get <- \(what) bind_rows(lapply(summaries, `[[`, what))
   list(
-    "Posterior draws" = get("draws"),
+    "MCMC diagnostics" = get("draws"),
     "Marginal means (continuous predictor at its mean)" = get("means") |>
       transmute(Outcome, pick(all_of(summaries[[1]]$group)),
                 `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
     "Contrasts between groups (continuous predictor at its mean)" = get("contrasts") |>
       transmute(Outcome, Contrast = paste(Level1, "-", Level2),
+                `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
+    "Contrasts between groups at values of the continuous predictor" = get("contrasts_at") |>
+      transmute(Outcome, Contrast = paste(Level1, "-", Level2), pick(all_of(summaries[[1]]$x)),
+                `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
+    "Average slope of the continuous predictor (per unit)" = get("slopes") |>
+      transmute(Outcome, pick(all_of(summaries[[1]]$group)),
                 `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
     "Predictions (Median [95% CI])" = predictions_wide(get("predictions"), summaries[[1]]$x),
     "Parameters" = get("parameters") |>
@@ -678,22 +730,7 @@ p_position <- df |>
   theme(axis.text.y = element_text(size = 8)) +
   labs(title = "Academic Position", x = "", y = "Count")
 
-# Country of work + specific affiliations (dodged)
-clean_country <- function(x) {
-  x <- str_to_title(str_trim(x))
-  case_when(
-    x %in% c("Uk", "United Kingdom", "England", "Wales (Uk)", "Uk - England") ~ "United Kingdom",
-    x %in% c("Be", "Belgique", "Belgium") ~ "Belgium",
-    x %in% c("Nl", "The Netherlands") ~ "Netherlands",
-    x %in% c("Usa", "United States") ~ "United States",
-    x %in% c("Italia") ~ "Italy",
-    x %in% c("Suisse") ~ "Switzerland",
-    x %in% c("Feance", "Frabce", "France ", "France/Canada",
-             "Germany And France", "Dijon", "Grenoble") ~ "France",
-    .default = x
-  )
-}
-
+# Country of work + specific affiliations (dodged); clean_country() is in inclusion.R
 normalize_affil <- function(x) {
   x <- stringr::str_squish(x)
 
@@ -1133,20 +1170,11 @@ df_quality2 <- predict(pca_criteria, names = c("Criteria1", "Criteria2")) |>
   cbind(df)
 
 
-m_criteria1 <- brms::brm(Criteria1 ~ Dem_Gender * poly(Dem_Age, 2), 
-                     data = df_quality2 |> 
-                       mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |> 
-                       filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 70),
-                     backend = "cmdstanr",
-                     algorithm = "pathfinder",
-                     seed = 123)
-m_criteria2 <- brms::brm(Criteria2 ~ Dem_Gender * poly(Dem_Age, 2), 
-                     data = df_quality2 |> 
-                       mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |> 
-                       filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 70),
-                     backend = "cmdstanr",
-                     algorithm = "pathfinder",
-                     seed = 123)
+df_quality_age <- df_quality2 |>
+  mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |>
+  filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 70)
+m_criteria1 <- fit_brm(Criteria1 ~ Dem_Gender * poly(Dem_Age, 2), data = df_quality_age)
+m_criteria2 <- fit_brm(Criteria2 ~ Dem_Gender * poly(Dem_Age, 2), data = df_quality_age)
 
 
 p_criteria_pred1 <- rbind(
@@ -1406,8 +1434,10 @@ make_markdown(list("Descriptive statistics" = describe_vars(df_ss_scales),
 ### Slow Science Definition
 
 ```{r}
-# TODO: Add subtitle: "Select up to 3" 
-df_ss_def <- select(df, starts_with("SS_Definition_"), -SS_Definition_Other)
+# TODO: Add subtitle: "Select up to 3"
+# Among the participants familiar with slow science: the question was mandatory,
+# and those who did not know the movement could only guess (chunk slow_science_ratings)
+df_ss_def <- select(filter(df, SS_Familiar > 0), starts_with("SS_Definition_"), -SS_Definition_Other)
 names(df_ss_def) <- str_replace(names(df_ss_def), "SS_Definition_", "") |>
   str_replace_all(fixed("_"), " ")
 
@@ -1512,7 +1542,7 @@ slider_items <- c(
   "OS_Familiar"                         = "Familiarity with the movement",
   "OS_Importance"                       = "Importance of the movement",
   "SS_Familiar"                         = "Familiarity with the movement",
-  "SS_Importance"                       = "Importance of the movement",
+  "SS_Importance"                       = "Importance (if familiar)",
   "GS_Importance_conducting"            = "Importance in conducting research",
   "GS_Importance_topic"                 = "Importance in choosing topics",
   "GS_Relation_Research_Sustainability" = "Link between research and environment",
@@ -1523,7 +1553,11 @@ slider_items <- c(
   "ES_Importance_research_team"         = "Importance of team diversity"
 )
 
+# The importance of slow science was mandatory, also for the participants not at
+# all familiar with it, who nearly all answered 0 ("cannot rate" rather than a
+# judgement, chunk slow_science_ratings): it is shown among the familiar only
 df_sliders <- df |>
+  mutate(SS_Importance = ifelse(SS_Familiar == 0, NA, SS_Importance)) |>
   select(all_of(names(slider_items))) |>
   pivot_longer(everything(), names_to = "Variable", values_to = "Score") |>
   filter(!is.na(Score)) |>
@@ -1613,6 +1647,7 @@ df_resprac <- select(df, starts_with("OS_"), starts_with("GS_"), -starts_with("O
          "Endorsement - Preregistration" = OS_Study_Preregistration)
 
 
+# The facets are framed once the EFA is fitted (next section)
 p_cor <- df_resprac |>
   correlation(redundant = TRUE) |>
   correlation::cor_sort() |>
@@ -1621,11 +1656,6 @@ p_cor <- df_resprac |>
   ggplot(aes(x=Parameter1, y=Parameter2, fill=r)) +
   geom_tile() +
   geom_text(aes(label=label), color="black", size=1.5) +
-  annotate(geom="rect", xmin=0.5, xmax=8.5, ymin=0.5, ymax=8.5, alpha=0, color="#9C27B0", linewidth = 2) +
-  annotate(geom="rect", xmin=0.55, xmax=4.5, ymin=0.55, ymax=4.5, alpha=0, color="#4CAF50", linewidth = 2) +
-  annotate(geom="rect", xmin=9.5, xmax=12.5, ymin=9.5, ymax=12.5, alpha=0, color="#3F51B5", linewidth = 2) +
-  annotate(geom="rect", xmin=13.5, xmax=15.5, ymin=13.5, ymax=15.5, alpha=0, color="#FF9800", linewidth = 2) +
-  annotate(geom="rect", xmin=12.5, xmax=19.5, ymin=12.5, ymax=19.5, alpha=0, color="#2196F3", linewidth = 2) +
   scale_fill_gradientn(colours = c("darkblue", "blue", "#2196F3","white", "#FFC107", "#F44336", "darkred"), limits = c(-1, 1)) +
   theme_minimal() +
   labs(title = "Correlation Matrix of Research Values",
@@ -1658,7 +1688,6 @@ plot(f)
 
 color_vars_resprac <- c(
   # GS variables (green)
-  "Green Science - Ecofriendly Practices"                  = "#4CAF50",
   "Green Science - Ecofriendly Practices" = "#4CAF50",
   "Green Science - Ecofriendly Topics" = "#4CAF50",
   "Green Science - Changed Practices" = "#4CAF50",
@@ -1702,10 +1731,27 @@ efa_ids <- sapply(efa_markers, \(v) {
   names(l)[which.max(abs(l))]
 })
 stopifnot(!anyDuplicated(efa_ids))  # One marker per factor
+efa_colors <- setNames(c("#4CAF50", "#9C27B0", "#2196F3", "#3F51B5", "#FF9800"), efa_ids)
+
+# Frame the items of each factor (the one they load most on) in the correlation
+# matrix above: one frame per run of adjacent items, in the order of cor_sort()
+efa_main_factor <- efa_loadings |>
+  pivot_longer(-Variable, names_to = "Factor", values_to = "Loading") |>
+  slice_max(abs(Loading), by = Variable, with_ties = FALSE)
+cor_frames <- tibble(Variable = levels(p_cor$data$Parameter1)) |>
+  mutate(k = row_number(),
+         Factor = efa_main_factor$Factor[match(Variable, efa_main_factor$Variable)],
+         run = cumsum(Factor != lag(Factor, default = ""))) |>
+  summarise(min = min(k) - 0.5, max = max(k) + 0.5, .by = c(Factor, run)) |>
+  mutate(color = efa_colors[Factor])
+p_cor <- p_cor +
+  geom_rect(data = cor_frames, aes(xmin = min, xmax = max, ymin = min, ymax = max, color = color),
+            inherit.aes = FALSE, fill = NA, linewidth = 1.5) +
+  scale_color_identity()
 
 p_resprac <- plot_graph(f, threshold = 0.2, arrow_end_gap = 0.12, expand = c(1, 0.5),
                         names_factors = as.list(efa_ids),
-                        color_factors = setNames(c("#4CAF50", "#9C27B0", "#2196F3", "#3F51B5", "#FF9800"), efa_ids),
+                        color_factors = efa_colors,
                         color_variables = color_vars_resprac)
 p_resprac
 ```
@@ -1783,7 +1829,10 @@ cfa_node_colors <- c(
   "ES_Consequences_society"    = "#9C27B0"
 )
 
-# Manual CFA model using raw df column names
+# Manual CFA model using raw df column names. Items are assigned to the facet of
+# their movement (open science split as in the EFA), and the two green beliefs
+# (link between research and sustainability, willingness to change) also load on
+# Ethical Science, as in the EFA (a priori model without them: cfa_alternatives)
 cfa_model <- "
   Open_Science     =~ OS_Importance +
                       OS_Open_Data +
@@ -1803,11 +1852,12 @@ cfa_model <- "
   Slow_Science     =~ SS_Importance +
                       SS_Familiar
   Ethical_Science  =~ ES_Importance_research_team +
-                      ES_Consequences_society
+                      ES_Consequences_society +
+                      GS_Relation_Research_Sustainability +
+                      GS_Change_practices_agreeing
 "
 
 library(lavaan)
-library(tidySEM)
 
 fit_cfa <- cfa(cfa_model, data = df, std.lv = TRUE)
 
@@ -1842,13 +1892,15 @@ cfa_pos <- tribble(
   "SS_Familiar",                 6,    0,
   # Green Science factor + vars (right, top half)
   "Green_Science",              11,    7.5,
-  "GS_Importance_conducting",              12,   9,
+  "GS_Importance_conducting",              12.5,   9,
   "GS_Importance_topic",                  11.5,   10,
-  "GS_Change_practices_agreeing",         10.5,   10,
-  "GS_Changes_practices",                 9.65,    9.75,
-  "GS_Changes_communication_practices",   9,   9,
-  "GS_Relation_Research_Sustainability",  8.75,   7.75,
-  
+  "GS_Changes_practices",                 10.5,   10,
+  "GS_Changes_communication_practices",   9.5,   9,
+  # Green beliefs, loading on both Green and Ethical Science (between them, on
+  # the right: the factor correlations run on the left)
+  "GS_Relation_Research_Sustainability",  12.4,   5,
+  "GS_Change_practices_agreeing",         13.8,   5,
+
   # Ethical Science factor + vars (right, bottom half)
   "Ethical_Science",            11,    2.5,
   "ES_Importance_research_team",10,    0,
@@ -1933,9 +1985,9 @@ p_cfa
 #| label: cfa_alternatives
 
 # The EFA puts two green items (link between research and sustainability,
-# willingness to change) on the Ethical factor rather than the Green one: the
-# model used above assigns them to Green (their movement); these alternatives
-# move them to Ethical, or let them load on both (as in the EFA)
+# willingness to change) on both the Green and the Ethical factors. The model used
+# above lets them load on both; it is compared with the a priori, movement-based
+# model (all green items on Green only) and with moving them to Ethical only
 green_core <- "GS_Importance_conducting + GS_Importance_topic + GS_Changes_practices + GS_Changes_communication_practices"
 green_beliefs <- "GS_Relation_Research_Sustainability + GS_Change_practices_agreeing"
 # The Open, Rigorous and Slow factors of cfa_model (each factor's definition runs to the next one)
@@ -1943,18 +1995,261 @@ cfa_common <- str_extract_all(cfa_model, "(?s)(Open|Rigorous|Slow)_Science\\s*=~
   paste(collapse = "\n") |>
   paste0("\n")
 cfa_models <- list(
-  "Movement-based (used)" = cfa_model,
+  "Movement-based" = paste0(cfa_common, "Green_Science =~ ", green_core, " + ", green_beliefs, "\n",
+                            "Ethical_Science =~ ES_Importance_research_team + ES_Consequences_society"),
   "Green beliefs on Ethical" = paste0(cfa_common, "Green_Science =~ ", green_core, "\n",
                        "Ethical_Science =~ ES_Importance_research_team + ES_Consequences_society + ", green_beliefs),
-  "Cross-loadings" = paste0(cfa_common, "Green_Science =~ ", green_core, " + ", green_beliefs, "\n",
-                            "Ethical_Science =~ ES_Importance_research_team + ES_Consequences_society + ", green_beliefs)
+  "Cross-loadings (used)" = cfa_model
 )
-cfa_comparison <- imap_dfr(cfa_models, \(model, name) {
-  fit <- cfa(model, data = df, std.lv = TRUE)
+cfa_fits <- map(cfa_models, \(model) cfa(model, data = df, std.lv = TRUE))
+cfa_comparison <- imap_dfr(cfa_fits, \(fit, name) {
   tibble(Model = name, r_Green_Ethical = lavInspect(fit, "cor.lv")["Green_Science", "Ethical_Science"],
-         !!!as.list(unclass(fitMeasures(fit, c("cfi", "tli", "rmsea", "srmr", "aic", "bic")))))
+         !!!as.list(unclass(fitMeasures(fit, c("chisq", "df", "cfi", "tli", "rmsea", "srmr", "aic", "bic")))))
 })
 knitr::kable(cfa_comparison, format = "pipe", digits = 3, caption = "Alternative CFA specifications")
+
+# The two other models are nested in the cross-loadings one (two loadings fixed to 0)
+cfa_lrt <- map_dfr(names(cfa_models)[1:2], \(name) {
+  lrt <- lavTestLRT(cfa_fits[[name]], cfa_fits[["Cross-loadings (used)"]])
+  tibble(Model = name, Chisq_diff = lrt$`Chisq diff`[2], Df_diff = lrt$`Df diff`[2], p = lrt$`Pr(>Chisq)`[2])
+})
+knitr::kable(cfa_lrt, format = "pipe", digits = 3, caption = "Likelihood ratio tests against the cross-loadings model")
+```
+
+#### Scoring Sensitivity
+
+```{r}
+#| label: scoring_sensitivity
+
+# Do the facets depend on how the open science practices are scored? The EFA and
+# the CFA used above are refitted under other scorings of the four answers (not
+# familiar, don't plan to use, plan to use, used), and their facet scores
+# correlated with those of the retained (engagement) scoring, in all participants
+# and in those familiar with all eight practices (the only ones whose answers are
+# all observed when unfamiliarity is missing; with a two-item Slow Science, this
+# scoring gives a slightly negative residual variance of SS_Importance)
+scorings <- list(
+  "Engagement (retained)" = c(0, 1/3, 2/3, 1),
+  "Former" = c(1/3, 0, 2/3, 1),
+  "Non-engagement pooled" = c(0, 0, 1/2, 1),
+  "Unfamiliarity missing" = c(NA, 0, 1/2, 1)
+)
+practice_items <- c("Endorsement - Preregistration" = "OS_Study_Preregistration",
+                    "Endorsement - Registered Reports" = "OS_Registered_Reports",
+                    "Endorsement - Open Materials" = "OS_Open_Materials",
+                    "Endorsement - Open Data" = "OS_Open_Data",
+                    "Endorsement - Open Peer Review" = "OS_Open_Peer_Review",
+                    "Endorsement - Open Access" = "OS_Open_Access_Publication",
+                    "Endorsement - Replication Studies" = "OS_Replication_Studies",
+                    "Endorsement - Participatory Research" = "OS_Participatory_Research")
+rescore <- \(x, scores) scores[round(x * 3) + 1]  # The answer is recovered from the engagement score
+facet_scores <- as.data.frame(predict(fit_cfa))
+familiar_all <- rowSums(df[unname(practice_items)] == 0) == 0
+
+sensitivity <- imap(scorings, \(scores, scoring) {
+  d <- mutate(df, across(all_of(unname(practice_items)), \(x) rescore(x, scores)))
+  d_resprac <- df_resprac
+  d_resprac[names(practice_items)] <- d[unname(practice_items)]
+  efa <- factor_analysis(d_resprac, n = 5, rotation = "oblimin")
+  fit <- cfa(cfa_model, data = d, std.lv = TRUE, missing = if (anyNA(scores)) "ml" else "listwise")  # FIML if missing answers
+  # EFA factors named after the same marker items as above
+  l <- as.data.frame(efa) |> select(Variable, starts_with("MR"))
+  ids <- sapply(efa_markers, \(v) names(which.max(abs(unlist(l[l$Variable == v, -1])))))
+  names(ids) <- str_replace_all(names(ids), "\n", " ")
+  loadings <- l |>
+    filter(str_starts(Variable, "Endorsement|Open Science")) |>
+    transmute(Scoring = scoring, Item = Variable,
+              Open = .data[[ids[["Open Science"]]]], Rigorous = .data[[ids[["Rigorous Science"]]]])
+  scores_s <- as.data.frame(predict(fit))
+  agreement <- map_dfr(list("All" = TRUE, "Familiar with all practices" = familiar_all), \(rows) {
+    tibble(N = sum(rep_len(rows, nrow(df))),
+           !!!map(setNames(names(facet_scores), names(facet_scores)), \(v) cor(scores_s[[v]][rows], facet_scores[[v]][rows])))
+  }, .id = "Participants")
+  fit_row <- tibble(Scoring = scoring, `Distinct EFA factors` = !anyDuplicated(ids),
+                    !!!as.list(unclass(fitMeasures(fit, c("cfi", "tli", "rmsea", "srmr")))))
+  list(fit = fit_row, agreement = mutate(agreement, Scoring = scoring, .before = 1), loadings = loadings)
+})
+scoring_fit <- map_dfr(sensitivity, "fit")
+scoring_agreement <- map_dfr(sensitivity, "agreement")
+scoring_loadings <- map_dfr(sensitivity, "loadings")
+knitr::kable(scoring_fit, format = "pipe", digits = 3, caption = "EFA factors and CFA fit, by scoring")
+knitr::kable(scoring_agreement, format = "pipe", digits = 3,
+             caption = "Correlation of each facet score with the retained scoring, by scoring")
+scoring_loadings |>
+  pivot_wider(names_from = Scoring, values_from = c(Open, Rigorous), names_glue = "{Scoring}: {.value}") |>
+  select(Item, starts_with(names(scorings))) |>
+  knitr::kable(format = "pipe", digits = 2, caption = "EFA loadings of the open science items on Open and Rigorous Science, by scoring")
+```
+
+#### Ordinal Items and Ceiling Effects
+
+```{r}
+#| label: cfa_ordinal
+#| warning: false
+
+# The eight practice items have four ordered levels, and several sliders pile up
+# at their maximum, which Pearson correlations understate. Factors could then
+# split by item difficulty: the Open Science items are the widely used practices
+# and the Rigorous Science items the rarely used ones. Two checks: (1) an EFA on
+# polychoric / polyserial correlations (practice items ordinal, sliders
+# continuous), to see whether open science still splits along the same line;
+# (2) the retained CFA refitted with the practice items declared ordered (WLSMV),
+# compared on fit, loadings, latent correlations and facet scores
+
+# Share of answers at the ceiling of each slider (and at the floor)
+slider_items <- setdiff(names(df_resprac), names(practice_items))
+ceiling_table <- df_resprac |>
+  summarise(across(all_of(slider_items), list(Floor = \(x) 100 * mean(x == 0, na.rm = TRUE),
+                                               Ceiling = \(x) 100 * mean(x == 1, na.rm = TRUE)))) |>
+  pivot_longer(everything(), names_to = c("Item", ".value"), names_sep = "_(?=Floor|Ceiling)") |>
+  arrange(desc(Ceiling))
+knitr::kable(ceiling_table, format = "pipe", digits = 1, caption = "Percentage of slider ratings at the floor (0) and at the ceiling (100)")
+
+# (1) Mixed correlations (psych::mixedCor): the practice items as 1-4 integers
+d_mixed <- mutate(df_resprac, across(all_of(names(practice_items)), \(x) round(x * 3) + 1))
+cor_mixed <- psych::mixedCor(d_mixed, p = which(names(d_mixed) %in% names(practice_items)),
+                             c = which(!names(d_mixed) %in% names(practice_items)))$rho
+efa_by_cor <- list(
+  "Pearson" = psych::fa(cor(df_resprac, use = "pairwise.complete.obs"), nfactors = 5, n.obs = nrow(df), rotate = "oblimin", fm = "minres"),
+  "Polychoric" = psych::fa(cor_mixed, nfactors = 5, n.obs = nrow(df), rotate = "oblimin", fm = "minres")
+)
+# Factors named after the same marker items as the EFA above; the facet each item
+# loads most on, with that loading
+name_fa_factors <- \(fa) {
+  l <- unclass(fa$loadings)
+  ids <- sapply(efa_markers, \(v) colnames(l)[which.max(abs(l[v, ]))])
+  setNames(str_replace_all(names(ids), "\n", " "), ids)
+}
+primary_facet <- \(fa, label) {
+  l <- unclass(fa$loadings)
+  nm <- name_fa_factors(fa)
+  tibble(Item = rownames(l),
+         !!paste0(label, ": facet") := unname(nm[colnames(l)[apply(abs(l), 1, which.max)]]),
+         !!paste0(label, ": loading") := apply(l, 1, \(r) r[which.max(abs(r))]))
+}
+ordinal_efa <- reduce(imap(efa_by_cor, \(fa, label) primary_facet(fa, label)), left_join, by = "Item") |>
+  filter(str_starts(Item, "Endorsement|Open Science")) |>
+  mutate(`Same facet` = .data[["Pearson: facet"]] == .data[["Polychoric: facet"]])
+knitr::kable(ordinal_efa, format = "pipe", digits = 2,
+             caption = "EFA (5 factors, oblimin) on Pearson vs. polychoric/polyserial correlations: facet each open science item loads most on")
+stopifnot(all(sapply(efa_by_cor, \(fa) !anyDuplicated(name_fa_factors(fa)))))  # Five distinct facets in both
+
+# (2) Ordinal CFA: practice items as ordered factors, WLSMV (diagonally weighted
+# least squares, robust fit indices; the scaled indices are reported)
+d_ord <- mutate(df, across(all_of(unname(practice_items)), \(x) factor(round(x * 3), levels = 0:3, ordered = TRUE)))
+fit_cfa_ord <- cfa(cfa_model, data = d_ord, std.lv = TRUE, ordered = unname(practice_items), estimator = "WLSMV")
+ordinal_fit <- bind_rows(
+  tibble(Estimator = "ML (retained)", !!!as.list(unclass(fitMeasures(fit_cfa, c("cfi", "tli", "rmsea", "srmr"))))),
+  tibble(Estimator = "WLSMV (practice items ordinal)",
+         !!!setNames(as.list(unclass(fitMeasures(fit_cfa_ord, c("cfi.scaled", "tli.scaled", "rmsea.scaled", "srmr")))), c("cfi", "tli", "rmsea", "srmr")))
+)
+knitr::kable(ordinal_fit, format = "pipe", digits = 3, caption = "CFA fit with the practice items treated as continuous (ML) or ordinal (WLSMV)")
+
+std_loadings <- \(fit, label) {
+  parameterEstimates(fit, standardized = TRUE) |>
+    filter(op == "=~", rhs %in% unname(practice_items)) |>
+    transmute(Facet = lhs, Item = cfa_labels[rhs] |> str_replace_all("\n", " "), !!label := std.all)
+}
+ordinal_loadings <- left_join(std_loadings(fit_cfa, "ML"), std_loadings(fit_cfa_ord, "WLSMV"), by = c("Facet", "Item"))
+knitr::kable(ordinal_loadings, format = "pipe", digits = 2, caption = "Standardised loadings of the practice items, ML vs. WLSMV")
+
+lv_cor_long <- \(fit, label) {
+  r <- lavInspect(fit, "cor.lv")
+  as.data.frame(as.table(r)) |>
+    filter(as.integer(Var1) < as.integer(Var2)) |>
+    transmute(Facet1 = as.character(Var1), Facet2 = as.character(Var2), !!label := Freq)
+}
+ordinal_cor <- left_join(lv_cor_long(fit_cfa, "ML"), lv_cor_long(fit_cfa_ord, "WLSMV"), by = c("Facet1", "Facet2"))
+knitr::kable(ordinal_cor, format = "pipe", digits = 2, caption = "Latent correlations between the facets, ML vs. WLSMV")
+
+scores_ord <- as.data.frame(lavPredict(fit_cfa_ord))
+ordinal_scores <- tibble(Facet = names(facet_scores),
+                         `r (ML scores, WLSMV scores)` = map_dbl(names(facet_scores), \(v) cor(facet_scores[[v]], scores_ord[[v]])))
+knitr::kable(ordinal_scores, format = "pipe", digits = 3, caption = "Agreement of the facet scores between the ML and the WLSMV CFA")
+```
+
+#### Slow Science: Knowledge or Endorsement?
+
+```{r}
+#| label: slow_science_sensitivity
+#| warning: false
+
+# A third of participants were not at all familiar with slow science and rated
+# its importance near zero, so the Slow Science facet may index exposure to
+# meta-science debates rather than endorsement of its values. Its correlations
+# with the other facets are re-estimated (a) with the importance rating of
+# participants not familiar with the movement treated as missing (FIML), (b)
+# among participants familiar with the movement only, and (c) item by item
+# (familiarity and importance ratings correlated with the other facets' scores)
+ss_familiar <- df$SS_Familiar > 0
+lv_cor_slow <- \(fit, label) {
+  r <- lavInspect(fit, "cor.lv")["Slow_Science", ]
+  tibble(Variant = label, !!!as.list(r[names(r) != "Slow_Science"]))
+}
+item_cor_slow <- \(item, rows, label) {
+  tibble(Variant = label, !!!map(select(facet_scores, -Slow_Science), \(s) cor(s[rows], df[[item]][rows])))
+}
+fit_ss_missing <- cfa(cfa_model, data = mutate(df, SS_Importance = ifelse(SS_Familiar == 0, NA, SS_Importance)),
+                      std.lv = TRUE, missing = "ml")
+fit_ss_familiar <- cfa(cfa_model, data = filter(df, ss_familiar), std.lv = TRUE)
+slow_sensitivity <- bind_rows(
+  lv_cor_slow(fit_cfa, "Retained CFA (all participants)"),
+  lv_cor_slow(fit_ss_missing, "CFA, importance missing when unfamiliar (FIML)"),
+  lv_cor_slow(fit_ss_familiar, paste0("CFA, familiar with slow science only (N = ", sum(ss_familiar), ")")),
+  item_cor_slow("SS_Familiar", TRUE, "Familiarity item, all participants"),
+  item_cor_slow("SS_Importance", TRUE, "Importance item, all participants"),
+  item_cor_slow("SS_Familiar", ss_familiar, "Familiarity item, familiar only"),
+  item_cor_slow("SS_Importance", ss_familiar, "Importance item, familiar only")
+)
+knitr::kable(slow_sensitivity, format = "pipe", digits = 2,
+             caption = "Correlations of Slow Science (latent, or its two items) with the other facets, by variant")
+slow_fit <- bind_rows(
+  tibble(Variant = "Importance missing when unfamiliar", !!!as.list(unclass(fitMeasures(fit_ss_missing, c("cfi", "tli", "rmsea", "srmr"))))),
+  tibble(Variant = "Familiar only", !!!as.list(unclass(fitMeasures(fit_ss_familiar, c("cfi", "tli", "rmsea", "srmr")))))
+)
+knitr::kable(slow_fit, format = "pipe", digits = 3, caption = "Fit of the two alternative CFAs")
+```
+
+```{r}
+#| label: slow_science_ratings
+#| warning: false
+
+# The importance question was mandatory, also for the participants who had just
+# reported no familiarity with slow science. Are their ratings judgements, or a
+# way of saying "cannot rate"? (1) Exact 0 and 50 answers by familiarity, against
+# the other attitude sliders (the two "changed practices" sliders are left out:
+# 0 is a substantive answer there, no change); (2) the facet scores when these
+# ratings are treated as missing (fit_ss_missing above): setting them to missing
+# does not remove the knowledge component, as the familiarity item stays at 0
+ss_unfamiliar <- df$SS_Familiar == 0
+attitude_sliders <- c("OS_Familiar", "OS_Importance", "GS_Importance_conducting", "GS_Importance_topic",
+                      "GS_Relation_Research_Sustainability", "GS_Change_practices_agreeing",
+                      "ES_Importance_research_team", "ES_Consequences_society")
+ss_ratings <- bind_rows(
+  tibble(Item = "SS_Importance (not familiar)", x = df$SS_Importance[ss_unfamiliar]),
+  tibble(Item = "SS_Importance (familiar)", x = df$SS_Importance[!ss_unfamiliar]),
+  map_dfr(attitude_sliders, \(v) tibble(Item = v, x = df[[v]]))
+) |>
+  summarise(n = sum(!is.na(x)), `At 0 (%)` = 100 * mean(round(x * 100) == 0, na.rm = TRUE),
+            `At 50 (%)` = 100 * mean(round(x * 100) == 50, na.rm = TRUE),
+            Mean = 100 * mean(x, na.rm = TRUE), SD = 100 * sd(x, na.rm = TRUE), .by = Item)
+knitr::kable(ss_ratings, format = "pipe", digits = 1,
+             caption = "Exact 0 and 50 answers to the importance of slow science, by familiarity, and to the other attitude sliders")
+
+scores_ss_missing <- as.data.frame(lavPredict(fit_ss_missing))
+std <- \(x) (x - mean(x)) / sd(x)
+ss_missing_check <- tibble(
+  `r with retained scores` = cor(facet_scores$Slow_Science, scores_ss_missing$Slow_Science),
+  `Not familiar, retained (SD)` = mean(std(facet_scores$Slow_Science)[ss_unfamiliar]),
+  `Not familiar, importance missing (SD)` = mean(std(scores_ss_missing$Slow_Science)[ss_unfamiliar]),
+  `Familiar, retained (SD)` = mean(std(facet_scores$Slow_Science)[!ss_unfamiliar]),
+  `Familiar, importance missing (SD)` = mean(std(scores_ss_missing$Slow_Science)[!ss_unfamiliar]),
+  `CFI retained` = unname(fitMeasures(fit_cfa, "cfi")),
+  `CFI importance missing` = unname(fitMeasures(fit_ss_missing, "cfi")),
+  `Negative residual variances (importance missing)` = sum(diag(lavInspect(fit_ss_missing, "est")$theta) < 0)
+)
+knitr::kable(ss_missing_check, format = "pipe", digits = 3,
+             caption = "Slow Science scores with the importance of unfamiliar participants treated as missing (FIML) vs. retained")
 ```
 
 ### Clustering
@@ -1965,7 +2260,13 @@ df_resprac_fac <- as.data.frame(predict(fit_cfa))
 rez_nclust <- n_clusters(df_resprac_fac, package = c("NbClust"))
 plot(rez_nclust)
 
-rez <- cluster_analysis(df_resprac_fac, n=5, method="hkmeans")
+# k-means, best of 200 random starts. Hierarchical k-means (used before
+# 2026-10-03) runs k-means once, from the centres of a complete-linkage tree,
+# which changes with a few participants: at N = 672 it stopped on a partition
+# 5.6% worse (within-cluster sum of squares) than the best, which most single
+# random starts reach, and reshuffled the five profiles
+set.seed(123)
+rez <- cluster_analysis(df_resprac_fac, n = 5, method = "kmeans", nstart = 200)
 plot(rez)
 rez
 
@@ -1982,6 +2283,37 @@ profile_labels <- df_resprac_fac |>
   summarise(Pattern = paste0(Sign[!is.na(Sign)], Factor[!is.na(Sign)], collapse = " "), .by = c(Cluster, n)) |>
   mutate(Label = paste0("Profile ", LETTERS[row_number()], "\n", ifelse(Pattern == "", "Average", Pattern)))
 df_resprac_fac$Profile <- profile_labels$Label[match(predict(rez), profile_labels$Cluster)]
+```
+
+```{r}
+#| label: profile_names
+#| cache: false
+
+# Descriptive names and colours of the profiles (paper figure and text), matched
+# by their pattern of facets: the letters follow the profiles' size, and the
+# patterns can change with the data (an unnamed pattern stops the render). The
+# modelled `Profile` keeps the letter labels. A profile takes the colour of its
+# highest facet when that facet defines it, and a colour outside the facets'
+# palette when a single facet would be misleading
+profile_key <- tribble(
+  ~Pattern,                           ~Name,                 ~Color,
+  "+Open +Rigorous +Slow +Ethical",        "Idealists",        "#C2185B",  # High on all facets (Green: slightly)
+  "-Slow",                                 "Aspirants",        "#8D6E63",  # Near average, low Slow Science (mostly unknown to them); the youngest, with the most plans to adopt (profile_correlates)
+  "-Rigorous +Green +Slow +Ethical",       "Stewards",         "#4CAF50",  # Green Science
+  "+Open +Rigorous -Green -Ethical",       "Purists",          "#3F51B5",  # Procedural reform, not the societal facets
+  "-Open -Rigorous -Slow -Ethical",        "Traditionalists",  "#757575"   # Below average on all but Green
+) |>
+  right_join(select(profile_labels, Pattern, Profile = Label), by = "Pattern") |>
+  mutate(Letter = str_extract(Profile, "^Profile \\w")) |>
+  arrange(Profile)
+stopifnot(!anyNA(profile_key$Name), !anyDuplicated(profile_key$Name))
+# Name of a profile label (with "\n" or a space) or letter ("Profile A")
+profile_name <- \(x) {
+  squish <- \(s) str_replace_all(s, "\\s+", " ")
+  i <- match(squish(x), squish(profile_key$Profile))
+  i[is.na(i)] <- match(x[is.na(i)], profile_key$Letter)
+  profile_key$Name[i]
+}
 ```
 
 ```{r}
@@ -2127,6 +2459,7 @@ p_radar
 
 df_resprac_fac |>
   summarise(N = n(), across(all_of(cluster_vars), mean), .by = Profile) |>
+  mutate(Name = profile_name(Profile), .after = Profile) |>
   mutate(Percentage = format_percent(N / sum(N)), .after = N) |>
   arrange(Profile) |>
   list() |>
@@ -2139,24 +2472,343 @@ df_resprac_fac |>
 ```{r}
 #| label: cluster_stability
 
-# Bootstrap: cluster resampled respondents, assign everyone to the nearest
-# resampled centroid, and compare with the full-sample solution (adjusted Rand
-# index; 1 = same partition)
+# Bootstrap: cluster resampled respondents (k-means, best of 50 random starts),
+# assign everyone to the nearest resampled centroid, and compare with the
+# full-sample solution (adjusted Rand index; 1 = same partition)
 cluster_data <- select(df_resprac_fac, -Profile)
 z <- as.matrix(standardize(cluster_data))  # The space cluster_analysis() clusters in
 nearest <- \(x, centers) apply(x, 1, \(r) which.min(colSums((t(centers) - r)^2)))
+kmeans_boot <- \(k) kmeans(z[sample(nrow(z), replace = TRUE), ], k, nstart = 50, iter.max = 100)
 
 set.seed(123)
 cluster_stability <- map_dfr(2:6, \(k) {
-  full <- predict(cluster_analysis(cluster_data, n = k, method = "hkmeans"))
-  ari <- replicate(100, {
-    boot <- factoextra::hkmeans(z[sample(nrow(z), replace = TRUE), ], k, hc.method = "complete", iter.max = 100)
-    mclust::adjustedRandIndex(full, nearest(z, boot$centers))
-  })
+  full <- predict(cluster_analysis(cluster_data, n = k, method = "kmeans", nstart = 200))
+  ari <- replicate(100, mclust::adjustedRandIndex(full, nearest(z, kmeans_boot(k)$centers)))
   tibble(Clusters = k, `Median ARI` = median(ari), `2.5%` = quantile(ari, 0.025), `97.5%` = quantile(ari, 0.975))
 })
 knitr::kable(cluster_stability, format = "pipe", digits = 2,
-             caption = "Bootstrap stability of the hkmeans solutions (100 resamples each)")
+             caption = "Bootstrap stability of the k-means solutions (100 resamples each)")
+
+# Hierarchical k-means (used before 2026-10-03) against k-means: within-cluster
+# sum of squares (the criterion both minimise; lower is better) and agreement
+wss <- \(cl) sum(sapply(unique(cl), \(k) sum(scale(z[cl == k, , drop = FALSE], scale = FALSE)^2)))
+kmeans_vs_hkmeans <- map_dfr(2:6, \(k) {
+  set.seed(123)
+  km <- predict(cluster_analysis(cluster_data, n = k, method = "kmeans", nstart = 200))
+  hk <- predict(cluster_analysis(cluster_data, n = k, method = "hkmeans"))
+  tibble(Clusters = k, `WSS k-means` = wss(km), `WSS hkmeans` = wss(hk),
+         `hkmeans worse by (%)` = 100 * (wss(hk) / wss(km) - 1), ARI = mclust::adjustedRandIndex(km, hk))
+})
+knitr::kable(kmeans_vs_hkmeans, format = "pipe", digits = 2,
+             caption = "k-means (best of 200 starts) vs. hierarchical k-means: within-cluster sum of squares and agreement")
+
+# Stability of each profile (Hennig, 2007): Jaccard similarity between its members
+# and the most similar resampled cluster (below .5 the profile is "dissolved";
+# above .75 it is stable), and the profile it is most often pooled with when
+# dissolved (the other profile most present in the resampled cluster that holds
+# most of its members)
+jaccard_best <- \(members, assigned) {
+  max(sapply(unique(assigned), \(b) {
+    in_b <- which(assigned == b)
+    length(intersect(members, in_b)) / length(union(members, in_b))
+  }))
+}
+profile_members <- split(seq_len(nrow(z)), df_resprac_fac$Profile)
+profile_boot <- map_dfr(1:100, \(i) {
+  assigned <- nearest(z, kmeans_boot(length(profile_members))$centers)
+  imap_dfr(profile_members, \(members, p) {
+    main <- as.integer(names(which.max(table(assigned[members]))))
+    others <- df_resprac_fac$Profile[assigned == main & df_resprac_fac$Profile != p]
+    tibble(Profile = p, Jaccard = jaccard_best(members, assigned),
+           Partner = if (length(others)) names(which.max(table(others))) else NA_character_)
+  })
+})
+profile_stability <- profile_boot |>
+  summarise(`Median Jaccard` = median(Jaccard), `2.5%` = quantile(Jaccard, 0.025), `97.5%` = quantile(Jaccard, 0.975),
+            `Dissolved (%)` = 100 * mean(Jaccard < 0.5),
+            `Pooled most often with (when dissolved)` = {
+              partners <- table(Partner[Jaccard < 0.5])
+              if (length(partners)) str_extract(names(which.max(partners)), "^Profile \\w") else NA_character_
+            },
+            .by = Profile) |>
+  mutate(Profile = str_replace(Profile, "\n", " "))
+knitr::kable(profile_stability, format = "pipe", digits = 2,
+             caption = "Bootstrap stability of each profile (100 resamples)")
+```
+
+```{r}
+#| label: slow_science_profiles
+
+# Do the profiles depend on how slow science is scored? Slow Science mixes knowing
+# the movement with valuing it (chunk slow_science_ratings). The clustering is
+# redone (1) on the facet scores of the CFA with the importance of unfamiliar
+# participants missing, with five clusters, and (2) without Slow Science, on the
+# four other facets, with four and five clusters. Each is compared with the
+# retained profiles (ARI), with where the Aspirants go, and with its bootstrap
+# stability (as in cluster_stability)
+cluster_by <- \(x, k) { set.seed(123); predict(cluster_analysis(x, n = k, method = "kmeans", nstart = 200)) }
+boot_ari <- \(zz, full, k) replicate(100, mclust::adjustedRandIndex(
+  full, nearest(zz, kmeans(zz[sample(nrow(zz), replace = TRUE), ], k, nstart = 50, iter.max = 100)$centers)))
+retained_names <- profile_name(df_resprac_fac$Profile)
+share_in <- \(cl, members, host) 100 * mean(cl[members] == names(which.max(table(cl[host]))))
+compare_variant <- \(label, x, k) {
+  set.seed(123)
+  cl <- cluster_by(x, k)
+  ari <- boot_ari(as.matrix(standardize(x)), cl, k)
+  tibble(Variant = label, Clusters = k,
+         `ARI with retained profiles` = mclust::adjustedRandIndex(cl, retained_names),
+         `Bootstrap ARI (median)` = median(ari), `2.5%` = quantile(ari, 0.025), `97.5%` = quantile(ari, 0.975),
+         `Aspirants in their main cluster (%)` = share_in(cl, retained_names == "Aspirants", retained_names == "Aspirants"),
+         `Aspirants with most Idealists (%)` = share_in(cl, retained_names == "Aspirants", retained_names == "Idealists"))
+}
+slow_profiles <- bind_rows(
+  compare_variant("Retained (five facets)", cluster_data, 5),
+  compare_variant("Importance of unfamiliar participants missing", scores_ss_missing, 5),
+  compare_variant("Without Slow Science", select(cluster_data, -Slow_Science), 4),
+  compare_variant("Without Slow Science", select(cluster_data, -Slow_Science), 5)
+)
+knitr::kable(slow_profiles, format = "pipe", digits = 2,
+             caption = "Profiles under alternative treatments of Slow Science: agreement with the retained profiles, fate of the Aspirants, and bootstrap stability (100 resamples)")
+```
+
+```{r}
+#| label: profile_gmm
+#| warning: false
+
+# Model-based check on the number of profiles: Gaussian mixtures (mclust) of the
+# standardised facet scores, all covariance structures, 1 to 9 components, chosen
+# by BIC (and ICL). The best model and the classic latent profile parameterisation
+# (VVI: diagonal covariances, free variances) with five components are compared
+# with the retained k-means profiles
+# mclust is not attached (its map() would mask purrr's), but Mclust() looks up
+# mclustBIC() in the calling environment
+mclustBIC <- mclust::mclustBIC
+set.seed(123)
+gmm_bic <- mclust::mclustBIC(z, G = 1:9, verbose = FALSE)
+gmm_icl <- mclust::mclustICL(z, G = 1:9, verbose = FALSE)
+tidy_ic <- \(x, name) { m <- matrix(x, nrow = nrow(x), dimnames = dimnames(x))
+  as.data.frame(as.table(m)) |> setNames(c("G", "Model", name)) |> filter(!is.na(.data[[name]])) |> mutate(G = as.integer(as.character(G)), Model = as.character(Model)) }
+gmm_fit <- full_join(tidy_ic(gmm_bic, "BIC"), tidy_ic(gmm_icl, "ICL"), by = c("G", "Model")) |> arrange(desc(BIC))
+knitr::kable(head(gmm_fit, 10), format = "pipe", digits = 1, caption = "Gaussian mixtures: the ten best models by BIC")
+
+gmm_best <- mclust::Mclust(z, x = gmm_bic, verbose = FALSE)
+gmm_vvi5 <- mclust::Mclust(z, G = 5, modelNames = "VVI", verbose = FALSE)
+gmm_components <- \(g, label) {
+  tibble(Model = label, Component = seq_len(g$G), N = as.vector(table(factor(g$classification, levels = seq_len(g$G)))),
+         !!!as.data.frame(t(g$parameters$mean)),
+         `Main profile` = sapply(seq_len(g$G), \(k) names(which.max(table(retained_names[g$classification == k])))),
+         `Profiles (n)` = sapply(seq_len(g$G), \(k) { t <- sort(table(retained_names[g$classification == k]), decreasing = TRUE); paste0(names(t), " (", t, ")", collapse = ", ") }))
+}
+gmm_profiles <- bind_rows(gmm_components(gmm_best, paste0(gmm_best$modelName, ", ", gmm_best$G, " components (best BIC)")),
+                          gmm_components(gmm_vvi5, "VVI, 5 components"))
+knitr::kable(gmm_profiles, format = "pipe", digits = 2, caption = "Components of the best mixture and of the five-component VVI mixture, with the retained profiles they hold")
+# Share of each retained profile in its main VVI component
+gmm_summary <- tibble(
+  `Best model` = gmm_best$modelName, `Best G` = gmm_best$G,
+  `ARI best with profiles` = mclust::adjustedRandIndex(retained_names, gmm_best$classification),
+  `Mean posterior (best)` = mean(apply(gmm_best$z, 1, max)),
+  `ARI VVI-5 with profiles` = mclust::adjustedRandIndex(retained_names, gmm_vvi5$classification),
+  `Best G within VVI` = with(filter(gmm_fit, Model == "VVI"), G[which.max(BIC)]),
+  `Profiles recovered by VVI-5` = sum(sapply(unique(retained_names), \(p) {
+    main <- names(which.max(table(gmm_vvi5$classification[retained_names == p])))
+    mean(gmm_vvi5$classification[retained_names == p] == main) > 0.5 &&
+      names(which.max(table(retained_names[gmm_vvi5$classification == as.integer(main)]))) == p
+  }))
+)
+knitr::kable(gmm_summary, format = "pipe", digits = 2, caption = "Gaussian mixtures against the retained profiles")
+```
+
+#### Groups or a Continuum?
+
+```{r}
+#| label: cluster_null
+#| warning: false
+
+# Do the facet scores fall into groups, or vary along a continuum? The same
+# diagnostics on data without groups: 10 datasets simulated from a Gaussian
+# copula with the facet scores' marginal distributions (empirical quantiles,
+# including the floor of Slow Science) and rank correlations, i.e., a single
+# continuous cloud. Compared with the observed data: the votes of the indices for
+# the number of clusters (as in rez_nclust), the average silhouette width and
+# the bootstrap stability (as in cluster_stability, 30 resamples) of the k-means
+# solutions
+null_cloud <- \(seed) {
+  set.seed(seed)
+  normal_scores <- apply(z, 2, \(x) qnorm(rank(x, ties.method = "random") / (nrow(z) + 1)))
+  sim <- MASS::mvrnorm(nrow(z), rep(0, ncol(z)), cor(normal_scores))
+  out <- sapply(seq_len(ncol(z)), \(j) quantile(z[, j], pnorm(sim[, j]), type = 1, names = FALSE))
+  `colnames<-`(out, colnames(z))
+}
+null_sets <- lapply(1:10, \(i) null_cloud(100 + i))
+best_kmeans <- \(x, k, nstart = 50) { set.seed(123); kmeans(x, k, nstart = nstart, iter.max = 100)$cluster }
+silhouette_width <- \(x, cl) mean(cluster::silhouette(cl, dist(x))[, 3])
+boot_ari <- \(x, k, B = 30) {
+  full <- best_kmeans(x, k)
+  median(replicate(B, mclust::adjustedRandIndex(
+    full, nearest(x, kmeans(x[sample(nrow(x), replace = TRUE), ], k, nstart = 20, iter.max = 100)$centers))))
+}
+
+count_votes <- \(r) as.integer(table(factor(as.data.frame(r)$n_Clusters, levels = 1:10)))
+null_votes <- sapply(null_sets, \(x) { set.seed(123); count_votes(suppressWarnings(n_clusters(as.data.frame(x), package = "NbClust"))) })
+cluster_null_votes <- tibble(Clusters = 1:10, Observed = count_votes(rez_nclust),
+                             `Without groups (mean)` = rowMeans(null_votes),
+                             `Without groups (min)` = apply(null_votes, 1, min),
+                             `Without groups (max)` = apply(null_votes, 1, max))
+knitr::kable(cluster_null_votes, format = "pipe", digits = 1,
+             caption = "Number of indices favouring each number of clusters: observed vs. 10 simulated datasets without groups")
+
+cluster_null_fit <- map_dfr(2:6, \(k) {
+  sil_null <- sapply(null_sets, \(x) silhouette_width(x, best_kmeans(x, k)))
+  ari_null <- sapply(null_sets, \(x) boot_ari(x, k))
+  tibble(Clusters = k,
+         `Silhouette (observed)` = silhouette_width(z, best_kmeans(z, k, nstart = 200)),
+         `Silhouette (without groups, mean)` = mean(sil_null),
+         `Silhouette (without groups, max)` = max(sil_null),
+         `Bootstrap ARI (observed)` = cluster_stability$`Median ARI`[cluster_stability$Clusters == k],
+         `Bootstrap ARI (without groups, median)` = median(ari_null),
+         `Bootstrap ARI (without groups, min)` = min(ari_null),
+         `Bootstrap ARI (without groups, max)` = max(ari_null))
+})
+knitr::kable(cluster_null_fit, format = "pipe", digits = 2,
+             caption = "Average silhouette width and bootstrap stability (median ARI) of the k-means solutions: observed vs. 10 simulated datasets without groups")
+```
+
+#### Nested Solutions
+
+```{r}
+#| label: profile_nesting
+#| cache: false
+
+# Which profiles do the k-means solutions with 2 to 6 clusters separate? Number
+# of participants of each profile in each cluster (clusters lettered by size).
+# Uncached: the profile names come from profile_key
+profile_nesting <- map_dfr(2:6, \(k) {
+  set.seed(123)
+  cl <- predict(cluster_analysis(cluster_data, n = k, method = "kmeans", nstart = 200))
+  tibble(Clusters = k, Cluster = LETTERS[match(cl, names(sort(table(cl), decreasing = TRUE)))],
+         Profile = factor(profile_name(df_resprac_fac$Profile), levels = profile_key$Name)) |>
+    count(Clusters, Cluster, Profile) |>
+    pivot_wider(names_from = Profile, values_from = n, values_fill = 0, names_sort = TRUE) |>
+    mutate(N = rowSums(pick(any_of(profile_key$Name))), .after = Cluster)
+})
+knitr::kable(profile_nesting, format = "pipe", caption = "Five profiles (columns) within the k-means solutions with 2 to 6 clusters")
+```
+
+#### Two and Three Clusters
+
+```{r}
+#| label: clusters_alternative
+
+# The methods for choosing the number of clusters favoured two or three. What do
+# they correspond to? Means of the facets in the two- and three-cluster k-means
+# solutions (clusters lettered by size), how they regroup the five profiles, and
+# their composition by gender and career stage
+alt_clusters <- map(c("Two clusters" = 2, "Three clusters" = 3), \(k) {
+  set.seed(123)
+  cl <- predict(cluster_analysis(cluster_data, n = k, method = "kmeans", nstart = 200))
+  LETTERS[match(cl, names(sort(table(cl), decreasing = TRUE)))]
+})
+alt_means <- imap_dfr(alt_clusters, \(cl, solution) {
+  cluster_data |>
+    mutate(Cluster = cl) |>
+    summarise(N = n(), across(all_of(cluster_vars), mean), .by = Cluster) |>
+    arrange(Cluster) |>
+    mutate(Solution = solution, .before = 1)
+})
+knitr::kable(alt_means, format = "pipe", digits = 2, caption = "Mean facet scores of the two- and three-cluster solutions")
+
+alt_profiles <- imap_dfr(alt_clusters, \(cl, solution) {
+  tibble(Solution = solution, Cluster = cl, Profile = profile_name(df_resprac_fac$Profile)) |>
+    count(Solution, Cluster, Profile) |>
+    pivot_wider(names_from = Profile, values_from = n, values_fill = 0)
+})
+knitr::kable(alt_profiles, format = "pipe", caption = "Five profiles (columns) within the two- and three-cluster solutions")
+
+alt_composition <- imap_dfr(alt_clusters, \(cl, solution) {
+  tibble(Solution = solution, Cluster = cl, Gender = df$Dem_Gender, Stage = as.character(df$Work_Career_Stage), Age = df$Dem_Age) |>
+    summarise(N = n(), `Women (%)` = 100 * mean(Gender == "Female"), `Mean age` = mean(Age, na.rm = TRUE),
+              `PhD / Student (%)` = 100 * mean(Stage == "PhD / Student", na.rm = TRUE),
+              `Non-permanent (%)` = 100 * mean(Stage == "Non-permanent", na.rm = TRUE),
+              `Permanent (%)` = 100 * mean(Stage == "Permanent", na.rm = TRUE), .by = c(Solution, Cluster)) |>
+    arrange(Cluster)
+})
+knitr::kable(alt_composition, format = "pipe", digits = 1, caption = "Composition of the two- and three-cluster solutions")
+
+p_alt_clusters <- alt_means |>
+  pivot_longer(all_of(cluster_vars), names_to = "Facet", values_to = "Mean") |>
+  mutate(Facet = factor(str_replace(Facet, "_", " "), levels = c("Open Science", "Rigorous Science", "Slow Science", "Green Science", "Ethical Science"))) |>
+  ggplot(aes(x = Facet, y = Mean, fill = Facet)) +
+  geom_col() +
+  geom_hline(yintercept = 0) +
+  facet_wrap(~ Solution + Cluster, nrow = 2, labeller = labeller(Cluster = \(x) paste("Cluster", x))) +  # No empty panel (no cluster C in the two-cluster solution)
+  scale_fill_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
+                               "Slow Science" = "#FF9800", "Ethical Science" = "#9C27B0"), guide = "none") +
+  labs(y = "Mean facet score", x = NULL, title = "Two- and Three-Cluster Solutions") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+p_alt_clusters
+```
+
+#### Profile Characteristics
+
+```{r}
+#| label: profile_correlates
+#| cache: false
+
+# Who belongs to each profile, beyond the facets that define it: demographics,
+# career, training, use of and plans for the practices, levers, quality criteria
+# and slow science measures. The basis of the profile names, and of hypotheses
+# in the Discussion (descriptive, not modelled). Uncached: the names come from
+# profile_key. Percentages are of each profile; ratings on 0-100
+pct_of <- \(x) 100 * mean(x, na.rm = TRUE)
+profile_correlates <- df |>
+  mutate(Name = factor(profile_name(df_resprac_fac$Profile), levels = profile_key$Name)) |>
+  summarise(
+    N = n(),
+    `Median age` = median(Dem_Age, na.rm = TRUE),
+    `Women (%)` = pct_of(Dem_Gender == "Female"),
+    `Men (%)` = pct_of(Dem_Gender == "Male"),
+    `PhD / Student (%)` = pct_of(Work_Career_Stage == "PhD / Student"),
+    `Permanent (%)` = pct_of(Work_Career_Stage == "Permanent"),
+    `No publication (%)` = pct_of(Work_Publication == "No"),
+    `Social sciences (%)` = pct_of(Work_Discipline == "Social Sciences & Humanities"),
+    `Life sciences (%)` = pct_of(Work_Discipline == "Life Sciences"),
+    `Physical sciences (%)` = pct_of(Work_Discipline == "Physical Sciences & Engineering"),
+    `France (%)` = pct_of(clean_country(Work_Country) %in% "France"),
+    `OS training (%)` = pct_of(OS_Workshops == 1),
+    `SS training (%)` = pct_of(SS_Workshops == 1),
+    `Not familiar with slow science (%)` = pct_of(SS_Familiar == 0),
+    `Preregistration used (%)` = pct_of(OS_Study_Preregistration == 1),
+    `Preregistration planned (%)` = pct_of(round(OS_Study_Preregistration * 3) == 2),
+    `Registered reports planned (%)` = pct_of(round(OS_Registered_Reports * 3) == 2),
+    `Preregistration or registered reports unknown (%)` = pct_of(OS_Study_Preregistration == 0 | OS_Registered_Reports == 0),
+    `Lever: support from seniors (%)` = pct_of(OS_Help_Support_Seniors == 1),
+    `Lever: training (%)` = pct_of(OS_Help_Training == 1),
+    `Criterion: high impact factor (%)` = pct_of(`Work_Criteria_quality_science_high-IF` == "Yes"),
+    `Criterion: originality (%)` = pct_of(Work_Criteria_quality_science_Originality == "Yes"),
+    `Criterion: significance (%)` = pct_of(Work_Criteria_quality_science_Significance == "Yes"),
+    `Criterion: environmental impact (%)` = pct_of(`Work_Criteria_quality_science_Environmental-impact` == "Yes"),
+    `Limiting publications not feasible (%)` = pct_of(SS_Limit_publication_Not_Feasible == 1),
+    `One publication per year not feasible (%)` = pct_of(SS_Onepublication_Not_Feasible == 1),
+    `Changed research practices (green)` = 100 * mean(GS_Changes_practices, na.rm = TRUE),
+    `Willing to change practices (green)` = 100 * mean(GS_Change_practices_agreeing, na.rm = TRUE),
+    `Importance of team diversity` = 100 * mean(ES_Importance_research_team, na.rm = TRUE),
+    .by = Name) |>
+  arrange(Name) |>
+  pivot_longer(-Name, names_to = "Characteristic", values_to = "Value")
+profile_correlates |>
+  pivot_wider(names_from = Name, values_from = Value) |>
+  knitr::kable(format = "pipe", digits = 0, caption = "Characteristics of the profiles (not used to define them)")
+
+# Is a profile's unfamiliarity with slow science only a matter of career stage?
+profile_ss_stage <- df |>
+  mutate(Name = factor(profile_name(df_resprac_fac$Profile), levels = profile_key$Name)) |>
+  filter(!is.na(Work_Career_Stage)) |>
+  summarise(N = n(), `Not familiar with slow science (%)` = pct_of(SS_Familiar == 0), .by = c(Name, Work_Career_Stage)) |>
+  arrange(Name, Work_Career_Stage)
+profile_ss_stage |>
+  pivot_wider(names_from = Work_Career_Stage, values_from = c(N, `Not familiar with slow science (%)`), names_glue = "{Work_Career_Stage}: {.value}") |>
+  knitr::kable(format = "pipe", digits = 0, caption = "Unfamiliarity with slow science by profile and career stage")
 ```
 
 ### Predictors
@@ -2245,15 +2897,7 @@ run_models <- function(dat = data, f = "~ Dem_Gender * poly(Dem_Age, 2)", means=
     priors <- brms::set_prior("normal(0, 1)", class = "b", coef = params) |>
       brms::validate_prior(m_f, data = dat_m)
     
-    m <- brms::brm(m_f,
-                   data = dat_m,
-                   refresh =  0,
-                   prior = priors,
-                   draws = 3000,
-                   single_path_draws  = 3000,
-                   backend = "cmdstanr",
-                   algorithm = "pathfinder",
-                   seed = 123)
+    m <- fit_brm(m_f, data = dat_m, prior = priors)
     models[[outcome]] <- m
     
     pred <- rbind(pred, mutate(estimate_relation(m, length = 40), Outcome = str_replace(outcome, "_", " ")))
@@ -2266,14 +2910,14 @@ run_models <- function(dat = data, f = "~ Dem_Gender * poly(Dem_Age, 2)", means=
 }
  
 
-rez <- data |>
+rez_age <- data |>
   mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |>
   filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 65) |> 
   run_models(f = "~ Dem_Gender * poly(Dem_Age, 2)", means="Dem_Gender")
 
 
 
-p_resval_pred1 <- rez$pred |>
+p_resval_pred1 <- rez_age$pred |>
   ggplot(aes(x = Dem_Age, y = Predicted)) +
   geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill=Outcome,
                   group = interaction(Dem_Gender, Outcome)), alpha = 0.1) +
@@ -2282,10 +2926,10 @@ p_resval_pred1 <- rez$pred |>
     mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |>
     filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 65), aes(linetype = Dem_Gender),
     show.legend = FALSE) +
-  ggside::geom_ysidesegment(data=rez$mmeans, aes(x = Dem_Gender, xend = Dem_Gender, 
+  ggside::geom_ysidesegment(data=rez_age$mmeans, aes(x = Dem_Gender, xend = Dem_Gender, 
                                                  y = CI_low, yend = CI_high, color = Outcome,
                                                  linetype = Dem_Gender), linewidth = 0.5) +
-  ggside::geom_ysidepoint(data = rez$mmeans, 
+  ggside::geom_ysidepoint(data = rez_age$mmeans, 
                             aes(x = Dem_Gender, y = Median, color = Outcome)) +
   scale_linetype_manual(values = c("longdash", "solid")) +
   scale_colour_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
@@ -2308,28 +2952,28 @@ p_resval_pred1
 #| echo: false
 #| cache: false
 
-make_markdown(model_tables(rez$tables), "Research values by gender and age")
+make_markdown(model_tables(rez_age$tables), "Research values by gender and age")
 ```
 
 #### Carrer worry
 
 
 ```{r}
-rez <- data |>
+rez_worry <- data |>
   run_models(f = "~ Work_Career_Stage * poly(WB_Carrer_worry, 2)", means="Work_Career_Stage",
              at = "WB_Carrer_worry=c(0, 0.25, 0.5, 0.75, 1)")
 
-p_resval_pred2 <- rez$pred |>
+p_resval_pred2 <- rez_worry$pred |>
   ggplot(aes(x = WB_Carrer_worry, y = Predicted)) +
   geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill=Outcome,
                   group = interaction(Work_Career_Stage, Outcome)), alpha = 0.1) +
   geom_line(aes(color=Outcome, linetype = Work_Career_Stage), linewidth = 1) +
   ggside::geom_xsidedensity(data = filter(data, !is.na(Work_Career_Stage)), aes(linetype = Work_Career_Stage),
     show.legend = FALSE) +
-  ggside::geom_ysidesegment(data=rez$mmeans, aes(x = Work_Career_Stage, xend = Work_Career_Stage, 
+  ggside::geom_ysidesegment(data=rez_worry$mmeans, aes(x = Work_Career_Stage, xend = Work_Career_Stage, 
                                                  y = CI_low, yend = CI_high, color = Outcome,
                                                  linetype = Work_Career_Stage), linewidth = 0.5) +
-  ggside::geom_ysidepoint(data = rez$mmeans, 
+  ggside::geom_ysidepoint(data = rez_worry$mmeans, 
                             aes(x = Work_Career_Stage, y = Median, color = Outcome)) +
   scale_linetype_manual(values = c("dotted", "longdash", "solid")) +
   scale_colour_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
@@ -2353,27 +2997,27 @@ p_resval_pred2
 #| echo: false
 #| cache: false
 
-make_markdown(model_tables(rez$tables), "Research values by career stage and career worry")
+make_markdown(model_tables(rez_worry$tables), "Research values by career stage and career worry")
 ```
 
 #### Research Time
 
 ```{r}
-rez <- data |>
+rez_time <- data |>
   run_models(f = "~ Work_Career_Stage * poly(WB_Time_research, 2)", means="Work_Career_Stage",
              at = "WB_Time_research=c(0, 0.25, 0.5, 0.75, 1)")
 
-p_resval_pred3 <- rez$pred |>
+p_resval_pred3 <- rez_time$pred |>
   ggplot(aes(x = WB_Time_research, y = Predicted)) +
   geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill=Outcome,
                   group = interaction(Work_Career_Stage, Outcome)), alpha = 0.1) +
   geom_line(aes(color=Outcome, linetype = Work_Career_Stage), linewidth = 1) +
   ggside::geom_xsidedensity(data = filter(data, !is.na(Work_Career_Stage)), aes(linetype = Work_Career_Stage),
     show.legend = FALSE) +
-  ggside::geom_ysidesegment(data=rez$mmeans, aes(x = Work_Career_Stage, xend = Work_Career_Stage, 
+  ggside::geom_ysidesegment(data=rez_time$mmeans, aes(x = Work_Career_Stage, xend = Work_Career_Stage, 
                                                  y = CI_low, yend = CI_high, color = Outcome,
                                                  linetype = Work_Career_Stage), linewidth = 0.5) +
-  ggside::geom_ysidepoint(data = rez$mmeans, 
+  ggside::geom_ysidepoint(data = rez_time$mmeans, 
                             aes(x = Work_Career_Stage, y = Median, color = Outcome)) +
   scale_linetype_manual(values = c("dotted", "longdash", "solid")) +
   scale_colour_manual(values = c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Green Science" = "#4CAF50",
@@ -2397,9 +3041,744 @@ p_resval_pred3
 #| echo: false
 #| cache: false
 
-make_markdown(model_tables(rez$tables), "Research values by career stage and research time")
+make_markdown(model_tables(rez_time$tables), "Research values by career stage and research time")
 ```
 
+## Career Stage, Training, Discipline and Country
+
+Analyses added on 2026-09-30 to test the preregistered hypotheses stated in the manuscript's introduction (knowledge, training and adoption of open science by career stage; barriers by career stage and contract) and to check the main confounds of the facet models (discipline, precariousness), the validity of the facets and the comparability of the sample with other countries. All models are Bayesian (brms, MCMC as above); the Bernoulli models take a normal(0, 2.5) prior on the coefficients, the Gaussian ones the brms defaults. Whether these results go in the paper's body or stay here as supporting evidence is decided afterwards.
+
+### Careless Responding
+
+```{r}
+#| label: careless
+
+# Completion time and straightlining, as screens for careless responding. Nobody
+# is excluded: the share of suspicious cases is reported
+time_min <- df$Time / 60
+slider_sd <- apply(select(df_resprac, -all_of(names(practice_items))), 1, sd, na.rm = TRUE)
+careless <- tibble(`Median time (min)` = median(time_min),
+                   `IQR` = paste(round(quantile(time_min, c(0.25, 0.75)), 1), collapse = "-"),
+                   `< 5 min (%)` = 100 * mean(time_min < 5), `< 6 min (%)` = 100 * mean(time_min < 6),
+                   `Sliders SD < .05 (%)` = 100 * mean(slider_sd < 0.05, na.rm = TRUE))
+knitr::kable(careless, format = "pipe", digits = 1, caption = "Completion time and straightlining on the 11 sliders of the four movements")
+```
+
+### Knowledge and Training by Career Stage (H1)
+
+```{r}
+#| label: h1_knowledge
+
+# H1: early-career researchers report more knowledge of, and training in, open
+# science than senior researchers
+data_stage <- filter(data, !is.na(Work_Career_Stage))
+stage_levels <- levels(data_stage$Work_Career_Stage)
+prior_b <- brms::set_prior("normal(0, 2.5)", class = "b")
+
+h1_desc <- data_stage |>
+  summarise(N = n(),
+            `OS familiarity` = mean(OS_Familiar), `OS importance` = mean(OS_Importance), `OS training (%)` = 100 * mean(OS_Workshops),
+            `SS familiarity` = mean(SS_Familiar), `SS importance` = mean(SS_Importance), `SS training (%)` = 100 * mean(SS_Workshops, na.rm = TRUE),
+            .by = Work_Career_Stage) |>
+  arrange(Work_Career_Stage)
+knitr::kable(h1_desc, format = "pipe", digits = 2, caption = "Familiarity (0-1), importance (0-1) and training, by career stage")
+
+h1_outcomes <- c("OS familiarity" = "OS_Familiar", "OS importance" = "OS_Importance", "OS training" = "OS_Workshops",
+                 "SS familiarity" = "SS_Familiar", "SS training" = "SS_Workshops")
+m_h1 <- imap(h1_outcomes, \(v, label) {
+  d <- drop_na(data_stage, all_of(v))
+  if (all(d[[v]] %in% 0:1)) fit_brm(as.formula(paste(v, "~ Work_Career_Stage")), d, family = bernoulli(), prior = prior_b)
+  else fit_brm(as.formula(paste(v, "~ Work_Career_Stage")), d)
+})
+summarise_stage <- \(models) {
+  list(
+    means = imap_dfr(models, \(m, label) mutate(as.data.frame(estimate_means(m, by = "Work_Career_Stage")), Outcome = label, .before = 1)),
+    contrasts = imap_dfr(models, \(m, label) mutate(as.data.frame(estimate_contrasts(m, contrast = "Work_Career_Stage")), Outcome = label, .before = 1)),
+    mcmc = imap_dfr(models, \(m, label) mutate(mcmc_info(m), Outcome = label, .before = 1))
+  )
+}
+format_stage <- \(s) {
+  list(
+    "Marginal means" = transmute(s$means, Outcome, Work_Career_Stage, `Median [95% CI]` = format_estimate(Median, CI_low, CI_high)),
+    "Contrasts" = transmute(s$contrasts, Outcome, Contrast = paste(Level1, "-", Level2),
+                            `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
+    "MCMC diagnostics" = s$mcmc
+  )
+}
+h1 <- summarise_stage(m_h1)
+knitr::kable(format_stage(h1)$Contrasts, format = "pipe", caption = "H1: differences between career stages (probability or 0-1 scale)")
+```
+
+```{r}
+#| label: md_h1
+#| echo: false
+#| cache: false
+
+make_markdown(format_stage(h1), "H1: knowledge and training by career stage")
+```
+
+### Adoption by Career Stage (H2)
+
+```{r}
+#| label: h2_adoption
+#| fig-width: 10
+#| fig-height: 5
+
+# H2: the difference in knowledge and training does not extend to adoption. Use
+# of each practice by career stage ("I know it and I used it"), also counting
+# planned use, and among participants with publications only (open access and
+# open materials/data presuppose something to publish or share)
+practice_long <- data_stage |>
+  select(id_Response_ID, Work_Career_Stage, Work_Publication, Work_Discipline, all_of(unname(practice_items))) |>
+  pivot_longer(all_of(unname(practice_items)), names_to = "Practice", values_to = "Engagement") |>
+  mutate(Practice = str_remove(names(practice_items)[match(Practice, practice_items)], "Endorsement - "),
+         Used = as.numeric(Engagement == 1), Used_or_planned = as.numeric(Engagement >= 2/3), Unfamiliar = as.numeric(Engagement == 0))
+h2_desc <- practice_long |>
+  summarise(`Used (%)` = 100 * mean(Used), `Used or planned (%)` = 100 * mean(Used_or_planned), `Unfamiliar (%)` = 100 * mean(Unfamiliar),
+            `Used, with publications (%)` = 100 * mean(Used[Work_Publication == "Yes"]),
+            .by = c(Practice, Work_Career_Stage)) |>
+  arrange(Practice, Work_Career_Stage)
+knitr::kable(h2_desc, format = "pipe", digits = 0, caption = "Use of each open science practice by career stage")
+
+practices <- unique(practice_long$Practice)
+m_h2 <- map(setNames(practices, practices), \(p) {
+  fit_brm(Used ~ Work_Career_Stage, filter(practice_long, Practice == p), family = bernoulli(), prior = prior_b)
+})
+h2 <- summarise_stage(m_h2)
+knitr::kable(format_stage(h2)$Contrasts, format = "pipe", caption = "H2: differences in the probability of having used each practice between career stages")
+
+p_h2 <- h2$means |>
+  mutate(Outcome = factor(Outcome, levels = practices), Work_Career_Stage = factor(Work_Career_Stage, levels = stage_levels)) |>
+  ggplot(aes(x = Outcome, y = Median, colour = Work_Career_Stage)) +
+  geom_pointrange(aes(ymin = CI_low, ymax = CI_high), position = position_dodge(width = 0.6)) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_colour_manual(values = c("PhD / Student" = "#FF7043", "Non-permanent" = "#7E57C2", "Permanent" = "#26A69A")) +
+  labs(x = NULL, y = "Probability of having used the practice", colour = "Career stage", title = "Adoption of Open Science Practices by Career Stage") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+p_h2
+```
+
+```{r}
+#| label: md_h2
+#| echo: false
+#| cache: false
+
+make_markdown(format_stage(h2), "H2: adoption by career stage")
+```
+
+### Levers and Barriers by Career Stage (H3, H4)
+
+```{r}
+#| label: h3_levers
+#| fig-width: 10
+#| fig-height: 6
+
+# H3: time and institutional support are the most selected levers (see the Open
+# Science section for the whole sample). H4: levers related to time and evaluation
+# pressure (time, workload, recognition in promotion and recruitment) are more
+# selected by non-permanent researchers than by permanent staff. One Bernoulli
+# model per lever; the two rarest answers (nothing would help, no plan to use
+# open science) are only described
+help_items <- c("More information" = "OS_Help_More_Information", "Training" = "OS_Help_Training",
+                "Ethical issues" = "OS_Help_Ethical_Issues", "Infrastructure" = "OS_Help_Infrastructure",
+                "Time" = "OS_Help_Time", "Reduced workload" = "OS_Help_Workload", "Funding" = "OS_Help_Funding",
+                "Incentives (funders, institutions)" = "OS_Help_Incentives_Fund_Institutions",
+                "Recognition (promotion, recruitment)" = "OS_Help_Recognition_Promotion_Recruitment",
+                "Support from seniors" = "OS_Help_Support_Seniors", "Support from juniors" = "OS_Help_Support_Juniors",
+                "Positive beliefs" = "OS_Help_Positive_Beliefs", "No plan to use OS" = "OS_Help_No_Plan_Use_OS", "Nothing" = "OS_Help_Nothing")
+help_long <- data_stage |>
+  select(id_Response_ID, Work_Career_Stage, all_of(unname(help_items))) |>
+  pivot_longer(all_of(unname(help_items)), names_to = "Lever", values_to = "Selected") |>
+  mutate(Lever = names(help_items)[match(Lever, help_items)])
+h3_desc <- help_long |>
+  summarise(`Selected (%)` = 100 * mean(Selected, na.rm = TRUE), .by = c(Lever, Work_Career_Stage)) |>
+  pivot_wider(names_from = Work_Career_Stage, values_from = `Selected (%)`) |>
+  mutate(All = 100 * colMeans(data_stage[help_items[Lever]], na.rm = TRUE)) |>
+  arrange(desc(All))
+knitr::kable(h3_desc, format = "pipe", digits = 0, caption = "Levers that would help adopting open science practices (% selecting each), by career stage")
+
+levers_modelled <- setdiff(names(help_items), c("No plan to use OS", "Nothing"))
+m_h3 <- map(setNames(levers_modelled, levers_modelled), \(l) {
+  fit_brm(Selected ~ Work_Career_Stage, drop_na(filter(help_long, Lever == l), Selected), family = bernoulli(), prior = prior_b)
+})
+h3 <- summarise_stage(m_h3)
+knitr::kable(format_stage(h3)$Contrasts |> filter(str_detect(Contrast, "Permanent")), format = "pipe",
+             caption = "H4: differences in the probability of selecting each lever, contrasts involving permanent staff")
+
+p_h3 <- h3$means |>
+  mutate(Outcome = factor(Outcome, levels = h3_desc$Lever), Work_Career_Stage = factor(Work_Career_Stage, levels = stage_levels)) |>
+  ggplot(aes(x = Outcome, y = Median, colour = Work_Career_Stage)) +
+  geom_pointrange(aes(ymin = CI_low, ymax = CI_high), position = position_dodge(width = 0.6)) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_colour_manual(values = c("PhD / Student" = "#FF7043", "Non-permanent" = "#7E57C2", "Permanent" = "#26A69A")) +
+  labs(x = NULL, y = "Probability of selecting the lever", colour = "Career stage", title = "Levers for Adopting Open Science by Career Stage") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+p_h3
+```
+
+```{r}
+#| label: md_h3
+#| echo: false
+#| cache: false
+
+make_markdown(format_stage(h3), "H3-H4: levers by career stage")
+```
+
+### Training and the Facets
+
+```{r}
+#| label: training_facets
+
+# Does training account for the career stage differences in the facets? Each facet
+# is modelled on career stage, without and with training in open science and in
+# slow science; the stage contrasts are compared, and the training effects reported
+facet_outcomes <- c("Open_Science", "Rigorous_Science", "Slow_Science", "Green_Science", "Ethical_Science")
+facet_label <- \(x) str_replace(x, "_", " ")
+data_training <- drop_na(data_stage, OS_Workshops, SS_Workshops)
+m_train <- map(setNames(facet_outcomes, facet_label(facet_outcomes)), \(o) list(
+  "Career stage" = fit_brm(as.formula(paste(o, "~ Work_Career_Stage")), data_training),
+  "Career stage + training" = fit_brm(as.formula(paste(o, "~ Work_Career_Stage + OS_Workshops + SS_Workshops")), data_training)
+))
+training_contrasts <- imap_dfr(m_train, \(ms, facet) {
+  imap_dfr(ms, \(m, model) {
+    as.data.frame(estimate_contrasts(m, contrast = "Work_Career_Stage")) |>
+      transmute(Facet = facet, Model = model, Contrast = paste(Level1, "-", Level2), `Median [95% CI]` = format_estimate(Median, CI_low, CI_high))
+  })
+}) |>
+  pivot_wider(names_from = Model, values_from = `Median [95% CI]`)
+knitr::kable(training_contrasts, format = "pipe", caption = "Career stage contrasts on the facets, without and with training as covariates")
+training_effects <- imap_dfr(m_train, \(ms, facet) {
+  model_parameters(ms[["Career stage + training"]], component = "conditional") |>
+    as.data.frame() |>
+    filter(str_detect(Parameter, "Workshops")) |>
+    transmute(Facet = facet, Training = ifelse(str_detect(Parameter, "^b_OS"), "Open science", "Slow science"),
+              `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd))
+})
+knitr::kable(training_effects, format = "pipe", caption = "Effect of having attended a training (vs. not) on each facet, adjusted for career stage")
+training_mcmc <- imap_dfr(m_train, \(ms, facet) imap_dfr(ms, \(m, model) mutate(mcmc_info(m), Facet = facet, Model = model, .before = 1)))
+```
+
+```{r}
+#| label: md_training
+#| echo: false
+#| cache: false
+
+make_markdown(list("Stage contrasts" = training_contrasts, "Training effects" = training_effects, "MCMC diagnostics" = training_mcmc),
+              "Training and the facets")
+```
+
+### Robustness to Knowledge and Opportunity
+
+```{r}
+#| label: knowledge_robustness
+#| warning: false
+
+# Robustness checks on knowledge and opportunity (review of 2026-10-03):
+# (1) H1 at the level of practices: unfamiliarity with preregistration and
+#     registered reports by career stage;
+# (2) H2 for the sharing practices among participants with at least one
+#     publication (permanent staff were not asked and count as having published);
+# (3) slow science by career stage among the participants familiar with it
+#     (security vs. longer exposure): the facet, and the importance rating alone;
+# (4) facet differences by career stage and by gender among the participants who
+#     know all eight practices, against all participants, with the same linear
+#     models in both samples (facet ~ career stage; facet ~ gender + age + age^2)
+m_unfamiliar <- map(c("Preregistration" = "Preregistration", "Registered Reports" = "Registered Reports"), \(p) {
+  fit_brm(Unfamiliar ~ Work_Career_Stage, filter(practice_long, Practice == p), family = bernoulli(), prior = prior_b)
+})
+h1_unfamiliar <- summarise_stage(m_unfamiliar)
+knitr::kable(format_stage(h1_unfamiliar)$Contrasts, format = "pipe",
+             caption = "Unfamiliarity with the procedural practices by career stage (differences in probability)")
+
+sharing_practices <- c("Open Access", "Open Data", "Open Materials", "Open Peer Review")
+m_h2_pub <- map(setNames(sharing_practices, sharing_practices), \(p) {
+  fit_brm(Used ~ Work_Career_Stage, filter(practice_long, Practice == p, Work_Publication == "Yes"), family = bernoulli(), prior = prior_b)
+})
+h2_pub <- summarise_stage(m_h2_pub)
+knitr::kable(format_stage(h2_pub)$Contrasts, format = "pipe",
+             caption = "H2 among participants with at least one publication: differences in the probability of having used each sharing practice")
+
+data_ss_familiar <- filter(data_stage, SS_Familiar > 0)
+slow_stage_familiar <- summarise_stage(list(
+  "Slow Science" = fit_brm(Slow_Science ~ Work_Career_Stage, data_ss_familiar),
+  "Importance of slow science" = fit_brm(SS_Importance ~ Work_Career_Stage, data_ss_familiar)
+))
+knitr::kable(format_stage(slow_stage_familiar)$Contrasts, format = "pipe",
+             caption = "Slow science by career stage among the participants familiar with it (facet score; importance on 0-1)")
+
+knows_all_practices <- \(x) rowSums(x[unname(practice_items)] == 0) == 0
+lm_contrasts <- \(m, contrast) {
+  as.data.frame(estimate_contrasts(m, contrast = contrast)) |>
+    transmute(Level1 = as.character(Level1), Level2 = as.character(Level2), Median = Difference, CI_low, CI_high)
+}
+data_gender <- filter(data, Dem_Gender %in% c("Female", "Male"), !is.na(Dem_Age), Dem_Age <= 65) |> mutate(Dem_Gender = factor(Dem_Gender))
+knowers_robustness <- map_dfr(c("All", "Knows all practices"), \(sample) {
+  ds <- if (sample == "All") data_stage else filter(data_stage, knows_all_practices(data_stage))
+  dg <- if (sample == "All") data_gender else filter(data_gender, knows_all_practices(data_gender))
+  map_dfr(setNames(facet_outcomes, facet_label(facet_outcomes)), \(o) bind_rows(
+    mutate(lm_contrasts(lm(as.formula(paste(o, "~ Work_Career_Stage")), ds), "Work_Career_Stage"), Comparison = "Career stage", N = nrow(ds)),
+    mutate(lm_contrasts(lm(as.formula(paste(o, "~ Dem_Gender + poly(Dem_Age, 2)")), dg), "Dem_Gender"), Comparison = "Gender", N = nrow(dg))
+  ), .id = "Facet") |>
+    mutate(Sample = sample, .before = 1)
+})
+knitr::kable(transmute(knowers_robustness, Sample, N, Comparison, Facet, Contrast = paste(Level1, "-", Level2),
+                       `Estimate [95% CI]` = format_estimate(Median, CI_low, CI_high)),
+             format = "pipe", caption = "Facet differences among all participants and among those who know all eight practices (linear models)")
+
+# Standard deviations of the facet scores (to express per-unit slopes per SD)
+facet_sd <- sapply(setNames(facet_outcomes, facet_label(facet_outcomes)), \(o) sd(data_stage[[o]]))
+```
+
+### Discipline
+
+```{r}
+#| label: discipline
+#| fig-width: 10
+#| fig-height: 4
+
+# Half the sample works in the social sciences and humanities, where most of the
+# women are. (1) Facets, familiarity, training and adoption by discipline; (2) the
+# gender and age models refitted with discipline as a covariate: do the gender
+# gaps on Ethical and Green Science survive?
+discipline_desc <- df |>
+  mutate(across(all_of(unname(practice_items)), \(x) 100 * (x == 1))) |>
+  summarise(N = n(), `Women (%)` = 100 * mean(Dem_Gender == "Female"),
+            `OS familiarity` = mean(OS_Familiar), `OS training (%)` = 100 * mean(OS_Workshops),
+            `SS familiarity` = mean(SS_Familiar), `SS training (%)` = 100 * mean(SS_Workshops, na.rm = TRUE),
+            across(all_of(unname(practice_items)), mean),
+            .by = Work_Discipline) |>
+  rename_with(\(n) paste(str_remove(names(practice_items)[match(n, practice_items)], "Endorsement - "), "used (%)"), all_of(unname(practice_items)))
+knitr::kable(discipline_desc, format = "pipe", digits = 1, caption = "Familiarity, training and use of open science practices, by discipline")
+
+m_disc <- map(setNames(facet_outcomes, facet_label(facet_outcomes)), \(o) fit_brm(as.formula(paste(o, "~ Work_Discipline")), data))
+disc_means <- imap_dfr(m_disc, \(m, facet) mutate(as.data.frame(estimate_means(m, by = "Work_Discipline")), Facet = facet, .before = 1))
+disc_contrasts <- imap_dfr(m_disc, \(m, facet) mutate(as.data.frame(estimate_contrasts(m, contrast = "Work_Discipline")), Facet = facet, .before = 1))
+knitr::kable(transmute(disc_contrasts, Facet, Contrast = paste(Level1, "-", Level2), `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
+             format = "pipe", caption = "Differences between disciplines on the facets")
+
+p_disc <- disc_means |>
+  mutate(Facet = factor(Facet, levels = facet_label(facet_outcomes))) |>
+  ggplot(aes(x = Facet, y = Median, colour = Work_Discipline)) +
+  geom_pointrange(aes(ymin = CI_low, ymax = CI_high), position = position_dodge(width = 0.5)) +
+  geom_hline(yintercept = 0, linetype = "dotted") +
+  labs(x = NULL, y = "Facet score (marginal mean)", colour = "Discipline", title = "Facets by Discipline") +
+  theme_minimal()
+p_disc
+
+# (2) Gender gap at the mean age, with and without discipline
+data_age <- data |>
+  mutate(Dem_Age = ifelse(is.na(Dem_Age), mean(df$Dem_Age, na.rm = TRUE), Dem_Age)) |>
+  filter(Dem_Gender %in% c("Female", "Male"), Dem_Age <= 65)
+m_gender_disc <- map(setNames(facet_outcomes, facet_label(facet_outcomes)), \(o) {
+  m_f <- brms::bf(as.formula(paste(o, "~ Dem_Gender * poly(Dem_Age, 2) + Work_Discipline")))
+  params <- get_prior(m_f, data = data_age)$coef
+  priors <- brms::set_prior("normal(0, 1)", class = "b", coef = params[str_ends(params, "22")]) |> brms::validate_prior(m_f, data = data_age)
+  fit_brm(m_f, data_age, prior = priors)
+})
+gender_gap <- bind_rows(
+  bind_rows(lapply(rez_age$tables, `[[`, "contrasts")) |> transmute(Facet = Outcome, Model = "Gender x age", Median, CI_low, CI_high),
+  imap_dfr(m_gender_disc, \(m, facet) mutate(as.data.frame(estimate_contrasts(m, contrast = "Dem_Gender")), Facet = facet, Model = "Gender x age + discipline"))
+) |>
+  transmute(Facet, Model, `Men - women [95% CI]` = format_estimate(Median, CI_low, CI_high)) |>
+  pivot_wider(names_from = Model, values_from = `Men - women [95% CI]`)
+knitr::kable(gender_gap, format = "pipe", caption = "Gender gap on the facets at the mean age, without and with discipline as a covariate")
+disc_mcmc <- bind_rows(imap_dfr(m_disc, \(m, facet) mutate(mcmc_info(m), Model = paste(facet, "~ discipline"), .before = 1)),
+                       imap_dfr(m_gender_disc, \(m, facet) mutate(mcmc_info(m), Model = paste(facet, "~ gender x age + discipline"), .before = 1)))
+```
+
+```{r}
+#| label: md_discipline
+#| echo: false
+#| cache: false
+
+make_markdown(list("Descriptives" = discipline_desc,
+                   "Marginal means" = transmute(disc_means, Facet, Work_Discipline, `Median [95% CI]` = format_estimate(Median, CI_low, CI_high)),
+                   "Contrasts" = transmute(disc_contrasts, Facet, Contrast = paste(Level1, "-", Level2), `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd)),
+                   "Gender gap" = gender_gap, "MCMC diagnostics" = disc_mcmc), "Discipline")
+```
+
+### Precariousness
+
+```{r}
+#| label: precariousness
+
+# The introduction promises to separate career stage from precariousness. Among
+# the researchers without a permanent position, the estimated probability of
+# obtaining one (0-1) is the direct measure; the intention to pursue an academic
+# career is described alongside
+data_precarious <- filter(data_stage, Work_Career_Stage != "Permanent", !is.na(Work_Probability_permanent_position)) |>
+  mutate(Work_Career_Stage = droplevels(Work_Career_Stage))
+precarious_desc <- data_precarious |>
+  summarise(N = n(), `P(permanent) mean` = mean(Work_Probability_permanent_position), `Career worry mean` = mean(WB_Carrer_worry),
+            `r (P(permanent), worry)` = cor(Work_Probability_permanent_position, WB_Carrer_worry), .by = Work_Career_Stage)
+knitr::kable(precarious_desc, format = "pipe", digits = 2, caption = "Perceived probability of a permanent position and career worry, non-permanent researchers")
+m_prec <- map(setNames(facet_outcomes, facet_label(facet_outcomes)), \(o) {
+  fit_brm(as.formula(paste(o, "~ Work_Career_Stage + Work_Probability_permanent_position")), data_precarious)
+})
+prec_slopes <- imap_dfr(m_prec, \(m, facet) {
+  model_parameters(m, component = "conditional") |>
+    as.data.frame() |>
+    filter(str_detect(Parameter, "Probability")) |>
+    transmute(Facet = facet, `Slope of P(permanent), 0 to 1 [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd))
+})
+knitr::kable(prec_slopes, format = "pipe", caption = "Effect of the perceived probability of a permanent position on each facet, adjusted for career stage (non-permanent researchers)")
+pursue_desc <- data_stage |>
+  filter(Work_Pursue_career %in% c("Yes", "No", "I don't know")) |>
+  summarise(N = n(), across(all_of(facet_outcomes), mean), .by = Work_Pursue_career) |>
+  rename_with(facet_label)
+knitr::kable(pursue_desc, format = "pipe", digits = 2, caption = "Mean facet scores by intention to pursue an academic career (non-permanent researchers)")
+prec_mcmc <- imap_dfr(m_prec, \(m, facet) mutate(mcmc_info(m), Facet = facet, .before = 1))
+```
+
+```{r}
+#| label: md_precariousness
+#| echo: false
+#| cache: false
+
+make_markdown(list("Descriptives" = precarious_desc, "Slopes" = prec_slopes, "Intention to pursue" = pursue_desc, "MCMC diagnostics" = prec_mcmc), "Precariousness")
+```
+
+### Alignment and Well-being as Outcomes
+
+```{r}
+#| label: wellbeing_outcomes
+
+# Do researchers who endorse the reforms feel more, or less, aligned and
+# fulfilled? Each well-being rating (0-1) is modelled on the five facets and
+# career stage; coefficients are per unit of facet score
+wb_outcomes <- c("Alignment of practices with principles" = "WB_Alignment", "Fulfilment" = "WB_Fulfilled",
+                 "Work-life satisfaction" = "WB_Satisfaction_work_personal", "Enough time for research" = "WB_Time_research",
+                 "Career worry" = "WB_Carrer_worry",
+                 "Satisfaction with publication number" = "Work_Satisfaction_numb_publications",
+                 "Satisfaction with publication quality" = "Work_Satisfaction_quality_publications")
+m_wb <- imap(wb_outcomes, \(v, label) {
+  fit_brm(as.formula(paste(v, "~", paste(facet_outcomes, collapse = " + "), "+ Work_Career_Stage")), drop_na(data_stage, all_of(v)))
+})
+wb_effects <- imap_dfr(m_wb, \(m, label) {
+  model_parameters(m, component = "conditional") |>
+    as.data.frame() |>
+    filter(str_detect(Parameter, "_Science")) |>
+    transmute(Outcome = label, Facet = facet_label(str_remove(Parameter, "^b_")),
+              `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd))
+})
+wb_wide <- wb_effects |>
+  select(-pd) |>
+  pivot_wider(names_from = Facet, values_from = `Median [95% CI]`)
+knitr::kable(wb_wide, format = "pipe", caption = "Effect of each facet (per unit) on the well-being ratings (0-1), adjusted for the other facets and career stage")
+wb_mcmc <- imap_dfr(m_wb, \(m, label) mutate(mcmc_info(m), Outcome = label, .before = 1))
+```
+
+```{r}
+#| label: md_wellbeing
+#| echo: false
+#| cache: false
+
+make_markdown(list("Effects" = wb_effects, "MCMC diagnostics" = wb_mcmc), "Alignment and well-being as outcomes")
+```
+
+### France and Other Countries
+
+```{r}
+#| label: country_comparison
+
+# The preregistration's second objective compares the French landscape with other
+# countries (all European, see the inclusion criterion): the facets are compared
+# between France and the rest of Europe. An unreadable country is left out
+data_region <- data |>
+  mutate(Country = clean_country(Work_Country),
+         Region = case_when(is.na(Country) | Country == "" ~ NA_character_,
+                            str_detect(Country, "France") ~ "France",
+                            .default = "Other European")) |>
+  filter(!is.na(Region))
+region_desc <- data_region |>
+  mutate(across(all_of(unname(practice_items)), \(x) 100 * (x == 1))) |>
+  summarise(N = n(), `Permanent (%)` = 100 * mean(Work_Career_Stage == "Permanent", na.rm = TRUE),
+            `OS familiarity` = mean(OS_Familiar), `OS importance` = mean(OS_Importance), `OS training (%)` = 100 * mean(OS_Workshops),
+            `SS familiarity` = mean(SS_Familiar), `SS training (%)` = 100 * mean(SS_Workshops, na.rm = TRUE),
+            across(all_of(unname(practice_items)), mean),
+            `Recognition lever (%)` = 100 * mean(OS_Help_Recognition_Promotion_Recruitment, na.rm = TRUE),
+            `Time lever (%)` = 100 * mean(OS_Help_Time, na.rm = TRUE),
+            `Social sciences (%)` = 100 * mean(Work_Discipline == "Social Sciences & Humanities"),
+            `Women (%)` = 100 * mean(Dem_Gender == "Female"),
+            across(all_of(facet_outcomes), mean),
+            .by = Region) |>
+  rename_with(\(n) paste(str_remove(names(practice_items)[match(n, practice_items)], "Endorsement - "), "used (%)"), all_of(unname(practice_items))) |>
+  rename_with(facet_label, all_of(facet_outcomes))
+knitr::kable(region_desc |> pivot_longer(-Region, names_to = "Indicator") |> pivot_wider(names_from = Region, values_from = value),
+             format = "pipe", digits = 2, caption = "Key indicators by region of the workplace")
+m_region <- map(setNames(facet_outcomes, facet_label(facet_outcomes)), \(o) {
+  fit_brm(as.formula(paste(o, "~ Region")), data_region)
+})
+format_region <- \(tab) transmute(tab, Facet, Contrast = paste(Level1, "-", Level2), `Median [95% CI]` = format_estimate(Median, CI_low, CI_high), pd = format_percent(pd))
+region_contrasts <- imap_dfr(m_region, \(m, facet) mutate(as.data.frame(estimate_contrasts(m, contrast = "Region")), Facet = facet, .before = 1))
+knitr::kable(format_region(region_contrasts), format = "pipe", caption = "France vs. other European countries on the facets")
+
+# The other European respondents are mostly non-permanent and from other
+# disciplines: the same contrast, adjusted for career stage and discipline
+m_region_adj <- map(setNames(facet_outcomes, facet_label(facet_outcomes)), \(o) {
+  fit_brm(as.formula(paste(o, "~ Region + Work_Career_Stage + Work_Discipline")),
+          filter(data_region, !is.na(Work_Career_Stage)))
+})
+region_contrasts_adj <- imap_dfr(m_region_adj, \(m, facet) mutate(as.data.frame(estimate_contrasts(m, contrast = "Region")), Facet = facet, .before = 1))
+knitr::kable(format_region(region_contrasts_adj), format = "pipe", caption = "France vs. other European countries on the facets, adjusted for career stage and discipline")
+region_mcmc <- bind_rows(imap_dfr(m_region, \(m, facet) mutate(mcmc_info(m), Model = paste(facet, "~ region"), .before = 1)),
+                         imap_dfr(m_region_adj, \(m, facet) mutate(mcmc_info(m), Model = paste(facet, "~ region + career stage + discipline"), .before = 1)))
+```
+
+```{r}
+#| label: md_country
+#| echo: false
+#| cache: false
+
+make_markdown(list("Indicators" = region_desc, "Contrasts" = format_region(region_contrasts), "Adjusted contrasts" = format_region(region_contrasts_adj),
+                   "MCMC diagnostics" = region_mcmc), "France and other countries")
+```
+
+### Profiles and Preregistration by Discipline and Country
+
+```{r}
+#| label: profile_composition
+#| warning: false
+
+# The profiles differ in composition (profile_correlates): how much are they a
+# matter of discipline and country, and do their gender and age trajectories
+# survive them? Multinomial logistic models (nnet) of the profile on gender x age,
+# as the Profile model, then with discipline and region added: likelihood ratio
+# tests, and differences in profile probabilities (marginal, i.e., everyone set to
+# a level and averaged) with 95% bootstrap intervals (300 resamples). Frequentist,
+# as a sensitivity analysis of the Bayesian Profile model. Proportions (0-1)
+data_pc <- data_region |>
+  filter(Dem_Gender %in% c("Female", "Male"), !is.na(Dem_Age), Dem_Age <= 65) |>
+  mutate(Name = factor(profile_name(Profile), levels = profile_key$Name),
+         Dem_Gender = factor(Dem_Gender),
+         Region = factor(Region, levels = c("France", "Other European")),
+         Work_Discipline = factor(Work_Discipline, levels = c("Social Sciences & Humanities", "Life Sciences", "Physical Sciences & Engineering")))
+f_pc <- list(
+  base = Name ~ Dem_Gender * poly(Dem_Age, 2),
+  full = Name ~ Dem_Gender * poly(Dem_Age, 2) + Work_Discipline + Region,
+  no_gender = Name ~ poly(Dem_Age, 2) + Work_Discipline + Region,
+  no_age = Name ~ Dem_Gender + Work_Discipline + Region
+)
+fit_mn <- \(f, x) nnet::multinom(f, data = x, trace = FALSE, maxit = 500)
+m_pc <- map(f_pc, fit_mn, x = data_pc)
+lrt_mn <- \(test, small, big) {
+  chi2 <- as.numeric(2 * (logLik(big) - logLik(small)))
+  df <- attr(logLik(big), "df") - attr(logLik(small), "df")
+  tibble(Test = test, Chi2 = chi2, df = df, p = pchisq(chi2, df, lower.tail = FALSE))
+}
+profile_comp_tests <- bind_rows(
+  lrt_mn("Discipline and region, given gender x age", m_pc$base, m_pc$full),
+  lrt_mn("Gender, given age, discipline and region", m_pc$no_gender, m_pc$full),
+  lrt_mn("Age, given gender, discipline and region", m_pc$no_age, m_pc$full)
+) |> mutate(`AIC without` = c(AIC(m_pc$base), AIC(m_pc$no_gender), AIC(m_pc$no_age)), `AIC with` = AIC(m_pc$full))
+knitr::kable(profile_comp_tests, format = "pipe", digits = 3, caption = "Profiles: likelihood ratio tests of discipline, region, gender and age (multinomial models)")
+
+# Marginal probability of each profile with a variable set to a level for everyone
+marg_mn <- \(m, x, ...) { nd <- x; sets <- list(...); for (v in names(sets)) nd[[v]] <- if (is.factor(x[[v]])) factor(sets[[v]], levels = levels(x[[v]])) else sets[[v]]
+  colMeans(predict(m, nd, type = "probs")) }
+pc_contrasts <- \(x) {
+  m0 <- fit_mn(f_pc$base, x); m1 <- fit_mn(f_pc$full, x)
+  gender_age <- \(m) rbind(
+    `Men - women, at 25` = marg_mn(m, x, Dem_Gender = "Male", Dem_Age = 25) - marg_mn(m, x, Dem_Gender = "Female", Dem_Age = 25),
+    `Men - women, at 55` = marg_mn(m, x, Dem_Gender = "Male", Dem_Age = 55) - marg_mn(m, x, Dem_Gender = "Female", Dem_Age = 55),
+    `55 - 25, women` = marg_mn(m, x, Dem_Gender = "Female", Dem_Age = 55) - marg_mn(m, x, Dem_Gender = "Female", Dem_Age = 25),
+    `55 - 25, men` = marg_mn(m, x, Dem_Gender = "Male", Dem_Age = 55) - marg_mn(m, x, Dem_Gender = "Male", Dem_Age = 25))
+  rbind(
+    setNames_rows(gender_age(m0), "Unadjusted"),
+    setNames_rows(gender_age(m1), "Adjusted for discipline and region"),
+    setNames_rows(rbind(
+      `Other European - France` = marg_mn(m1, x, Region = "Other European") - marg_mn(m1, x, Region = "France"),
+      `Social - physical sciences` = marg_mn(m1, x, Work_Discipline = "Social Sciences & Humanities") - marg_mn(m1, x, Work_Discipline = "Physical Sciences & Engineering"),
+      `Social - life sciences` = marg_mn(m1, x, Work_Discipline = "Social Sciences & Humanities") - marg_mn(m1, x, Work_Discipline = "Life Sciences")),
+      "Adjusted for discipline and region"))
+}
+setNames_rows <- \(mat, model) { rownames(mat) <- paste(model, rownames(mat), sep = "|"); mat }
+set.seed(123)
+pc_est <- pc_contrasts(data_pc)
+pc_boot <- replicate(300, pc_contrasts(data_pc[sample(nrow(data_pc), replace = TRUE), ]), simplify = "array")
+profile_comp_effects <- as.data.frame(as.table(pc_est)) |>
+  setNames(c("Row", "Name", "Median")) |>
+  mutate(CI_low = as.vector(apply(pc_boot, c(1, 2), quantile, 0.025)),
+         CI_high = as.vector(apply(pc_boot, c(1, 2), quantile, 0.975)),
+         Model = str_extract(Row, "^[^|]+"), Contrast = str_extract(Row, "[^|]+$"), Name = as.character(Name)) |>
+  select(Model, Contrast, Name, Median, CI_low, CI_high)
+knitr::kable(transmute(profile_comp_effects, Model, Contrast, Name, `Percentage points [95% CI]` = format_estimate(100 * Median, 100 * CI_low, 100 * CI_high)),
+             format = "pipe", caption = "Differences in profile probability (percentage points), multinomial models with 95% bootstrap intervals")
+```
+
+```{r}
+#| label: prereg_discipline
+#| warning: false
+
+# Career stage is confounded with discipline and country (permanent staff more
+# often in France and in the physical sciences), and the sample cannot separate
+# them jointly with precision. Descriptive check: does the preregistration gradient
+# between career stages hold within each discipline, and among social scientists
+# working in France? Differences in percentage points (logistic models, marginal),
+# 95% bootstrap intervals (1000 resamples)
+data_pd <- data_region |>
+  filter(!is.na(Work_Career_Stage)) |>
+  mutate(Prereg = as.numeric(OS_Study_Preregistration == 1),
+         Work_Discipline = factor(Work_Discipline, levels = c("Social Sciences & Humanities", "Life Sciences", "Physical Sciences & Engineering")))
+prereg_disc_desc <- data_pd |>
+  summarise(N = n(), `Preregistration used (%)` = 100 * mean(Prereg), .by = c(Work_Discipline, Region, Work_Career_Stage)) |>
+  bind_rows(summarise(data_pd, N = n(), `Preregistration used (%)` = 100 * mean(Prereg), .by = c(Work_Discipline, Work_Career_Stage)) |> mutate(Region = "All")) |>
+  mutate(across(c(Work_Discipline, Work_Career_Stage), as.character)) |>
+  arrange(Work_Discipline, Region, Work_Career_Stage)
+knitr::kable(prereg_disc_desc, format = "pipe", digits = 0, caption = "Preregistration used by career stage, discipline and region")
+
+pd_diff <- \(x, a, b) {
+  m <- glm(Prereg ~ Work_Career_Stage, binomial, x)
+  pr <- \(lv) { nd <- x; nd$Work_Career_Stage <- factor(lv, levels = levels(x$Work_Career_Stage)); mean(predict(m, nd, type = "response")) }
+  pr(a) - pr(b)
+}
+pd_subsets <- list(
+  "All" = data_pd,
+  "Social Sciences & Humanities" = filter(data_pd, Work_Discipline == "Social Sciences & Humanities"),
+  "Social Sciences & Humanities, France" = filter(data_pd, Work_Discipline == "Social Sciences & Humanities", Region == "France"),
+  "Life Sciences" = filter(data_pd, Work_Discipline == "Life Sciences"),
+  "Physical Sciences & Engineering" = filter(data_pd, Work_Discipline == "Physical Sciences & Engineering")
+)
+set.seed(123)
+prereg_disc_diff <- imap_dfr(pd_subsets, \(x, subset) map_dfr(list(c("Permanent", "PhD / Student"), c("Permanent", "Non-permanent")), \(ab) {
+  draws <- replicate(1000, tryCatch(pd_diff(x[sample(nrow(x), replace = TRUE), ], ab[1], ab[2]), error = \(e) NA))
+  tibble(Subset = subset, N = nrow(x), Level1 = ab[1], Level2 = ab[2], Median = pd_diff(x, ab[1], ab[2]),
+         CI_low = quantile(draws, 0.025, na.rm = TRUE), CI_high = quantile(draws, 0.975, na.rm = TRUE))
+}))
+knitr::kable(transmute(prereg_disc_diff, Subset, N, Contrast = paste(Level1, "-", Level2),
+                       `Percentage points [95% CI]` = format_estimate(100 * Median, 100 * CI_low, 100 * CI_high)),
+             format = "pipe", caption = "Preregistration: differences between career stages within disciplines")
+pd_int <- anova(glm(Prereg ~ Work_Career_Stage + Work_Discipline, binomial, data_pd),
+                glm(Prereg ~ Work_Career_Stage * Work_Discipline, binomial, data_pd), test = "LRT")
+prereg_disc_interaction <- tibble(Chi2 = pd_int$Deviance[2], df = pd_int$Df[2], p = pd_int$`Pr(>Chi)`[2])
+knitr::kable(prereg_disc_interaction, format = "pipe", digits = 3, caption = "Career stage x discipline interaction on preregistration (likelihood ratio test)")
+
+# The same question for the facet: Rigorous Science by career stage among social scientists
+m_rig_ssh <- lm(Rigorous_Science ~ Work_Career_Stage, filter(data_pd, Work_Discipline == "Social Sciences & Humanities"))
+rigorous_ssh <- tibble(Level1 = c("Non-permanent", "Permanent"), Level2 = "PhD / Student",
+                       Median = coef(m_rig_ssh)[-1], CI_low = confint(m_rig_ssh)[-1, 1], CI_high = confint(m_rig_ssh)[-1, 2])
+knitr::kable(rigorous_ssh, format = "pipe", digits = 2, caption = "Rigorous Science by career stage among social scientists (linear model)")
+```
+
+### Measurement Invariance
+
+```{r}
+#| label: invariance
+#| warning: false
+
+# Comparing facet scores between groups assumes that the items measure the facets
+# the same way in each group. Configural, metric (equal loadings) and scalar
+# (equal loadings and intercepts) models across gender, career stage and
+# discipline; a drop in CFI larger than .01 is the usual flag
+invariance_groups <- list(
+  "Gender" = list(var = "Dem_Gender", data = filter(df, Dem_Gender %in% c("Female", "Male"))),
+  "Career stage" = list(var = "Work_Career_Stage", data = filter(df, !is.na(Work_Career_Stage))),
+  "Discipline" = list(var = "Work_Discipline", data = df)
+)
+invariance <- imap_dfr(invariance_groups, \(g, name) {
+  fits <- list(
+    "Configural" = cfa(cfa_model, data = g$data, std.lv = TRUE, group = g$var),
+    "Metric" = cfa(cfa_model, data = g$data, std.lv = TRUE, group = g$var, group.equal = "loadings"),
+    "Scalar" = cfa(cfa_model, data = g$data, std.lv = TRUE, group = g$var, group.equal = c("loadings", "intercepts"))
+  )
+  imap_dfr(fits, \(fit, level) tibble(Grouping = name, Level = level, !!!as.list(unclass(fitMeasures(fit, c("chisq", "df", "cfi", "rmsea", "srmr")))))) |>
+    mutate(`Delta CFI` = cfi - lag(cfi), `Delta RMSEA` = rmsea - lag(rmsea))
+})
+knitr::kable(invariance, format = "pipe", digits = 3, caption = "Measurement invariance of the retained CFA across groups")
+```
+
+### Quality Criteria and the Facets
+
+```{r}
+#| label: criteria_facets
+
+# Validity check: participants who chose transparency among their three criteria
+# of quality should score higher on Open Science, those who chose environmental
+# impact on Green Science, etc. Standardised mean differences (Cohen's d) in each
+# facet between those who chose a criterion and those who did not
+criteria_items <- c("Rigorous methodology" = "Work_Criteria_quality_science_Rigorous_meth",
+                    "Transparency / Open Science" = "Work_Criteria_quality_science_Transparence",
+                    "Appropriate statistics" = "Work_Criteria_quality_science_Relevance-data-analyses",
+                    "Originality / Innovation" = "Work_Criteria_quality_science_Originality",
+                    "Significance / Impact" = "Work_Criteria_quality_science_Significance",
+                    "Replication" = "Work_Criteria_quality_science_Replication",
+                    "High impact factor journal" = "Work_Criteria_quality_science_high-IF",
+                    "Inclusivity / Diversity" = "Work_Criteria_quality_science_Inclusivity",
+                    "Environmental impact" = "Work_Criteria_quality_science_Environmental-impact")
+cohens_d <- \(x, chosen) {
+  m <- tapply(x, chosen, mean); s <- tapply(x, chosen, sd); n <- table(chosen)
+  unname((m[["TRUE"]] - m[["FALSE"]]) / sqrt(((n[["TRUE"]] - 1) * s[["TRUE"]]^2 + (n[["FALSE"]] - 1) * s[["FALSE"]]^2) / (sum(n) - 2)))
+}
+criteria_facets <- imap_dfr(criteria_items, \(v, label) {
+  chosen <- data[[v]] == "Yes"
+  tibble(Criterion = label, `Chosen (%)` = 100 * mean(chosen),
+         !!!map(setNames(facet_outcomes, facet_label(facet_outcomes)), \(o) cohens_d(data[[o]], chosen)))
+})
+knitr::kable(criteria_facets, format = "pipe", digits = 2,
+             caption = "Facet scores of participants choosing each quality criterion vs. not (Cohen's d)")
+```
+
+```{r}
+#| label: export_career
+#| cache: false
+
+# Numbers the manuscript reports from this section and from the sensitivity
+# analyses (read by ../paper/manuscript.qmd). Contrasts are exported unformatted
+# (Median, CI_low, CI_high), recomputed here from the cached fits where the
+# section only kept formatted tables
+stage_contrasts_raw <- \(m) as.data.frame(estimate_contrasts(m, contrast = "Work_Career_Stage"))
+# modelbased/parameters tables carry the fitted model in their attributes (megabytes each): keep the plain data frames
+plain <- \(x) if (is.data.frame(x)) { attributes(x) <- attributes(x)[c("names", "row.names")]; class(x) <- "data.frame"; x } else x
+saveRDS(lapply(list(
+  careless = careless,
+  n_stage = nrow(data_stage),
+  h1_desc = h1_desc, h1_means = h1$means, h1_contrasts = h1$contrasts,
+  h2_desc = h2_desc, h2_means = h2$means, h2_contrasts = h2$contrasts,
+  h3_desc = h3_desc, h3_means = h3$means, h3_contrasts = h3$contrasts,
+  n_training = nrow(data_training),
+  training_contrasts = imap_dfr(m_train, \(ms, facet) imap_dfr(ms, \(m, model) mutate(stage_contrasts_raw(m), Facet = facet, Model = model, .before = 1))),
+  training_effects = imap_dfr(m_train, \(ms, facet) {
+    as.data.frame(model_parameters(ms[["Career stage + training"]], component = "conditional")) |>
+      filter(str_detect(Parameter, "Workshops")) |>
+      mutate(Facet = facet, Training = ifelse(str_detect(Parameter, "^b_OS"), "Open science", "Slow science"), .before = 1)
+  }),
+  pct_trained = c(`Open science` = 100 * mean(data_training$OS_Workshops), `Slow science` = 100 * mean(data_training$SS_Workshops)),
+  discipline_desc = discipline_desc, disc_means = disc_means, disc_contrasts = disc_contrasts,
+  gender_gap_disc = imap_dfr(m_gender_disc, \(m, facet) mutate(as.data.frame(estimate_contrasts(m, contrast = "Dem_Gender")), Facet = facet, .before = 1)),
+  n_precarious = nrow(data_precarious), precarious_desc = precarious_desc,
+  prec_slopes = imap_dfr(m_prec, \(m, facet) {
+    as.data.frame(model_parameters(m, component = "conditional")) |> filter(str_detect(Parameter, "Probability")) |> mutate(Facet = facet, .before = 1)
+  }),
+  pursue_desc = pursue_desc,
+  wb_effects = imap_dfr(m_wb, \(m, label) {
+    as.data.frame(model_parameters(m, component = "conditional")) |>
+      filter(str_detect(Parameter, "_Science")) |>
+      mutate(Outcome = label, Facet = facet_label(str_remove(Parameter, "^b_")), .before = 1)
+  }),
+  region_desc = region_desc, region_contrasts = region_contrasts, region_contrasts_adj = region_contrasts_adj,
+  invariance = invariance,
+  criteria_facets = criteria_facets,
+  slow_sensitivity = slow_sensitivity, n_ss_familiar = sum(ss_familiar),
+  slow_ratings = ss_ratings, slow_missing = ss_missing_check, slow_profiles = slow_profiles,
+  profile_comp_tests = profile_comp_tests, profile_comp_effects = profile_comp_effects,
+  gmm_fit = gmm_fit, gmm_profiles = gmm_profiles, gmm_summary = gmm_summary,
+  prereg_disc_desc = prereg_disc_desc, prereg_disc_diff = prereg_disc_diff,
+  prereg_disc_interaction = prereg_disc_interaction, rigorous_ssh = rigorous_ssh,
+  h1_unfamiliar_means = h1_unfamiliar$means, h1_unfamiliar_contrasts = h1_unfamiliar$contrasts,
+  h2_pub_means = h2_pub$means, h2_pub_contrasts = h2_pub$contrasts,
+  slow_stage_familiar = slow_stage_familiar$contrasts, n_ss_familiar_stage = nrow(data_ss_familiar),
+  knowers_robustness = knowers_robustness, facet_sd = facet_sd,
+  ordinal_fit = ordinal_fit, ordinal_cor = ordinal_cor, ordinal_scores = ordinal_scores, ceiling_table = ceiling_table,
+  alt_means = alt_means, alt_profiles = alt_profiles, alt_composition = alt_composition,
+  mcmc = bind_rows(mutate(h1$mcmc, Set = "H1"), mutate(h2$mcmc, Set = "H2"), mutate(h3$mcmc, Set = "H3-H4"),
+                   mutate(training_mcmc, Set = "Training"), mutate(disc_mcmc, Set = "Discipline"), mutate(prec_mcmc, Set = "Precariousness"),
+                   mutate(wb_mcmc, Set = "Well-being"), mutate(region_mcmc, Set = "Region"),
+                   mutate(h1_unfamiliar$mcmc, Set = "Robustness: unfamiliarity"), mutate(h2_pub$mcmc, Set = "Robustness: with publications"),
+                   mutate(slow_stage_familiar$mcmc, Set = "Robustness: familiar with slow science"))
+), plain), "../paper/results/career.rds")
+```
 
 ## Practices
 
@@ -2478,7 +3857,7 @@ p4 <- p_os_help$data |>
 p5 <- ss_def$data |>
   mutate(name = str_replace_all(name, "\n", " ")) |>
   bar_panel(Total, name, domain_colors[["Slow Science"]],
-            "Meaning of Slow Science", "Which of these best describes slow science for you? (up to 3)")
+            "Meaning of Slow Science", "Which of these best describes slow science for you? (up to 3; if familiar)")
 
 p6 <- ss_feas$data |>
   mutate(Practice = fct_rev(fct_relabel(Practice, \(x) str_replace_all(x, "\n", " "))),
@@ -2502,7 +3881,6 @@ dir.create("../paper/figures", showWarnings = FALSE)
 ggsave("../paper/figures/fig_landscape.png", fig_landscape, width = 10.5, height = 13.5, dpi = 300, bg = "white")
 fig_landscape
 ```
-
 
 
 ### Facets
@@ -2697,6 +4075,10 @@ saveRDS(list(
     select(Facet1 = lhs, Facet2 = rhs, r = est, ci.lower, ci.upper),
   item_cor = cor(df_resprac, use = "pairwise.complete.obs"),
   cfa_comparison = cfa_comparison,
+  cfa_lrt = cfa_lrt,
+  scoring_fit = scoring_fit,
+  scoring_agreement = scoring_agreement,
+  scoring_loadings = scoring_loadings,
   criteria_cor = as_tibble(cor_pairs(df_quality_num)),
   criteria_n_components = as.data.frame(summary(rez_criteria)),
   criteria_pca = as_tibble(as.data.frame(pca_criteria)) |> select(Variable, PC1, PC2),
@@ -2715,6 +4097,260 @@ make_markdown(list(
   "CFA standardized loadings" = facets$cfa_loadings,
   "CFA latent correlations" = facets$cfa_cor
 ), "Facets: confirmatory factor analysis")
+```
+
+### Career Stage
+
+```{r fig_career}
+#| fig-width: 10.5
+#| fig-height: 9.5
+#| warning: false
+
+# Figure "career" of the manuscript: use of each open science practice and
+# selection of each lever by career stage (Bernoulli models of the H2 and H3-H4
+# sections; medians and 95% CI), and facet scores by career stage. Practices are
+# grouped by the facet they load on, levers by the types of the landscape figure
+stage_order <- c("PhD / Student", "Non-permanent", "Permanent")
+stage_colors <- c("PhD / Student" = "#FF7043", "Non-permanent" = "#7E57C2", "Permanent" = "#26A69A")
+stage_panel <- function(means, title, subtitle, xmax = 1) {
+  # Points dodged by hand (PhD students on top), so that a line can join the
+  # three stages of each row
+  # Outcomes ordered by group, then by mean use: each facet holds a contiguous
+  # block of rows (the y axis is numeric)
+  outcome_order <- means |>
+    summarise(m = mean(Median), .by = c(Group, Outcome)) |>
+    arrange(desc(as.integer(Group)), m) |>
+    pull(Outcome)
+  d <- means |>
+    mutate(Work_Career_Stage = factor(Work_Career_Stage, levels = stage_order),
+           Outcome = factor(Outcome, levels = outcome_order),
+           y = as.numeric(Outcome) + c(0.22, 0, -0.22)[as.integer(Work_Career_Stage)]) |>
+    arrange(Outcome, Work_Career_Stage)
+  outcome_levels <- levels(d$Outcome)
+  ggplot(d, aes(x = Median, y = y, color = Work_Career_Stage, shape = Work_Career_Stage)) +
+    geom_path(aes(group = Outcome), color = "grey60", linewidth = 0.5) +
+    geom_linerange(aes(xmin = CI_low, xmax = CI_high), linewidth = 0.6) +
+    geom_point(size = 2) +
+    scale_x_continuous(labels = scales::percent_format(), limits = c(0, xmax), expand = expansion(mult = c(0, 0.02))) +
+    scale_y_continuous(breaks = \(l) seq(ceiling(l[1]), floor(l[2])), labels = \(b) outcome_levels[b], expand = expansion(add = 0.5)) +
+    scale_color_manual(values = stage_colors, breaks = stage_order, name = NULL) +
+    scale_shape_manual(values = c("PhD / Student" = 16, "Non-permanent" = 17, "Permanent" = 15), breaks = stage_order, name = NULL) +
+    facet_grid(Group ~ ., scales = "free_y", space = "free_y", switch = "y") +
+    theme_panel +
+    theme(strip.placement = "outside", strip.text.y.left = element_text(angle = 0, face = "bold", hjust = 1),
+          panel.grid.major.y = element_line(color = "grey92"), legend.key.size = unit(0.35, "cm")) +
+    labs(title = title, subtitle = subtitle, x = NULL, y = NULL)
+}
+
+sharing_practices <- c("Open Access", "Open Data", "Open Materials")
+pc_adoption <- h2$means |>
+  mutate(Group = factor(ifelse(Outcome %in% sharing_practices, "Sharing outputs\n(Open Science)", "Reforming procedures\n(Rigorous Science)"),
+                        levels = c("Sharing outputs\n(Open Science)", "Reforming procedures\n(Rigorous Science)"))) |>
+  stage_panel("Adoption of Open Science Practices by Career Stage", "Probability of having used each practice (median and 95% CI)")
+
+lever_types <- c("Recognition (promotion, recruitment)" = "Recognition", "Incentives (funders, institutions)" = "Funding", "Funding" = "Funding",
+                 "Time" = "Time", "Reduced workload" = "Time",
+                 "Infrastructure" = "Support", "Support from seniors" = "Support", "Training" = "Support", "Support from juniors" = "Support",
+                 "More information" = "Support", "Ethical issues" = "Other", "Positive beliefs" = "Other")
+pc_levers <- h3$means |>
+  mutate(Group = factor(lever_types[Outcome], levels = c("Recognition", "Funding", "Time", "Support", "Other")),
+         Outcome = fct_recode(Outcome, "Career recognition" = "Recognition (promotion, recruitment)", "Institutional incentives" = "Incentives (funders, institutions)",
+                              "Dedicated funding" = "Funding", "Dedicated OS workload" = "Reduced workload", "Technical infrastructure" = "Infrastructure",
+                              "Senior researcher support" = "Support from seniors", "Junior researcher support" = "Support from juniors",
+                              "OS training" = "Training", "Data sharing ethics" = "Ethical issues")) |>
+  stage_panel("Levers for Open Science by Career Stage", "Probability of selecting each lever (up to 5; median and 95% CI)", xmax = 0.7)
+
+# Facets by career stage, from the primary career-stage models of the manuscript
+# (facet ~ career stage, chunk training_facets; the career worry and time models
+# are sensitivity analyses). Pairwise differences between stages whose 95% (*),
+# 99% (**) or 99.9% (***) CI excludes 0, as brackets above the points: adjacent
+# stages on a first level, PhD vs. permanent above
+facet_levels_fig <- names(facet_colors)
+stage_means_fig <- imap_dfr(m_train, \(ms, facet) {
+  mutate(as.data.frame(estimate_means(ms[["Career stage"]], by = "Work_Career_Stage")), Outcome = facet)
+}) |>
+  mutate(Outcome = factor(Outcome, levels = facet_levels_fig))
+stage_stars <- imap_dfr(m_train, \(ms, facet) {
+  mutate(as.data.frame(estimate_contrasts(ms[["Career stage"]], contrast = "Work_Career_Stage")), Outcome = facet)
+}) |>
+  mutate(Outcome = factor(Outcome, levels = facet_levels_fig),
+         x1 = match(as.character(Level1), stage_order), x2 = match(as.character(Level2), stage_order),
+         stars = case_when(pd > 0.9995 ~ "***", pd > 0.995 ~ "**", pd > 0.975 ~ "*", .default = NA_character_)) |>
+  filter(!is.na(stars)) |>
+  left_join(summarise(stage_means_fig, top = max(CI_high), .by = Outcome), by = "Outcome") |>
+  mutate(y = top + 0.1 + 0.22 * (abs(x1 - x2) > 1))
+
+pc_facets <- stage_means_fig |>
+  mutate(Stage = factor(Work_Career_Stage, levels = stage_order,
+                        labels = c("PhD /\nstudent", "Non-\npermanent", "Permanent"))) |>
+  ggplot(aes(x = Stage, y = Median, color = Outcome)) +
+  geom_hline(yintercept = 0, color = "grey80") +
+  geom_line(aes(group = Outcome), linewidth = 0.4, alpha = 0.5) +
+  geom_pointrange(aes(ymin = CI_low, ymax = CI_high), size = 0.3, linewidth = 0.7) +
+  geom_segment(data = stage_stars, aes(x = x1, xend = x2, y = y, yend = y), inherit.aes = FALSE, color = "grey45", linewidth = 0.3) +
+  geom_text(data = stage_stars, aes(x = (x1 + x2) / 2, y = y, label = stars), inherit.aes = FALSE, color = "grey30", size = 3, vjust = -0.1) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +  # Room for the brackets
+  scale_color_manual(values = facet_colors, guide = "none") +
+  facet_wrap(~Outcome, nrow = 1) +
+  theme_minimal(base_size = 10) +
+  theme(plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(color = "grey40", size = 9),
+        plot.title.position = "plot", panel.grid.minor = element_blank(), strip.text = element_text(face = "bold", size = 8.5),
+        axis.text.x = element_text(size = 7.5)) +
+  labs(title = "Facets by Career Stage", subtitle = "Marginal means (median and 95% CI)", x = NULL, y = "Facet score")
+
+fig_career <- (pc_adoption | pc_levers) / pc_facets +
+  plot_layout(heights = c(1.7, 1), guides = "collect") +
+  plot_annotation(tag_levels = "A") &
+  theme(legend.position = "bottom", plot.tag = element_text(face = "bold", size = 14))
+ggsave("../paper/figures/fig_career.png", fig_career, width = 10.5, height = 9.5, dpi = 300, bg = "white")
+fig_career
+```
+
+### Profiles
+
+```{r fig_profiles}
+#| fig-width: 10.5
+#| fig-height: 9.5
+#| warning: false
+#| cache: false
+
+# Figure "profiles" of the manuscript: facets by gender and age (Gaussian models
+# above), researcher profiles and their stability, and profiles by gender and age
+# (Profile model). Facets by career stage are in the figure "career". Uncached:
+# the Profile fit is read at each render
+if (!is.null(m)) {
+gender_linetypes <- scale_linetype_manual(values = c(Female = "longdash", Male = "solid"), name = "Gender")
+theme_fig <- theme_minimal(base_size = 10) +
+  theme(plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(color = "grey40", size = 9),
+        plot.title.position = "plot", panel.grid.minor = element_blank(), strip.text = element_text(face = "bold", size = 8.5))
+
+pp_age <- rez_age$pred |>
+  ggplot(aes(x = Dem_Age, y = Predicted)) +
+  geom_hline(yintercept = 0, color = "grey80") +
+  geom_ribbon(aes(ymin = CI_low, ymax = CI_high, fill = Outcome, group = Dem_Gender), alpha = 0.15) +
+  geom_line(aes(color = Outcome, linetype = Dem_Gender), linewidth = 0.8) +
+  scale_color_manual(values = facet_colors, guide = "none") +
+  scale_fill_manual(values = facet_colors, guide = "none") +
+  gender_linetypes +
+  guides(linetype = guide_legend(override.aes = list(color = "grey30", fill = NA))) +
+  facet_wrap(~Outcome, nrow = 1) +
+  theme_fig +
+  labs(tag = "A", title = "Facets by Gender and Age", subtitle = "Predicted facet score (median and 95% CI)",
+       x = "Age", y = "Facet score")
+
+# Profiles: the radar coordinates of the Clustering section, one panel per
+# profile (named and coloured as in profile_key, in the order of their size),
+# with the sample average (facet scores of 0) dashed
+as_name <- \(x) factor(profile_name(x), levels = profile_key$Name)
+profile_scales <- list(scale_color_manual(values = setNames(profile_key$Color, profile_key$Name), guide = "none"),
+                       scale_fill_manual(values = setNames(profile_key$Color, profile_key$Name), guide = "none"))
+profile_info <- profile_counts |>
+  mutate(Key = str_replace(Profile, "\n", " ")) |>
+  left_join(select(profile_stability, Key = Profile, `Median Jaccard`), by = "Key") |>
+  mutate(Name = as_name(Profile),
+         info = sprintf("N = %d (%.0f%%)\nStability: %s", n, pct, sub("^0", "", sprintf("%.2f", `Median Jaccard`))))
+average_polygon <- tibble(Variable = cluster_vars, angle = angles) |>
+  mutate(r = -var_mins[Variable] / (var_maxs[Variable] - var_mins[Variable]), x = r * sin(angle), y = r * cos(angle)) |>
+  (\(d) bind_rows(d, d[1, ]))()
+in_all_panels <- \(d) tidyr::expand_grid(Name = factor(profile_key$Name, levels = profile_key$Name), d)
+pp_radar <- ggplot() +
+  geom_path(data = in_all_panels(grid_circles), aes(x = x, y = y, group = r), color = "grey88", linewidth = 0.25) +
+  geom_segment(data = in_all_panels(spokes), aes(x = 0, y = 0, xend = x1, yend = y1), color = "grey85", linewidth = 0.3) +
+  geom_path(data = in_all_panels(average_polygon), aes(x = x, y = y), color = "grey45", linetype = "dashed", linewidth = 0.4) +
+  geom_polygon(data = mutate(radar_closed, Name = as_name(Profile)), aes(x = x, y = y, group = Name, fill = Name, color = Name),
+               alpha = 0.25, linewidth = 0.8) +
+  geom_point(data = mutate(radar_long, Name = as_name(Profile)), aes(x = x, y = y, color = Name), size = 1.2) +
+  geom_text(data = in_all_panels(mutate(axis_labels, label = str_remove(Variable, "_Science"))),
+            aes(x = lx, y = ly, label = label), size = 2.5, color = "grey30") +
+  geom_text(data = profile_info, aes(x = 0, y = -1.62, label = info), size = 2.5, color = "grey20", lineheight = 0.9) +
+  profile_scales +
+  facet_wrap(~Name, nrow = 1) +
+  coord_equal(xlim = c(-1.35, 1.35), ylim = c(-1.85, 1.3), clip = "off") +
+  theme_void(base_size = 10) +
+  theme(plot.title = element_text(face = "bold", size = 11), plot.subtitle = element_text(color = "grey40", size = 9),
+        plot.title.position = "plot", strip.text = element_text(face = "bold", size = 8.5, lineheight = 0.9)) +
+  labs(tag = "B", title = "Researcher Profiles",
+       subtitle = "Mean facet scores (range of each facet), sample average dashed; stability: bootstrap median Jaccard")
+
+pp_prob <- estimate_relation(m, length = 40) |>
+  as.data.frame() |>
+  mutate(Name = as_name(Response)) |>
+  ggplot(aes(x = Dem_Age, y = Predicted)) +
+  geom_ribbon(aes(ymin = CI_low, ymax = CI_high, group = Dem_Gender, fill = Name), alpha = 0.15) +
+  geom_line(aes(linetype = Dem_Gender, color = Name), linewidth = 0.8) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  profile_scales +
+  gender_linetypes +
+  guides(linetype = "none") +  # Shown in A
+  facet_wrap(~Name, nrow = 1) +
+  theme_fig +
+  labs(tag = "C", title = "Profiles by Gender and Age", subtitle = "Predicted probability of belonging to each profile (median and 95% CI)",
+       x = "Age", y = "Probability")
+
+fig_profiles <- pp_age / pp_radar / pp_prob +
+  plot_layout(heights = c(1, 1.15, 1), guides = "collect") &
+  theme(legend.position = "bottom", legend.key.width = unit(1.2, "cm"), plot.tag = element_text(face = "bold", size = 14))
+ggsave("../paper/figures/fig_profiles.png", fig_profiles, width = 10.5, height = 9.5, dpi = 300, bg = "white")
+fig_profiles
+}
+```
+
+```{r}
+#| label: export_profiles
+#| cache: false
+
+# Numbers the manuscript reports on the determinants of the facets and on the
+# profiles (read by ../paper/manuscript.qmd)
+if (!is.null(m)) {
+bind_tables <- \(rez, what) bind_rows(lapply(rez$tables, `[[`, what))
+# Differences in profile probabilities between genders (at each age) and between
+# ages (in each gender), from the posterior draws
+ages <- c(25, 35, 45, 55, 65)
+profile_grid <- expand_grid(Dem_Age = ages, Dem_Gender = c("Female", "Male"))
+profile_epred <- brms::posterior_epred(m, newdata = profile_grid)  # Draws x rows x profiles
+summarise_draws <- \(d, ...) tibble(..., Profile = dimnames(profile_epred)[[3]], Median = apply(d, 2, median),
+                                    CI_low = apply(d, 2, quantile, 0.025), CI_high = apply(d, 2, quantile, 0.975))
+row_of <- \(age, gender) which(profile_grid$Dem_Age == age & profile_grid$Dem_Gender == gender)
+profile_gender <- map_dfr(ages, \(age) {
+  summarise_draws(profile_epred[, row_of(age, "Male"), ] - profile_epred[, row_of(age, "Female"), ], Dem_Age = age)
+})
+profile_age <- map_dfr(c("Female", "Male"), \(gender) {
+  summarise_draws(profile_epred[, row_of(55, gender), ] - profile_epred[, row_of(25, gender), ], Dem_Gender = gender)
+})
+dir.create("../paper/results", showWarnings = FALSE)
+saveRDS(list(
+  n_age = nrow(data_profile),
+  n_stage = sum(!is.na(data$Work_Career_Stage)),
+  mcmc = bind_rows(bind_tables(rez_age, "draws"), bind_tables(rez_worry, "draws"), bind_tables(rez_time, "draws")),
+  age_contrasts = bind_tables(rez_age, "contrasts"),
+  age_contrasts_at = bind_tables(rez_age, "contrasts_at"),
+  age_slopes = bind_tables(rez_age, "slopes"),
+  age_predictions = bind_tables(rez_age, "predictions"),
+  worry_contrasts = bind_tables(rez_worry, "contrasts"),
+  worry_slopes = bind_tables(rez_worry, "slopes"),
+  time_contrasts = bind_tables(rez_time, "contrasts"),
+  time_slopes = bind_tables(rez_time, "slopes"),
+  n_clusters = as.data.frame(summary(rez_nclust)),
+  profile_key = profile_key,
+  profiles = df_resprac_fac |>
+    summarise(N = n(), across(all_of(cluster_vars), mean), .by = Profile) |>
+    mutate(Name = profile_name(Profile)) |>
+    arrange(Profile),
+  cluster_stability = cluster_stability,
+  profile_stability = profile_stability |>
+    mutate(Name = profile_name(Profile), `Pooled with` = profile_name(`Pooled most often with (when dissolved)`)),
+  cluster_null_votes = cluster_null_votes,
+  cluster_null_fit = cluster_null_fit,
+  profile_nesting = profile_nesting,
+  profile_correlates = mutate(profile_correlates, Name = as.character(Name)),
+  profile_ss_stage = mutate(profile_ss_stage, Name = as.character(Name), Work_Career_Stage = as.character(Work_Career_Stage)),
+  profile_mcmc = mcmc_info(m),
+  profile_predictions = as.data.frame(estimate_relation(m, by = c("Dem_Age=c(25, 35, 45, 55, 65)", "Dem_Gender"))) |>
+    mutate(Name = profile_name(Response)),
+  profile_gender = mutate(profile_gender, Name = profile_name(Profile)),
+  profile_age = mutate(profile_age, Name = profile_name(Profile))
+), "../paper/results/profiles.rds")
+}
 ```
 
 ### Structure of Research Values

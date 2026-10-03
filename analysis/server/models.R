@@ -6,7 +6,7 @@
 # the model names from them.
 
 osa_models <- list(
-  # Researcher profile (CFA factor scores -> hkmeans, in analysis.qmd) by gender
+  # Researcher profile (CFA factor scores -> k-means, in analysis.qmd) by gender
   # x age. Dem_Gender is also a main effect: the smooths of a factor `by` are
   # centred, so without it both genders get the same average profile odds.
   Profile = list(
