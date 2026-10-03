@@ -9686,55 +9686,61 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a><span class="co"># in the Discussion (descriptive, not modelled). Uncached: the names come from</span></span>
 <span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a><span class="co"># profile_key. Percentages are of each profile; ratings on 0-100</span></span>
 <span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>pct_of <span class="ot">&lt;-</span> \(x) <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a>profile_correlates <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
-<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Name =</span> <span class="fu">factor</span>(<span class="fu">profile_name</span>(df_resprac_fac<span class="sc">$</span>Profile), <span class="at">levels =</span> profile_key<span class="sc">$</span>Name)) <span class="sc">|&gt;</span></span>
-<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">n</span>(),</span>
-<span id="cb87-11"><a href="#cb87-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Median age</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">median</span>(Dem_Age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb87-12"><a href="#cb87-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Women (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Dem_Gender <span class="sc">==</span> <span class="st">"Female"</span>),</span>
-<span id="cb87-13"><a href="#cb87-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Men (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Dem_Gender <span class="sc">==</span> <span class="st">"Male"</span>),</span>
-<span id="cb87-14"><a href="#cb87-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">PhD / Student (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Career_Stage <span class="sc">==</span> <span class="st">"PhD / Student"</span>),</span>
-<span id="cb87-15"><a href="#cb87-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Permanent (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Career_Stage <span class="sc">==</span> <span class="st">"Permanent"</span>),</span>
-<span id="cb87-16"><a href="#cb87-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">No publication (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Publication <span class="sc">==</span> <span class="st">"No"</span>),</span>
-<span id="cb87-17"><a href="#cb87-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Social sciences (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Discipline <span class="sc">==</span> <span class="st">"Social Sciences &amp; Humanities"</span>),</span>
-<span id="cb87-18"><a href="#cb87-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Life sciences (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Discipline <span class="sc">==</span> <span class="st">"Life Sciences"</span>),</span>
-<span id="cb87-19"><a href="#cb87-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Physical sciences (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Discipline <span class="sc">==</span> <span class="st">"Physical Sciences &amp; Engineering"</span>),</span>
-<span id="cb87-20"><a href="#cb87-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">France (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="fu">clean_country</span>(Work_Country) <span class="sc">%in%</span> <span class="st">"France"</span>),</span>
-<span id="cb87-21"><a href="#cb87-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">OS training (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Workshops <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb87-22"><a href="#cb87-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">SS training (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(SS_Workshops <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb87-23"><a href="#cb87-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Not familiar with slow science (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(SS_Familiar <span class="sc">==</span> <span class="dv">0</span>),</span>
-<span id="cb87-24"><a href="#cb87-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Preregistration used (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Study_Preregistration <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb87-25"><a href="#cb87-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Preregistration planned (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="fu">round</span>(OS_Study_Preregistration <span class="sc">*</span> <span class="dv">3</span>) <span class="sc">==</span> <span class="dv">2</span>),</span>
-<span id="cb87-26"><a href="#cb87-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Registered reports planned (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="fu">round</span>(OS_Registered_Reports <span class="sc">*</span> <span class="dv">3</span>) <span class="sc">==</span> <span class="dv">2</span>),</span>
-<span id="cb87-27"><a href="#cb87-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Preregistration or registered reports unknown (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Study_Preregistration <span class="sc">==</span> <span class="dv">0</span> <span class="sc">|</span> OS_Registered_Reports <span class="sc">==</span> <span class="dv">0</span>),</span>
-<span id="cb87-28"><a href="#cb87-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Lever: support from seniors (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Help_Support_Seniors <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb87-29"><a href="#cb87-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Lever: training (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Help_Training <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb87-30"><a href="#cb87-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Criterion: high impact factor (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="st">`</span><span class="at">Work_Criteria_quality_science_high-IF</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Yes"</span>),</span>
-<span id="cb87-31"><a href="#cb87-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Criterion: originality (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Criteria_quality_science_Originality <span class="sc">==</span> <span class="st">"Yes"</span>),</span>
-<span id="cb87-32"><a href="#cb87-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Criterion: significance (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Criteria_quality_science_Significance <span class="sc">==</span> <span class="st">"Yes"</span>),</span>
-<span id="cb87-33"><a href="#cb87-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Criterion: environmental impact (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="st">`</span><span class="at">Work_Criteria_quality_science_Environmental-impact</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Yes"</span>),</span>
-<span id="cb87-34"><a href="#cb87-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Limiting publications not feasible (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(SS_Limit_publication_Not_Feasible <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb87-35"><a href="#cb87-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">One publication per year not feasible (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(SS_Onepublication_Not_Feasible <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb87-36"><a href="#cb87-36" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Changed research practices (green)</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(GS_Changes_practices, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb87-37"><a href="#cb87-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Willing to change practices (green)</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(GS_Change_practices_agreeing, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb87-38"><a href="#cb87-38" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Importance of team diversity</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(ES_Importance_research_team, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb87-39"><a href="#cb87-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Name) <span class="sc">|&gt;</span></span>
-<span id="cb87-40"><a href="#cb87-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Name) <span class="sc">|&gt;</span></span>
-<span id="cb87-41"><a href="#cb87-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>Name, <span class="at">names_to =</span> <span class="st">"Characteristic"</span>, <span class="at">values_to =</span> <span class="st">"Value"</span>)</span>
-<span id="cb87-42"><a href="#cb87-42" aria-hidden="true" tabindex="-1"></a>profile_correlates <span class="sc">|&gt;</span></span>
-<span id="cb87-43"><a href="#cb87-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Name, <span class="at">values_from =</span> Value) <span class="sc">|&gt;</span></span>
-<span id="cb87-44"><a href="#cb87-44" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"pipe"</span>, <span class="at">digits =</span> <span class="dv">0</span>, <span class="at">caption =</span> <span class="st">"Characteristics of the profiles (not used to define them)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb87-7"><a href="#cb87-7" aria-hidden="true" tabindex="-1"></a>characteristics <span class="ot">&lt;-</span> \(d, <span class="at">by =</span> <span class="cn">NULL</span>) <span class="fu">summarise</span>(d,</span>
+<span id="cb87-8"><a href="#cb87-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">N =</span> <span class="fu">n</span>(),</span>
+<span id="cb87-9"><a href="#cb87-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Median age</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">median</span>(Dem_Age, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb87-10"><a href="#cb87-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Women (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Dem_Gender <span class="sc">==</span> <span class="st">"Female"</span>),</span>
+<span id="cb87-11"><a href="#cb87-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Men (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Dem_Gender <span class="sc">==</span> <span class="st">"Male"</span>),</span>
+<span id="cb87-12"><a href="#cb87-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">PhD / Student (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Career_Stage <span class="sc">==</span> <span class="st">"PhD / Student"</span>),</span>
+<span id="cb87-13"><a href="#cb87-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Permanent (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Career_Stage <span class="sc">==</span> <span class="st">"Permanent"</span>),</span>
+<span id="cb87-14"><a href="#cb87-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">No publication (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Publication <span class="sc">==</span> <span class="st">"No"</span>),</span>
+<span id="cb87-15"><a href="#cb87-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Social sciences (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Discipline <span class="sc">==</span> <span class="st">"Social Sciences &amp; Humanities"</span>),</span>
+<span id="cb87-16"><a href="#cb87-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Life sciences (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Discipline <span class="sc">==</span> <span class="st">"Life Sciences"</span>),</span>
+<span id="cb87-17"><a href="#cb87-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Physical sciences (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Discipline <span class="sc">==</span> <span class="st">"Physical Sciences &amp; Engineering"</span>),</span>
+<span id="cb87-18"><a href="#cb87-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">France (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="fu">clean_country</span>(Work_Country) <span class="sc">%in%</span> <span class="st">"France"</span>),</span>
+<span id="cb87-19"><a href="#cb87-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">OS training (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Workshops <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb87-20"><a href="#cb87-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">SS training (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(SS_Workshops <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb87-21"><a href="#cb87-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Not familiar with slow science (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(SS_Familiar <span class="sc">==</span> <span class="dv">0</span>),</span>
+<span id="cb87-22"><a href="#cb87-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Preregistration used (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Study_Preregistration <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb87-23"><a href="#cb87-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Preregistration planned (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="fu">round</span>(OS_Study_Preregistration <span class="sc">*</span> <span class="dv">3</span>) <span class="sc">==</span> <span class="dv">2</span>),</span>
+<span id="cb87-24"><a href="#cb87-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Registered reports planned (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="fu">round</span>(OS_Registered_Reports <span class="sc">*</span> <span class="dv">3</span>) <span class="sc">==</span> <span class="dv">2</span>),</span>
+<span id="cb87-25"><a href="#cb87-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Preregistration or registered reports unknown (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Study_Preregistration <span class="sc">==</span> <span class="dv">0</span> <span class="sc">|</span> OS_Registered_Reports <span class="sc">==</span> <span class="dv">0</span>),</span>
+<span id="cb87-26"><a href="#cb87-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Lever: support from seniors (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Help_Support_Seniors <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb87-27"><a href="#cb87-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Lever: training (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(OS_Help_Training <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb87-28"><a href="#cb87-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Criterion: high impact factor (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="st">`</span><span class="at">Work_Criteria_quality_science_high-IF</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Yes"</span>),</span>
+<span id="cb87-29"><a href="#cb87-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Criterion: originality (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Criteria_quality_science_Originality <span class="sc">==</span> <span class="st">"Yes"</span>),</span>
+<span id="cb87-30"><a href="#cb87-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Criterion: significance (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(Work_Criteria_quality_science_Significance <span class="sc">==</span> <span class="st">"Yes"</span>),</span>
+<span id="cb87-31"><a href="#cb87-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Criterion: environmental impact (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(<span class="st">`</span><span class="at">Work_Criteria_quality_science_Environmental-impact</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Yes"</span>),</span>
+<span id="cb87-32"><a href="#cb87-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Limiting publications not feasible (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(SS_Limit_publication_Not_Feasible <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb87-33"><a href="#cb87-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">One publication per year not feasible (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">pct_of</span>(SS_Onepublication_Not_Feasible <span class="sc">==</span> <span class="dv">1</span>),</span>
+<span id="cb87-34"><a href="#cb87-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Changed research practices (green)</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(GS_Changes_practices, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb87-35"><a href="#cb87-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Willing to change practices (green)</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(GS_Change_practices_agreeing, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb87-36"><a href="#cb87-36" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Importance of team diversity</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">mean</span>(ES_Importance_research_team, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb87-37"><a href="#cb87-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> {{ by }})</span>
+<span id="cb87-38"><a href="#cb87-38" aria-hidden="true" tabindex="-1"></a>profile_correlates <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb87-39"><a href="#cb87-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Name =</span> <span class="fu">factor</span>(<span class="fu">profile_name</span>(df_resprac_fac<span class="sc">$</span>Profile), <span class="at">levels =</span> profile_key<span class="sc">$</span>Name)) <span class="sc">|&gt;</span></span>
+<span id="cb87-40"><a href="#cb87-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">characteristics</span>(<span class="at">by =</span> Name) <span class="sc">|&gt;</span></span>
+<span id="cb87-41"><a href="#cb87-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Name) <span class="sc">|&gt;</span></span>
+<span id="cb87-42"><a href="#cb87-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>Name, <span class="at">names_to =</span> <span class="st">"Characteristic"</span>, <span class="at">values_to =</span> <span class="st">"Value"</span>)</span>
+<span id="cb87-43"><a href="#cb87-43" aria-hidden="true" tabindex="-1"></a><span class="co"># The same in the whole sample: the reference of the manuscript's profile table</span></span>
+<span id="cb87-44"><a href="#cb87-44" aria-hidden="true" tabindex="-1"></a>sample_characteristics <span class="ot">&lt;-</span> <span class="fu">characteristics</span>(df) <span class="sc">|&gt;</span></span>
+<span id="cb87-45"><a href="#cb87-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"Characteristic"</span>, <span class="at">values_to =</span> <span class="st">"Value"</span>)</span>
+<span id="cb87-46"><a href="#cb87-46" aria-hidden="true" tabindex="-1"></a>profile_correlates <span class="sc">|&gt;</span></span>
+<span id="cb87-47"><a href="#cb87-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Name, <span class="at">values_from =</span> Value) <span class="sc">|&gt;</span></span>
+<span id="cb87-48"><a href="#cb87-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">rename</span>(sample_characteristics, <span class="st">`</span><span class="at">All participants</span><span class="st">`</span> <span class="ot">=</span> Value), <span class="at">by =</span> <span class="st">"Characteristic"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb87-49"><a href="#cb87-49" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">format =</span> <span class="st">"pipe"</span>, <span class="at">digits =</span> <span class="dv">0</span>, <span class="at">caption =</span> <span class="st">"Characteristics of the profiles (not used to define them)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <caption>Characteristics of the profiles (not used to define them)</caption>
 <colgroup>
-<col style="width: 48%">
-<col style="width: 9%">
-<col style="width: 9%">
+<col style="width: 41%">
+<col style="width: 8%">
 <col style="width: 8%">
 <col style="width: 7%">
-<col style="width: 15%">
+<col style="width: 6%">
+<col style="width: 13%">
+<col style="width: 14%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -9744,6 +9750,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <th style="text-align: right;">Stewards</th>
 <th style="text-align: right;">Purists</th>
 <th style="text-align: right;">Traditionalists</th>
+<th style="text-align: right;">All participants</th>
 </tr>
 </thead>
 <tbody>
@@ -9754,6 +9761,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">130</td>
 <td style="text-align: right;">103</td>
 <td style="text-align: right;">100</td>
+<td style="text-align: right;">672</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Median age</td>
@@ -9762,6 +9770,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">40</td>
 <td style="text-align: right;">38</td>
 <td style="text-align: right;">40</td>
+<td style="text-align: right;">35</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Women (%)</td>
@@ -9770,6 +9779,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">54</td>
 <td style="text-align: right;">37</td>
 <td style="text-align: right;">59</td>
+<td style="text-align: right;">57</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Men (%)</td>
@@ -9778,6 +9788,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">46</td>
 <td style="text-align: right;">62</td>
 <td style="text-align: right;">40</td>
+<td style="text-align: right;">41</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">PhD / Student (%)</td>
@@ -9786,6 +9797,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">21</td>
 <td style="text-align: right;">19</td>
 <td style="text-align: right;">27</td>
+<td style="text-align: right;">30</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Permanent (%)</td>
@@ -9794,6 +9806,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">62</td>
 <td style="text-align: right;">49</td>
 <td style="text-align: right;">51</td>
+<td style="text-align: right;">44</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">No publication (%)</td>
@@ -9802,6 +9815,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">10</td>
 <td style="text-align: right;">11</td>
 <td style="text-align: right;">18</td>
+<td style="text-align: right;">15</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Social sciences (%)</td>
@@ -9810,6 +9824,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">28</td>
 <td style="text-align: right;">55</td>
 <td style="text-align: right;">23</td>
+<td style="text-align: right;">49</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Life sciences (%)</td>
@@ -9818,6 +9833,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">35</td>
 <td style="text-align: right;">30</td>
 <td style="text-align: right;">37</td>
+<td style="text-align: right;">33</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Physical sciences (%)</td>
@@ -9826,6 +9842,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">36</td>
 <td style="text-align: right;">15</td>
 <td style="text-align: right;">40</td>
+<td style="text-align: right;">18</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">France (%)</td>
@@ -9834,6 +9851,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">93</td>
 <td style="text-align: right;">59</td>
 <td style="text-align: right;">93</td>
+<td style="text-align: right;">73</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">OS training (%)</td>
@@ -9842,6 +9860,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">37</td>
 <td style="text-align: right;">59</td>
 <td style="text-align: right;">23</td>
+<td style="text-align: right;">53</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">SS training (%)</td>
@@ -9850,6 +9869,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">5</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">0</td>
+<td style="text-align: right;">5</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Not familiar with slow science (%)</td>
@@ -9858,6 +9878,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">39</td>
 <td style="text-align: right;">64</td>
+<td style="text-align: right;">33</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Preregistration used (%)</td>
@@ -9866,6 +9887,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">50</td>
 <td style="text-align: right;">5</td>
+<td style="text-align: right;">39</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Preregistration planned (%)</td>
@@ -9874,6 +9896,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">15</td>
 <td style="text-align: right;">21</td>
 <td style="text-align: right;">7</td>
+<td style="text-align: right;">22</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Registered reports planned (%)</td>
@@ -9882,6 +9905,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">11</td>
 <td style="text-align: right;">39</td>
 <td style="text-align: right;">7</td>
+<td style="text-align: right;">36</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Preregistration or registered reports unknown (%)</td>
@@ -9890,6 +9914,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">73</td>
 <td style="text-align: right;">20</td>
 <td style="text-align: right;">84</td>
+<td style="text-align: right;">37</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Lever: support from seniors (%)</td>
@@ -9898,6 +9923,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">26</td>
 <td style="text-align: right;">28</td>
 <td style="text-align: right;">33</td>
+<td style="text-align: right;">35</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Lever: training (%)</td>
@@ -9906,6 +9932,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">27</td>
 <td style="text-align: right;">21</td>
 <td style="text-align: right;">37</td>
+<td style="text-align: right;">28</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Criterion: high impact factor (%)</td>
@@ -9914,6 +9941,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">9</td>
 <td style="text-align: right;">17</td>
+<td style="text-align: right;">7</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Criterion: originality (%)</td>
@@ -9922,6 +9950,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">46</td>
 <td style="text-align: right;">48</td>
 <td style="text-align: right;">51</td>
+<td style="text-align: right;">42</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Criterion: significance (%)</td>
@@ -9930,6 +9959,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">38</td>
 <td style="text-align: right;">51</td>
 <td style="text-align: right;">53</td>
+<td style="text-align: right;">40</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Criterion: environmental impact (%)</td>
@@ -9938,6 +9968,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">16</td>
 <td style="text-align: right;">2</td>
 <td style="text-align: right;">3</td>
+<td style="text-align: right;">7</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Limiting publications not feasible (%)</td>
@@ -9946,6 +9977,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">15</td>
 <td style="text-align: right;">44</td>
 <td style="text-align: right;">28</td>
+<td style="text-align: right;">26</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">One publication per year not feasible (%)</td>
@@ -9954,6 +9986,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">20</td>
 <td style="text-align: right;">44</td>
 <td style="text-align: right;">34</td>
+<td style="text-align: right;">28</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Changed research practices (green)</td>
@@ -9962,6 +9995,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">55</td>
 <td style="text-align: right;">13</td>
 <td style="text-align: right;">35</td>
+<td style="text-align: right;">36</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Willing to change practices (green)</td>
@@ -9970,6 +10004,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">86</td>
 <td style="text-align: right;">39</td>
 <td style="text-align: right;">67</td>
+<td style="text-align: right;">73</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Importance of team diversity</td>
@@ -9978,6 +10013,7 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <td style="text-align: right;">76</td>
 <td style="text-align: right;">45</td>
 <td style="text-align: right;">62</td>
+<td style="text-align: right;">70</td>
 </tr>
 </tbody>
 </table>
@@ -21003,170 +21039,143 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Figure "facets" of the manuscript: EFA loadings next to the item correlations</span></span>
-<span id="cb137-2"><a href="#cb137-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (same item order), facet correlations (CFA) and structure of quality criteria</span></span>
-<span id="cb137-3"><a href="#cb137-3" aria-hidden="true" tabindex="-1"></a>movement_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Open Science"</span> <span class="ot">=</span> <span class="st">"#2196F3"</span>, <span class="st">"Slow Science"</span> <span class="ot">=</span> <span class="st">"#FF9800"</span>,</span>
-<span id="cb137-4"><a href="#cb137-4" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"Green Science"</span> <span class="ot">=</span> <span class="st">"#4CAF50"</span>, <span class="st">"Ethical Science"</span> <span class="ot">=</span> <span class="st">"#9C27B0"</span>)</span>
-<span id="cb137-5"><a href="#cb137-5" aria-hidden="true" tabindex="-1"></a>facet_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Open Science"</span> <span class="ot">=</span> <span class="st">"#2196F3"</span>, <span class="st">"Rigorous Science"</span> <span class="ot">=</span> <span class="st">"#3F51B5"</span>, <span class="st">"Slow Science"</span> <span class="ot">=</span> <span class="st">"#FF9800"</span>,</span>
-<span id="cb137-6"><a href="#cb137-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Green Science"</span> <span class="ot">=</span> <span class="st">"#4CAF50"</span>, <span class="st">"Ethical Science"</span> <span class="ot">=</span> <span class="st">"#9C27B0"</span>)</span>
-<span id="cb137-7"><a href="#cb137-7" aria-hidden="true" tabindex="-1"></a>item_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb137-8"><a href="#cb137-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Open Science - Importance"</span>               <span class="ot">=</span> <span class="st">"Importance of open science"</span>,</span>
-<span id="cb137-9"><a href="#cb137-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Open Data"</span>                 <span class="ot">=</span> <span class="st">"Open data"</span>,</span>
-<span id="cb137-10"><a href="#cb137-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Open Materials"</span>            <span class="ot">=</span> <span class="st">"Open materials"</span>,</span>
-<span id="cb137-11"><a href="#cb137-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Open Access"</span>               <span class="ot">=</span> <span class="st">"Open access"</span>,</span>
-<span id="cb137-12"><a href="#cb137-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Preregistration"</span>           <span class="ot">=</span> <span class="st">"Preregistration"</span>,</span>
-<span id="cb137-13"><a href="#cb137-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Registered Reports"</span>        <span class="ot">=</span> <span class="st">"Registered reports"</span>,</span>
-<span id="cb137-14"><a href="#cb137-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Replication Studies"</span>       <span class="ot">=</span> <span class="st">"Replication studies"</span>,</span>
-<span id="cb137-15"><a href="#cb137-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Participatory Research"</span>    <span class="ot">=</span> <span class="st">"Participatory research"</span>,</span>
-<span id="cb137-16"><a href="#cb137-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Open Peer Review"</span>          <span class="ot">=</span> <span class="st">"Open peer review"</span>,</span>
-<span id="cb137-17"><a href="#cb137-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Slow Science - Familiarity"</span>              <span class="ot">=</span> <span class="st">"Familiarity with slow science"</span>,</span>
-<span id="cb137-18"><a href="#cb137-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Slow Science - Importance"</span>               <span class="ot">=</span> <span class="st">"Importance of slow science"</span>,</span>
-<span id="cb137-19"><a href="#cb137-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Ecofriendly Practices"</span>   <span class="ot">=</span> <span class="st">"Importance in conducting research"</span>,</span>
-<span id="cb137-20"><a href="#cb137-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Ecofriendly Topics"</span>      <span class="ot">=</span> <span class="st">"Importance in choosing topics"</span>,</span>
-<span id="cb137-21"><a href="#cb137-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Changed Practices"</span>       <span class="ot">=</span> <span class="st">"Changed research practices"</span>,</span>
-<span id="cb137-22"><a href="#cb137-22" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Changed Communication"</span>   <span class="ot">=</span> <span class="st">"Changed communication (e.g., travel)"</span>,</span>
-<span id="cb137-23"><a href="#cb137-23" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Change Willingness"</span>      <span class="ot">=</span> <span class="st">"Willing to change practices"</span>,</span>
-<span id="cb137-24"><a href="#cb137-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Belief Relation"</span>         <span class="ot">=</span> <span class="st">"Link between research and environment"</span>,</span>
-<span id="cb137-25"><a href="#cb137-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Ethical Science - Team Diversity"</span>        <span class="ot">=</span> <span class="st">"Importance of team diversity"</span>,</span>
-<span id="cb137-26"><a href="#cb137-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Ethical Science - Societal Consequences"</span> <span class="ot">=</span> <span class="st">"Care for societal consequences"</span></span>
-<span id="cb137-27"><a href="#cb137-27" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb137-28"><a href="#cb137-28" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">setequal</span>(<span class="fu">names</span>(item_labels), <span class="fu">names</span>(df_resprac)))</span>
-<span id="cb137-29"><a href="#cb137-29" aria-hidden="true" tabindex="-1"></a>diverging <span class="ot">&lt;-</span> <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"#D6604D"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"#4D4D4D"</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="at">na.value =</span> <span class="st">"white"</span>,</span>
-<span id="cb137-30"><a href="#cb137-30" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">name =</span> <span class="st">"Loading / r"</span>, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="fl">0.5</span>, <span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</span>
-<span id="cb137-31"><a href="#cb137-31" aria-hidden="true" tabindex="-1"></a>theme_heat <span class="ot">&lt;-</span> <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb137-32"><a href="#cb137-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>(), <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">11</span>),</span>
-<span id="cb137-33"><a href="#cb137-33" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"grey40"</span>, <span class="at">size =</span> <span class="dv">9</span>), <span class="at">plot.title.position =</span> <span class="st">"plot"</span>)</span>
-<span id="cb137-34"><a href="#cb137-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb137-35"><a href="#cb137-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Items ordered by the facet they load most on, then by loading</span></span>
-<span id="cb137-36"><a href="#cb137-36" aria-hidden="true" tabindex="-1"></a>facet_names <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">str_replace_all</span>(<span class="fu">names</span>(efa_ids), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>, <span class="st">" "</span>), efa_ids)</span>
-<span id="cb137-37"><a href="#cb137-37" aria-hidden="true" tabindex="-1"></a>efa_long <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(f) <span class="sc">|&gt;</span></span>
-<span id="cb137-38"><a href="#cb137-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Variable, <span class="fu">all_of</span>(<span class="fu">unname</span>(efa_ids))) <span class="sc">|&gt;</span></span>
-<span id="cb137-39"><a href="#cb137-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>Variable, <span class="at">names_to =</span> <span class="st">"Factor"</span>, <span class="at">values_to =</span> <span class="st">"Loading"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb137-40"><a href="#cb137-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Facet =</span> <span class="fu">factor</span>(facet_names[Factor], <span class="at">levels =</span> <span class="fu">names</span>(facet_colors)))</span>
-<span id="cb137-41"><a href="#cb137-41" aria-hidden="true" tabindex="-1"></a>efa_main <span class="ot">&lt;-</span> <span class="fu">slice_max</span>(efa_long, <span class="fu">abs</span>(Loading), <span class="at">by =</span> Variable, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb137-42"><a href="#cb137-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Facet, <span class="fu">desc</span>(<span class="fu">abs</span>(Loading)))</span>
-<span id="cb137-43"><a href="#cb137-43" aria-hidden="true" tabindex="-1"></a>item_order <span class="ot">&lt;-</span> efa_main<span class="sc">$</span>Variable</span>
-<span id="cb137-44"><a href="#cb137-44" aria-hidden="true" tabindex="-1"></a>item_levels <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">unname</span>(item_labels[item_order]))  <span class="co"># First item on top</span></span>
-<span id="cb137-45"><a href="#cb137-45" aria-hidden="true" tabindex="-1"></a>efa_long <span class="ot">&lt;-</span> <span class="fu">mutate</span>(efa_long, <span class="at">Item =</span> <span class="fu">factor</span>(item_labels[Variable], <span class="at">levels =</span> item_levels))</span>
-<span id="cb137-46"><a href="#cb137-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb137-47"><a href="#cb137-47" aria-hidden="true" tabindex="-1"></a>p_strip <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Variable =</span> item_order) <span class="sc">|&gt;</span></span>
-<span id="cb137-48"><a href="#cb137-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">factor</span>(item_labels[Variable], <span class="at">levels =</span> item_levels),</span>
-<span id="cb137-49"><a href="#cb137-49" aria-hidden="true" tabindex="-1"></a>         <span class="at">Movement =</span> <span class="fu">case_when</span>(<span class="fu">str_starts</span>(Variable, <span class="st">"Open Science|Endorsement"</span>) <span class="sc">~</span> <span class="st">"Open Science"</span>,</span>
-<span id="cb137-50"><a href="#cb137-50" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">str_starts</span>(Variable, <span class="st">"Slow"</span>) <span class="sc">~</span> <span class="st">"Slow Science"</span>,</span>
-<span id="cb137-51"><a href="#cb137-51" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">str_starts</span>(Variable, <span class="st">"Green"</span>) <span class="sc">~</span> <span class="st">"Green Science"</span>,</span>
-<span id="cb137-52"><a href="#cb137-52" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.default =</span> <span class="st">"Ethical Science"</span>),</span>
-<span id="cb137-53"><a href="#cb137-53" aria-hidden="true" tabindex="-1"></a>         <span class="at">Movement =</span> <span class="fu">factor</span>(Movement, <span class="at">levels =</span> <span class="fu">names</span>(movement_colors))) <span class="sc">|&gt;</span></span>
-<span id="cb137-54"><a href="#cb137-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> Item, <span class="at">fill =</span> Movement)) <span class="sc">+</span></span>
-<span id="cb137-55"><a href="#cb137-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">width =</span> <span class="fl">0.9</span>, <span class="at">height =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb137-56"><a href="#cb137-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> movement_colors, <span class="at">name =</span> <span class="st">"Movement"</span>) <span class="sc">+</span></span>
-<span id="cb137-57"><a href="#cb137-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
-<span id="cb137-58"><a href="#cb137-58" aria-hidden="true" tabindex="-1"></a>  theme_heat <span class="sc">+</span></span>
-<span id="cb137-59"><a href="#cb137-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
-<span id="cb137-60"><a href="#cb137-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">tag =</span> <span class="st">"A"</span>, <span class="at">title =</span> <span class="st">"Facets (Exploratory Factor Analysis)"</span>,</span>
-<span id="cb137-61"><a href="#cb137-61" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Loadings of each item, by the movement it was asked under"</span>)</span>
-<span id="cb137-62"><a href="#cb137-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb137-63"><a href="#cb137-63" aria-hidden="true" tabindex="-1"></a>p_loadings <span class="ot">&lt;-</span> efa_long <span class="sc">|&gt;</span></span>
-<span id="cb137-64"><a href="#cb137-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Facet, <span class="at">y =</span> Item)) <span class="sc">+</span></span>
-<span id="cb137-65"><a href="#cb137-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Loading), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb137-66"><a href="#cb137-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">str_replace</span>(<span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, Loading), <span class="st">"^(-?)0"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">1"</span>),</span>
-<span id="cb137-67"><a href="#cb137-67" aria-hidden="true" tabindex="-1"></a>                <span class="at">color =</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(Loading) <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="st">"white"</span>, <span class="st">"grey20"</span>), <span class="at">fontface =</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(Loading) <span class="sc">&gt;=</span> <span class="fl">0.3</span>, <span class="st">"bold"</span>, <span class="st">"plain"</span>)),</span>
-<span id="cb137-68"><a href="#cb137-68" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb137-69"><a href="#cb137-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">Facet =</span> <span class="fu">factor</span>(<span class="fu">names</span>(facet_colors), <span class="at">levels =</span> <span class="fu">names</span>(facet_colors))),</span>
-<span id="cb137-70"><a href="#cb137-70" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">x =</span> Facet, <span class="at">y =</span> <span class="fu">length</span>(item_levels) <span class="sc">+</span> <span class="fl">0.85</span>, <span class="at">color =</span> facet_colors[<span class="fu">as.character</span>(Facet)]), <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb137-71"><a href="#cb137-71" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">15</span>, <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb137-72"><a href="#cb137-72" aria-hidden="true" tabindex="-1"></a>  diverging <span class="sc">+</span></span>
-<span id="cb137-73"><a href="#cb137-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_identity</span>() <span class="sc">+</span></span>
-<span id="cb137-74"><a href="#cb137-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">position =</span> <span class="st">"top"</span>, <span class="at">labels =</span> \(x) <span class="fu">str_remove</span>(x, <span class="st">" Science"</span>)) <span class="sc">+</span></span>
-<span id="cb137-75"><a href="#cb137-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">clip =</span> <span class="st">"off"</span>) <span class="sc">+</span></span>
-<span id="cb137-76"><a href="#cb137-76" aria-hidden="true" tabindex="-1"></a>  theme_heat <span class="sc">+</span></span>
-<span id="cb137-77"><a href="#cb137-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.x.top =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>, <span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="dv">0</span>, <span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">b =</span> <span class="dv">10</span>))) <span class="sc">+</span></span>
-<span id="cb137-78"><a href="#cb137-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span>
-<span id="cb137-79"><a href="#cb137-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb137-80"><a href="#cb137-80" aria-hidden="true" tabindex="-1"></a><span class="co"># Item correlations, in the same order, with the items of each facet framed</span></span>
-<span id="cb137-81"><a href="#cb137-81" aria-hidden="true" tabindex="-1"></a>cor_long <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(<span class="fu">cor</span>(df_resprac, <span class="at">use =</span> <span class="st">"pairwise.complete.obs"</span>))) <span class="sc">|&gt;</span></span>
-<span id="cb137-82"><a href="#cb137-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">Row =</span> <span class="fu">factor</span>(item_labels[<span class="fu">as.character</span>(Var1)], <span class="at">levels =</span> item_levels),</span>
-<span id="cb137-83"><a href="#cb137-83" aria-hidden="true" tabindex="-1"></a>            <span class="at">Col =</span> <span class="fu">factor</span>(item_labels[<span class="fu">as.character</span>(Var2)], <span class="at">levels =</span> <span class="fu">rev</span>(item_levels)),</span>
-<span id="cb137-84"><a href="#cb137-84" aria-hidden="true" tabindex="-1"></a>            <span class="at">r =</span> <span class="fu">ifelse</span>(Var1 <span class="sc">==</span> Var2, <span class="cn">NA</span>, Freq))</span>
-<span id="cb137-85"><a href="#cb137-85" aria-hidden="true" tabindex="-1"></a>n_items <span class="ot">&lt;-</span> <span class="fu">length</span>(item_order)</span>
-<span id="cb137-86"><a href="#cb137-86" aria-hidden="true" tabindex="-1"></a>facet_blocks <span class="ot">&lt;-</span> efa_main <span class="sc">|&gt;</span></span>
-<span id="cb137-87"><a href="#cb137-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">k =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb137-88"><a href="#cb137-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">xmin =</span> <span class="fu">min</span>(k) <span class="sc">-</span> <span class="fl">0.5</span>, <span class="at">xmax =</span> <span class="fu">max</span>(k) <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">.by =</span> Facet) <span class="sc">|&gt;</span></span>
-<span id="cb137-89"><a href="#cb137-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ymin =</span> n_items <span class="sc">-</span> xmax <span class="sc">+</span> <span class="dv">1</span>, <span class="at">ymax =</span> n_items <span class="sc">-</span> xmin <span class="sc">+</span> <span class="dv">1</span>)</span>
-<span id="cb137-90"><a href="#cb137-90" aria-hidden="true" tabindex="-1"></a>p_cor_items <span class="ot">&lt;-</span> cor_long <span class="sc">|&gt;</span></span>
-<span id="cb137-91"><a href="#cb137-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Col, <span class="at">y =</span> Row)) <span class="sc">+</span></span>
-<span id="cb137-92"><a href="#cb137-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> r), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb137-93"><a href="#cb137-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(r) <span class="sc">&amp;</span> <span class="fu">abs</span>(r) <span class="sc">&gt;=</span> <span class="fl">0.3</span>, <span class="fu">str_replace</span>(<span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, r), <span class="st">"^(-?)0"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">1"</span>), <span class="st">""</span>),</span>
-<span id="cb137-94"><a href="#cb137-94" aria-hidden="true" tabindex="-1"></a>                <span class="at">color =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(r) <span class="sc">&amp;</span> <span class="fu">abs</span>(r) <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="st">"white"</span>, <span class="st">"grey20"</span>)), <span class="at">size =</span> <span class="fl">2.2</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb137-95"><a href="#cb137-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rect</span>(<span class="at">data =</span> facet_blocks, <span class="fu">aes</span>(<span class="at">xmin =</span> xmin, <span class="at">xmax =</span> xmax, <span class="at">ymin =</span> ymin, <span class="at">ymax =</span> ymax, <span class="at">color =</span> facet_colors[<span class="fu">as.character</span>(Facet)]),</span>
-<span id="cb137-96"><a href="#cb137-96" aria-hidden="true" tabindex="-1"></a>            <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>, <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb137-97"><a href="#cb137-97" aria-hidden="true" tabindex="-1"></a>  diverging <span class="sc">+</span></span>
-<span id="cb137-98"><a href="#cb137-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_identity</span>() <span class="sc">+</span></span>
-<span id="cb137-99"><a href="#cb137-99" aria-hidden="true" tabindex="-1"></a>  theme_heat <span class="sc">+</span></span>
-<span id="cb137-100"><a href="#cb137-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
-<span id="cb137-101"><a href="#cb137-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">tag =</span> <span class="st">"B"</span>, <span class="at">title =</span> <span class="st">"Item Correlations"</span>,</span>
-<span id="cb137-102"><a href="#cb137-102" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Items in the same order as in A; |r| ≥ .30 labelled; facets framed"</span>)</span>
-<span id="cb137-103"><a href="#cb137-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb137-104"><a href="#cb137-104" aria-hidden="true" tabindex="-1"></a><span class="co"># Facet correlations (CFA), significant ones only</span></span>
-<span id="cb137-105"><a href="#cb137-105" aria-hidden="true" tabindex="-1"></a>facet_pos <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Facet =</span> <span class="fu">c</span>(<span class="st">"Slow Science"</span>, <span class="st">"Green Science"</span>, <span class="st">"Ethical Science"</span>, <span class="st">"Rigorous Science"</span>, <span class="st">"Open Science"</span>),</span>
-<span id="cb137-106"><a href="#cb137-106" aria-hidden="true" tabindex="-1"></a>                    <span class="at">angle =</span> (<span class="dv">90</span> <span class="sc">-</span> <span class="dv">72</span> <span class="sc">*</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">4</span>) <span class="sc">*</span> pi <span class="sc">/</span> <span class="dv">180</span>) <span class="sc">|&gt;</span></span>
-<span id="cb137-107"><a href="#cb137-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">x =</span> <span class="fu">cos</span>(angle), <span class="at">y =</span> <span class="fu">sin</span>(angle), <span class="at">Latent =</span> <span class="fu">str_replace</span>(Facet, <span class="st">" "</span>, <span class="st">"_"</span>))</span>
-<span id="cb137-108"><a href="#cb137-108" aria-hidden="true" tabindex="-1"></a>cfa_cor <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">parameterEstimates</span>(fit_cfa) <span class="sc">|&gt;</span></span>
-<span id="cb137-109"><a href="#cb137-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"~~"</span>, lhs <span class="sc">!=</span> rhs) <span class="sc">|&gt;</span></span>
-<span id="cb137-110"><a href="#cb137-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(facet_pos, <span class="at">lhs =</span> Latent, x, y), <span class="at">by =</span> <span class="st">"lhs"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb137-111"><a href="#cb137-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(facet_pos, <span class="at">rhs =</span> Latent, <span class="at">xend =</span> x, <span class="at">yend =</span> y), <span class="at">by =</span> <span class="st">"rhs"</span>)</span>
-<span id="cb137-112"><a href="#cb137-112" aria-hidden="true" tabindex="-1"></a>p_cor_facets <span class="ot">&lt;-</span> cfa_cor <span class="sc">|&gt;</span></span>
-<span id="cb137-113"><a href="#cb137-113" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ci.lower <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">|</span> ci.upper <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
-<span id="cb137-114"><a href="#cb137-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb137-115"><a href="#cb137-115" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend, <span class="at">linewidth =</span> <span class="fu">abs</span>(est)), <span class="at">color =</span> <span class="st">"grey55"</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb137-116"><a href="#cb137-116" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="fu">aes</span>(<span class="at">x =</span> (x <span class="sc">+</span> xend) <span class="sc">/</span> <span class="dv">2</span>, <span class="at">y =</span> (y <span class="sc">+</span> yend) <span class="sc">/</span> <span class="dv">2</span>, <span class="at">label =</span> <span class="fu">str_replace</span>(<span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, est), <span class="st">"^(-?)0"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">1"</span>)),</span>
-<span id="cb137-117"><a href="#cb137-117" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="dv">3</span>, <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">label.size =</span> <span class="dv">0</span>, <span class="at">label.padding =</span> <span class="fu">unit</span>(<span class="fl">0.15</span>, <span class="st">"lines"</span>), <span class="at">color =</span> <span class="st">"grey20"</span>) <span class="sc">+</span></span>
-<span id="cb137-118"><a href="#cb137-118" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> facet_pos, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">color =</span> Facet), <span class="at">size =</span> <span class="dv">23</span>) <span class="sc">+</span></span>
-<span id="cb137-119"><a href="#cb137-119" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> facet_pos, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">label =</span> <span class="fu">str_replace</span>(Facet, <span class="st">" "</span>, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)),</span>
-<span id="cb137-120"><a href="#cb137-120" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">lineheight =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb137-121"><a href="#cb137-121" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> facet_colors, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb137-122"><a href="#cb137-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linewidth_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">4</span>), <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb137-123"><a href="#cb137-123" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.25</span>, <span class="fl">1.25</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.1</span>, <span class="fl">1.25</span>)) <span class="sc">+</span></span>
-<span id="cb137-124"><a href="#cb137-124" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>(<span class="at">base_size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb137-125"><a href="#cb137-125" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">11</span>), <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"grey40"</span>, <span class="at">size =</span> <span class="dv">9</span>),</span>
-<span id="cb137-126"><a href="#cb137-126" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title.position =</span> <span class="st">"plot"</span>) <span class="sc">+</span></span>
-<span id="cb137-127"><a href="#cb137-127" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">tag =</span> <span class="st">"C"</span>, <span class="at">title =</span> <span class="st">"Correlations between Facets"</span>,</span>
-<span id="cb137-128"><a href="#cb137-128" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Latent correlations (CFA) whose 95% CI excludes 0"</span>)</span>
-<span id="cb137-129"><a href="#cb137-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb137-130"><a href="#cb137-130" aria-hidden="true" tabindex="-1"></a><span class="co"># Quality criteria: loadings on the two principal components</span></span>
-<span id="cb137-131"><a href="#cb137-131" aria-hidden="true" tabindex="-1"></a>pca_var <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">summary</span>(pca_criteria)) <span class="sc">|&gt;</span> <span class="fu">filter</span>(Parameter <span class="sc">==</span> <span class="st">"Variance"</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span>Parameter) <span class="sc">|&gt;</span> <span class="fu">unlist</span>()</span>
-<span id="cb137-132"><a href="#cb137-132" aria-hidden="true" tabindex="-1"></a>p_pca_criteria <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(pca_criteria) <span class="sc">|&gt;</span></span>
-<span id="cb137-133"><a href="#cb137-133" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Variable, PC1, PC2) <span class="sc">|&gt;</span></span>
-<span id="cb137-134"><a href="#cb137-134" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(p_criteria<span class="sc">$</span>data, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Variable"</span> <span class="ot">=</span> <span class="st">"Criterion"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb137-135"><a href="#cb137-135" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Labels beside their point, on the side with room (neighbours on the other)</span></span>
-<span id="cb137-136"><a href="#cb137-136" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">side =</span> <span class="fu">case_when</span>(Variable <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Originality / Innovation"</span>, <span class="st">"High Impact Factor Journal"</span>, <span class="st">"Replication"</span>) <span class="sc">~</span> <span class="st">"left"</span>,</span>
-<span id="cb137-137"><a href="#cb137-137" aria-hidden="true" tabindex="-1"></a>                          Variable <span class="sc">==</span> <span class="st">"Significance / Impact"</span> <span class="sc">~</span> <span class="st">"below"</span>,</span>
-<span id="cb137-138"><a href="#cb137-138" aria-hidden="true" tabindex="-1"></a>                          <span class="at">.default =</span> <span class="st">"right"</span>),</span>
-<span id="cb137-139"><a href="#cb137-139" aria-hidden="true" tabindex="-1"></a>         <span class="at">offset =</span> <span class="fl">0.04</span> <span class="sc">+</span> <span class="fl">0.08</span> <span class="sc">*</span> <span class="fu">sqrt</span>(pct),</span>
-<span id="cb137-140"><a href="#cb137-140" aria-hidden="true" tabindex="-1"></a>         <span class="at">label_x =</span> PC1 <span class="sc">+</span> <span class="fu">case_when</span>(side <span class="sc">==</span> <span class="st">"left"</span> <span class="sc">~</span> <span class="sc">-</span>offset, side <span class="sc">==</span> <span class="st">"right"</span> <span class="sc">~</span> offset, <span class="at">.default =</span> <span class="dv">0</span>),</span>
-<span id="cb137-141"><a href="#cb137-141" aria-hidden="true" tabindex="-1"></a>         <span class="at">label_y =</span> PC2 <span class="sc">-</span> <span class="fu">ifelse</span>(side <span class="sc">==</span> <span class="st">"below"</span>, offset, <span class="dv">0</span>),</span>
-<span id="cb137-142"><a href="#cb137-142" aria-hidden="true" tabindex="-1"></a>         <span class="at">hjust =</span> <span class="fu">case_when</span>(side <span class="sc">==</span> <span class="st">"left"</span> <span class="sc">~</span> <span class="dv">1</span>, side <span class="sc">==</span> <span class="st">"right"</span> <span class="sc">~</span> <span class="dv">0</span>, <span class="at">.default =</span> <span class="fl">0.5</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb137-143"><a href="#cb137-143" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2)) <span class="sc">+</span></span>
-<span id="cb137-144"><a href="#cb137-144" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"grey80"</span>) <span class="sc">+</span></span>
-<span id="cb137-145"><a href="#cb137-145" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"grey80"</span>) <span class="sc">+</span></span>
-<span id="cb137-146"><a href="#cb137-146" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> pct), <span class="at">color =</span> <span class="st">"#546E7A"</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb137-147"><a href="#cb137-147" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> label_x, <span class="at">y =</span> label_y, <span class="at">label =</span> Variable, <span class="at">hjust =</span> hjust), <span class="at">size =</span> <span class="fl">2.9</span>, <span class="at">color =</span> <span class="st">"grey20"</span>) <span class="sc">+</span></span>
-<span id="cb137-148"><a href="#cb137-148" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_area</span>(<span class="at">max_size =</span> <span class="dv">9</span>, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
-<span id="cb137-149"><a href="#cb137-149" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.8</span>, <span class="fl">0.9</span>), <span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="dv">0</span>, <span class="fl">0.5</span>)) <span class="sc">+</span></span>
-<span id="cb137-150"><a href="#cb137-150" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.7</span>, <span class="fl">0.7</span>)) <span class="sc">+</span></span>
-<span id="cb137-151"><a href="#cb137-151" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
-<span id="cb137-152"><a href="#cb137-152" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(), <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">11</span>),</span>
-<span id="cb137-153"><a href="#cb137-153" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"grey40"</span>, <span class="at">size =</span> <span class="dv">9</span>), <span class="at">plot.title.position =</span> <span class="st">"plot"</span>,</span>
-<span id="cb137-154"><a href="#cb137-154" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fl">8.5</span>)) <span class="sc">+</span></span>
-<span id="cb137-155"><a href="#cb137-155" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">tag =</span> <span class="st">"D"</span>, <span class="at">title =</span> <span class="st">"Structure of Quality Criteria"</span>,</span>
-<span id="cb137-156"><a href="#cb137-156" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Loadings on the principal components (point size: % selecting)"</span>,</span>
-<span id="cb137-157"><a href="#cb137-157" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="fu">sprintf</span>(<span class="st">"PC1 (%.0f%%): rigour and transparency (−) vs. novelty and impact (+)"</span>, <span class="dv">100</span> <span class="sc">*</span> pca_var[<span class="dv">1</span>]),</span>
-<span id="cb137-158"><a href="#cb137-158" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="fu">sprintf</span>(<span class="st">"PC2 (%.0f%%): transparency and inclusivity (−) vs. rigour and innovation (+)"</span>, <span class="dv">100</span> <span class="sc">*</span> pca_var[<span class="dv">2</span>]))</span>
-<span id="cb137-159"><a href="#cb137-159" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb137-160"><a href="#cb137-160" aria-hidden="true" tabindex="-1"></a>fig_facets <span class="ot">&lt;-</span> ((p_strip <span class="sc">|</span> p_loadings <span class="sc">|</span> p_cor_items) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">widths =</span> <span class="fu">c</span>(<span class="fl">0.35</span>, <span class="dv">5</span>, <span class="dv">19</span>))) <span class="sc">/</span></span>
-<span id="cb137-161"><a href="#cb137-161" aria-hidden="true" tabindex="-1"></a>  ((p_cor_facets <span class="sc">|</span> p_pca_criteria) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">widths =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">1.25</span>))) <span class="sc">+</span></span>
-<span id="cb137-162"><a href="#cb137-162" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">heights =</span> <span class="fu">c</span>(<span class="fl">1.55</span>, <span class="dv">1</span>), <span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span></span>
-<span id="cb137-163"><a href="#cb137-163" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>, <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">14</span>))</span>
-<span id="cb137-164"><a href="#cb137-164" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"../paper/figures/fig_facets.png"</span>, fig_facets, <span class="at">width =</span> <span class="fl">10.5</span>, <span class="at">height =</span> <span class="fl">12.5</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
-<span id="cb137-165"><a href="#cb137-165" aria-hidden="true" tabindex="-1"></a>fig_facets</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb137-2"><a href="#cb137-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (same item order), and facet correlations (CFA). The structure of the quality</span></span>
+<span id="cb137-3"><a href="#cb137-3" aria-hidden="true" tabindex="-1"></a><span class="co"># criteria (PCA) is left to its own section</span></span>
+<span id="cb137-4"><a href="#cb137-4" aria-hidden="true" tabindex="-1"></a>movement_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Open Science"</span> <span class="ot">=</span> <span class="st">"#2196F3"</span>, <span class="st">"Slow Science"</span> <span class="ot">=</span> <span class="st">"#FF9800"</span>,</span>
+<span id="cb137-5"><a href="#cb137-5" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"Green Science"</span> <span class="ot">=</span> <span class="st">"#4CAF50"</span>, <span class="st">"Ethical Science"</span> <span class="ot">=</span> <span class="st">"#9C27B0"</span>)</span>
+<span id="cb137-6"><a href="#cb137-6" aria-hidden="true" tabindex="-1"></a>facet_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Open Science"</span> <span class="ot">=</span> <span class="st">"#2196F3"</span>, <span class="st">"Rigorous Science"</span> <span class="ot">=</span> <span class="st">"#3F51B5"</span>, <span class="st">"Slow Science"</span> <span class="ot">=</span> <span class="st">"#FF9800"</span>,</span>
+<span id="cb137-7"><a href="#cb137-7" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Green Science"</span> <span class="ot">=</span> <span class="st">"#4CAF50"</span>, <span class="st">"Ethical Science"</span> <span class="ot">=</span> <span class="st">"#9C27B0"</span>)</span>
+<span id="cb137-8"><a href="#cb137-8" aria-hidden="true" tabindex="-1"></a>item_labels <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb137-9"><a href="#cb137-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Open Science - Importance"</span>               <span class="ot">=</span> <span class="st">"Importance of open science"</span>,</span>
+<span id="cb137-10"><a href="#cb137-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Open Data"</span>                 <span class="ot">=</span> <span class="st">"Open data"</span>,</span>
+<span id="cb137-11"><a href="#cb137-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Open Materials"</span>            <span class="ot">=</span> <span class="st">"Open materials"</span>,</span>
+<span id="cb137-12"><a href="#cb137-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Open Access"</span>               <span class="ot">=</span> <span class="st">"Open access"</span>,</span>
+<span id="cb137-13"><a href="#cb137-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Preregistration"</span>           <span class="ot">=</span> <span class="st">"Preregistration"</span>,</span>
+<span id="cb137-14"><a href="#cb137-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Registered Reports"</span>        <span class="ot">=</span> <span class="st">"Registered reports"</span>,</span>
+<span id="cb137-15"><a href="#cb137-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Replication Studies"</span>       <span class="ot">=</span> <span class="st">"Replication studies"</span>,</span>
+<span id="cb137-16"><a href="#cb137-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Participatory Research"</span>    <span class="ot">=</span> <span class="st">"Participatory research"</span>,</span>
+<span id="cb137-17"><a href="#cb137-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Endorsement - Open Peer Review"</span>          <span class="ot">=</span> <span class="st">"Open peer review"</span>,</span>
+<span id="cb137-18"><a href="#cb137-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Slow Science - Familiarity"</span>              <span class="ot">=</span> <span class="st">"Familiarity with slow science"</span>,</span>
+<span id="cb137-19"><a href="#cb137-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Slow Science - Importance"</span>               <span class="ot">=</span> <span class="st">"Importance of slow science"</span>,</span>
+<span id="cb137-20"><a href="#cb137-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Ecofriendly Practices"</span>   <span class="ot">=</span> <span class="st">"Importance in conducting research"</span>,</span>
+<span id="cb137-21"><a href="#cb137-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Ecofriendly Topics"</span>      <span class="ot">=</span> <span class="st">"Importance in choosing topics"</span>,</span>
+<span id="cb137-22"><a href="#cb137-22" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Changed Practices"</span>       <span class="ot">=</span> <span class="st">"Changed research practices"</span>,</span>
+<span id="cb137-23"><a href="#cb137-23" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Changed Communication"</span>   <span class="ot">=</span> <span class="st">"Changed communication (e.g., travel)"</span>,</span>
+<span id="cb137-24"><a href="#cb137-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Change Willingness"</span>      <span class="ot">=</span> <span class="st">"Willing to change practices"</span>,</span>
+<span id="cb137-25"><a href="#cb137-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green Science - Belief Relation"</span>         <span class="ot">=</span> <span class="st">"Link between research and environment"</span>,</span>
+<span id="cb137-26"><a href="#cb137-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Ethical Science - Team Diversity"</span>        <span class="ot">=</span> <span class="st">"Importance of team diversity"</span>,</span>
+<span id="cb137-27"><a href="#cb137-27" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Ethical Science - Societal Consequences"</span> <span class="ot">=</span> <span class="st">"Care for societal consequences"</span></span>
+<span id="cb137-28"><a href="#cb137-28" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb137-29"><a href="#cb137-29" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">setequal</span>(<span class="fu">names</span>(item_labels), <span class="fu">names</span>(df_resprac)))</span>
+<span id="cb137-30"><a href="#cb137-30" aria-hidden="true" tabindex="-1"></a>diverging <span class="ot">&lt;-</span> <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"#D6604D"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"#4D4D4D"</span>, <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>), <span class="at">na.value =</span> <span class="st">"white"</span>,</span>
+<span id="cb137-31"><a href="#cb137-31" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">name =</span> <span class="st">"Loading / r"</span>, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="fl">0.5</span>, <span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>))</span>
+<span id="cb137-32"><a href="#cb137-32" aria-hidden="true" tabindex="-1"></a>theme_heat <span class="ot">&lt;-</span> <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb137-33"><a href="#cb137-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">panel.grid =</span> <span class="fu">element_blank</span>(), <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb137-34"><a href="#cb137-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"grey40"</span>, <span class="at">size =</span> <span class="dv">9</span>), <span class="at">plot.title.position =</span> <span class="st">"plot"</span>)</span>
+<span id="cb137-35"><a href="#cb137-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb137-36"><a href="#cb137-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Items ordered by the facet they load most on, then by loading</span></span>
+<span id="cb137-37"><a href="#cb137-37" aria-hidden="true" tabindex="-1"></a>facet_names <span class="ot">&lt;-</span> <span class="fu">setNames</span>(<span class="fu">str_replace_all</span>(<span class="fu">names</span>(efa_ids), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>, <span class="st">" "</span>), efa_ids)</span>
+<span id="cb137-38"><a href="#cb137-38" aria-hidden="true" tabindex="-1"></a>efa_long <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(f) <span class="sc">|&gt;</span></span>
+<span id="cb137-39"><a href="#cb137-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Variable, <span class="fu">all_of</span>(<span class="fu">unname</span>(efa_ids))) <span class="sc">|&gt;</span></span>
+<span id="cb137-40"><a href="#cb137-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>Variable, <span class="at">names_to =</span> <span class="st">"Factor"</span>, <span class="at">values_to =</span> <span class="st">"Loading"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb137-41"><a href="#cb137-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Facet =</span> <span class="fu">factor</span>(facet_names[Factor], <span class="at">levels =</span> <span class="fu">names</span>(facet_colors)))</span>
+<span id="cb137-42"><a href="#cb137-42" aria-hidden="true" tabindex="-1"></a>efa_main <span class="ot">&lt;-</span> <span class="fu">slice_max</span>(efa_long, <span class="fu">abs</span>(Loading), <span class="at">by =</span> Variable, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb137-43"><a href="#cb137-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Facet, <span class="fu">desc</span>(<span class="fu">abs</span>(Loading)))</span>
+<span id="cb137-44"><a href="#cb137-44" aria-hidden="true" tabindex="-1"></a>item_order <span class="ot">&lt;-</span> efa_main<span class="sc">$</span>Variable</span>
+<span id="cb137-45"><a href="#cb137-45" aria-hidden="true" tabindex="-1"></a>item_levels <span class="ot">&lt;-</span> <span class="fu">rev</span>(<span class="fu">unname</span>(item_labels[item_order]))  <span class="co"># First item on top</span></span>
+<span id="cb137-46"><a href="#cb137-46" aria-hidden="true" tabindex="-1"></a>efa_long <span class="ot">&lt;-</span> <span class="fu">mutate</span>(efa_long, <span class="at">Item =</span> <span class="fu">factor</span>(item_labels[Variable], <span class="at">levels =</span> item_levels))</span>
+<span id="cb137-47"><a href="#cb137-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb137-48"><a href="#cb137-48" aria-hidden="true" tabindex="-1"></a>p_strip <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Variable =</span> item_order) <span class="sc">|&gt;</span></span>
+<span id="cb137-49"><a href="#cb137-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">factor</span>(item_labels[Variable], <span class="at">levels =</span> item_levels),</span>
+<span id="cb137-50"><a href="#cb137-50" aria-hidden="true" tabindex="-1"></a>         <span class="at">Movement =</span> <span class="fu">case_when</span>(<span class="fu">str_starts</span>(Variable, <span class="st">"Open Science|Endorsement"</span>) <span class="sc">~</span> <span class="st">"Open Science"</span>,</span>
+<span id="cb137-51"><a href="#cb137-51" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">str_starts</span>(Variable, <span class="st">"Slow"</span>) <span class="sc">~</span> <span class="st">"Slow Science"</span>,</span>
+<span id="cb137-52"><a href="#cb137-52" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">str_starts</span>(Variable, <span class="st">"Green"</span>) <span class="sc">~</span> <span class="st">"Green Science"</span>,</span>
+<span id="cb137-53"><a href="#cb137-53" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.default =</span> <span class="st">"Ethical Science"</span>),</span>
+<span id="cb137-54"><a href="#cb137-54" aria-hidden="true" tabindex="-1"></a>         <span class="at">Movement =</span> <span class="fu">factor</span>(Movement, <span class="at">levels =</span> <span class="fu">names</span>(movement_colors))) <span class="sc">|&gt;</span></span>
+<span id="cb137-55"><a href="#cb137-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> Item, <span class="at">fill =</span> Movement)) <span class="sc">+</span></span>
+<span id="cb137-56"><a href="#cb137-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="at">width =</span> <span class="fl">0.9</span>, <span class="at">height =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb137-57"><a href="#cb137-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> movement_colors, <span class="at">name =</span> <span class="st">"Movement"</span>) <span class="sc">+</span></span>
+<span id="cb137-58"><a href="#cb137-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb137-59"><a href="#cb137-59" aria-hidden="true" tabindex="-1"></a>  theme_heat <span class="sc">+</span></span>
+<span id="cb137-60"><a href="#cb137-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb137-61"><a href="#cb137-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">tag =</span> <span class="st">"A"</span>, <span class="at">title =</span> <span class="st">"Facets (Exploratory Factor Analysis)"</span>,</span>
+<span id="cb137-62"><a href="#cb137-62" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Loadings of each item, by the movement it was asked under"</span>)</span>
+<span id="cb137-63"><a href="#cb137-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb137-64"><a href="#cb137-64" aria-hidden="true" tabindex="-1"></a>p_loadings <span class="ot">&lt;-</span> efa_long <span class="sc">|&gt;</span></span>
+<span id="cb137-65"><a href="#cb137-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Facet, <span class="at">y =</span> Item)) <span class="sc">+</span></span>
+<span id="cb137-66"><a href="#cb137-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> Loading), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb137-67"><a href="#cb137-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">str_replace</span>(<span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, Loading), <span class="st">"^(-?)0"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">1"</span>),</span>
+<span id="cb137-68"><a href="#cb137-68" aria-hidden="true" tabindex="-1"></a>                <span class="at">color =</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(Loading) <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="st">"white"</span>, <span class="st">"grey20"</span>), <span class="at">fontface =</span> <span class="fu">ifelse</span>(<span class="fu">abs</span>(Loading) <span class="sc">&gt;=</span> <span class="fl">0.3</span>, <span class="st">"bold"</span>, <span class="st">"plain"</span>)),</span>
+<span id="cb137-69"><a href="#cb137-69" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="fl">2.6</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb137-70"><a href="#cb137-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> <span class="fu">tibble</span>(<span class="at">Facet =</span> <span class="fu">factor</span>(<span class="fu">names</span>(facet_colors), <span class="at">levels =</span> <span class="fu">names</span>(facet_colors))),</span>
+<span id="cb137-71"><a href="#cb137-71" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">x =</span> Facet, <span class="at">y =</span> <span class="fu">length</span>(item_levels) <span class="sc">+</span> <span class="fl">0.85</span>, <span class="at">color =</span> facet_colors[<span class="fu">as.character</span>(Facet)]), <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb137-72"><a href="#cb137-72" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">15</span>, <span class="at">size =</span> <span class="fl">3.5</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb137-73"><a href="#cb137-73" aria-hidden="true" tabindex="-1"></a>  diverging <span class="sc">+</span></span>
+<span id="cb137-74"><a href="#cb137-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_identity</span>() <span class="sc">+</span></span>
+<span id="cb137-75"><a href="#cb137-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">position =</span> <span class="st">"top"</span>, <span class="at">labels =</span> \(x) <span class="fu">str_remove</span>(x, <span class="st">" Science"</span>)) <span class="sc">+</span></span>
+<span id="cb137-76"><a href="#cb137-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">clip =</span> <span class="st">"off"</span>) <span class="sc">+</span></span>
+<span id="cb137-77"><a href="#cb137-77" aria-hidden="true" tabindex="-1"></a>  theme_heat <span class="sc">+</span></span>
+<span id="cb137-78"><a href="#cb137-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.y =</span> <span class="fu">element_blank</span>(), <span class="at">axis.text.x.top =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>, <span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="dv">0</span>, <span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">b =</span> <span class="dv">10</span>))) <span class="sc">+</span></span>
+<span id="cb137-79"><a href="#cb137-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>)</span>
+<span id="cb137-80"><a href="#cb137-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb137-81"><a href="#cb137-81" aria-hidden="true" tabindex="-1"></a><span class="co"># Item correlations, in the same order, with the items of each facet framed</span></span>
+<span id="cb137-82"><a href="#cb137-82" aria-hidden="true" tabindex="-1"></a>cor_long <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">as.table</span>(<span class="fu">cor</span>(df_resprac, <span class="at">use =</span> <span class="st">"pairwise.complete.obs"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb137-83"><a href="#cb137-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(<span class="at">Row =</span> <span class="fu">factor</span>(item_labels[<span class="fu">as.character</span>(Var1)], <span class="at">levels =</span> item_levels),</span>
+<span id="cb137-84"><a href="#cb137-84" aria-hidden="true" tabindex="-1"></a>            <span class="at">Col =</span> <span class="fu">factor</span>(item_labels[<span class="fu">as.character</span>(Var2)], <span class="at">levels =</span> <span class="fu">rev</span>(item_levels)),</span>
+<span id="cb137-85"><a href="#cb137-85" aria-hidden="true" tabindex="-1"></a>            <span class="at">r =</span> <span class="fu">ifelse</span>(Var1 <span class="sc">==</span> Var2, <span class="cn">NA</span>, Freq))</span>
+<span id="cb137-86"><a href="#cb137-86" aria-hidden="true" tabindex="-1"></a>n_items <span class="ot">&lt;-</span> <span class="fu">length</span>(item_order)</span>
+<span id="cb137-87"><a href="#cb137-87" aria-hidden="true" tabindex="-1"></a>facet_blocks <span class="ot">&lt;-</span> efa_main <span class="sc">|&gt;</span></span>
+<span id="cb137-88"><a href="#cb137-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">k =</span> <span class="fu">row_number</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb137-89"><a href="#cb137-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">xmin =</span> <span class="fu">min</span>(k) <span class="sc">-</span> <span class="fl">0.5</span>, <span class="at">xmax =</span> <span class="fu">max</span>(k) <span class="sc">+</span> <span class="fl">0.5</span>, <span class="at">.by =</span> Facet) <span class="sc">|&gt;</span></span>
+<span id="cb137-90"><a href="#cb137-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ymin =</span> n_items <span class="sc">-</span> xmax <span class="sc">+</span> <span class="dv">1</span>, <span class="at">ymax =</span> n_items <span class="sc">-</span> xmin <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb137-91"><a href="#cb137-91" aria-hidden="true" tabindex="-1"></a>p_cor_items <span class="ot">&lt;-</span> cor_long <span class="sc">|&gt;</span></span>
+<span id="cb137-92"><a href="#cb137-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Col, <span class="at">y =</span> Row)) <span class="sc">+</span></span>
+<span id="cb137-93"><a href="#cb137-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>(<span class="fu">aes</span>(<span class="at">fill =</span> r), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb137-94"><a href="#cb137-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(r) <span class="sc">&amp;</span> <span class="fu">abs</span>(r) <span class="sc">&gt;=</span> <span class="fl">0.3</span>, <span class="fu">str_replace</span>(<span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, r), <span class="st">"^(-?)0"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">1"</span>), <span class="st">""</span>),</span>
+<span id="cb137-95"><a href="#cb137-95" aria-hidden="true" tabindex="-1"></a>                <span class="at">color =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(r) <span class="sc">&amp;</span> <span class="fu">abs</span>(r) <span class="sc">&gt;=</span> <span class="fl">0.5</span>, <span class="st">"white"</span>, <span class="st">"grey20"</span>)), <span class="at">size =</span> <span class="fl">2.2</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb137-96"><a href="#cb137-96" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_rect</span>(<span class="at">data =</span> facet_blocks, <span class="fu">aes</span>(<span class="at">xmin =</span> xmin, <span class="at">xmax =</span> xmax, <span class="at">ymin =</span> ymin, <span class="at">ymax =</span> ymax, <span class="at">color =</span> facet_colors[<span class="fu">as.character</span>(Facet)]),</span>
+<span id="cb137-97"><a href="#cb137-97" aria-hidden="true" tabindex="-1"></a>            <span class="at">inherit.aes =</span> <span class="cn">FALSE</span>, <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb137-98"><a href="#cb137-98" aria-hidden="true" tabindex="-1"></a>  diverging <span class="sc">+</span></span>
+<span id="cb137-99"><a href="#cb137-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_identity</span>() <span class="sc">+</span></span>
+<span id="cb137-100"><a href="#cb137-100" aria-hidden="true" tabindex="-1"></a>  theme_heat <span class="sc">+</span></span>
+<span id="cb137-101"><a href="#cb137-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
+<span id="cb137-102"><a href="#cb137-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">tag =</span> <span class="st">"B"</span>, <span class="at">title =</span> <span class="st">"Item Correlations"</span>,</span>
+<span id="cb137-103"><a href="#cb137-103" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Items in the same order as in A; |r| ≥ .30 labelled; facets framed"</span>)</span>
+<span id="cb137-104"><a href="#cb137-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb137-105"><a href="#cb137-105" aria-hidden="true" tabindex="-1"></a><span class="co"># Facet correlations (CFA), significant ones only</span></span>
+<span id="cb137-106"><a href="#cb137-106" aria-hidden="true" tabindex="-1"></a>facet_pos <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Facet =</span> <span class="fu">c</span>(<span class="st">"Slow Science"</span>, <span class="st">"Green Science"</span>, <span class="st">"Ethical Science"</span>, <span class="st">"Rigorous Science"</span>, <span class="st">"Open Science"</span>),</span>
+<span id="cb137-107"><a href="#cb137-107" aria-hidden="true" tabindex="-1"></a>                    <span class="at">angle =</span> (<span class="dv">90</span> <span class="sc">-</span> <span class="dv">72</span> <span class="sc">*</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">4</span>) <span class="sc">*</span> pi <span class="sc">/</span> <span class="dv">180</span>) <span class="sc">|&gt;</span></span>
+<span id="cb137-108"><a href="#cb137-108" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">x =</span> <span class="fu">cos</span>(angle), <span class="at">y =</span> <span class="fu">sin</span>(angle), <span class="at">Latent =</span> <span class="fu">str_replace</span>(Facet, <span class="st">" "</span>, <span class="st">"_"</span>))</span>
+<span id="cb137-109"><a href="#cb137-109" aria-hidden="true" tabindex="-1"></a>cfa_cor <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">parameterEstimates</span>(fit_cfa) <span class="sc">|&gt;</span></span>
+<span id="cb137-110"><a href="#cb137-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"~~"</span>, lhs <span class="sc">!=</span> rhs) <span class="sc">|&gt;</span></span>
+<span id="cb137-111"><a href="#cb137-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(facet_pos, <span class="at">lhs =</span> Latent, x, y), <span class="at">by =</span> <span class="st">"lhs"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb137-112"><a href="#cb137-112" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(facet_pos, <span class="at">rhs =</span> Latent, <span class="at">xend =</span> x, <span class="at">yend =</span> y), <span class="at">by =</span> <span class="st">"rhs"</span>)</span>
+<span id="cb137-113"><a href="#cb137-113" aria-hidden="true" tabindex="-1"></a>p_cor_facets <span class="ot">&lt;-</span> cfa_cor <span class="sc">|&gt;</span></span>
+<span id="cb137-114"><a href="#cb137-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ci.lower <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">|</span> ci.upper <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb137-115"><a href="#cb137-115" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb137-116"><a href="#cb137-116" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">xend =</span> xend, <span class="at">yend =</span> yend, <span class="at">linewidth =</span> <span class="fu">abs</span>(est)), <span class="at">color =</span> <span class="st">"grey55"</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb137-117"><a href="#cb137-117" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_label</span>(<span class="fu">aes</span>(<span class="at">x =</span> (x <span class="sc">+</span> xend) <span class="sc">/</span> <span class="dv">2</span>, <span class="at">y =</span> (y <span class="sc">+</span> yend) <span class="sc">/</span> <span class="dv">2</span>, <span class="at">label =</span> <span class="fu">str_replace</span>(<span class="fu">sprintf</span>(<span class="st">"%.2f"</span>, est), <span class="st">"^(-?)0"</span>, <span class="st">"</span><span class="sc">\\</span><span class="st">1"</span>)),</span>
+<span id="cb137-118"><a href="#cb137-118" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="dv">3</span>, <span class="at">fill =</span> <span class="st">"white"</span>, <span class="at">label.size =</span> <span class="dv">0</span>, <span class="at">label.padding =</span> <span class="fu">unit</span>(<span class="fl">0.15</span>, <span class="st">"lines"</span>), <span class="at">color =</span> <span class="st">"grey20"</span>) <span class="sc">+</span></span>
+<span id="cb137-119"><a href="#cb137-119" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> facet_pos, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">color =</span> Facet), <span class="at">size =</span> <span class="dv">23</span>) <span class="sc">+</span></span>
+<span id="cb137-120"><a href="#cb137-120" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> facet_pos, <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">label =</span> <span class="fu">str_replace</span>(Facet, <span class="st">" "</span>, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)),</span>
+<span id="cb137-121"><a href="#cb137-121" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">fontface =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">lineheight =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb137-122"><a href="#cb137-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> facet_colors, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb137-123"><a href="#cb137-123" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_linewidth_continuous</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="dv">4</span>), <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb137-124"><a href="#cb137-124" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.25</span>, <span class="fl">1.25</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.1</span>, <span class="fl">1.25</span>)) <span class="sc">+</span></span>
+<span id="cb137-125"><a href="#cb137-125" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>(<span class="at">base_size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb137-126"><a href="#cb137-126" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">11</span>), <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"grey40"</span>, <span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb137-127"><a href="#cb137-127" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title.position =</span> <span class="st">"plot"</span>) <span class="sc">+</span></span>
+<span id="cb137-128"><a href="#cb137-128" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">tag =</span> <span class="st">"C"</span>, <span class="at">title =</span> <span class="st">"Correlations between Facets"</span>,</span>
+<span id="cb137-129"><a href="#cb137-129" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Latent correlations (CFA) whose 95% CI excludes 0"</span>)</span>
+<span id="cb137-130"><a href="#cb137-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb137-131"><a href="#cb137-131" aria-hidden="true" tabindex="-1"></a><span class="co"># The legends fill the space beside C (a guide area collects them only at the</span></span>
+<span id="cb137-132"><a href="#cb137-132" aria-hidden="true" tabindex="-1"></a><span class="co"># top level of the layout)</span></span>
+<span id="cb137-133"><a href="#cb137-133" aria-hidden="true" tabindex="-1"></a>fig_facets <span class="ot">&lt;-</span> <span class="fu">wrap_plots</span>(<span class="at">A =</span> (p_strip <span class="sc">|</span> p_loadings <span class="sc">|</span> p_cor_items) <span class="sc">+</span> <span class="fu">plot_layout</span>(<span class="at">widths =</span> <span class="fu">c</span>(<span class="fl">0.35</span>, <span class="dv">5</span>, <span class="dv">19</span>)),</span>
+<span id="cb137-134"><a href="#cb137-134" aria-hidden="true" tabindex="-1"></a>                         <span class="at">C =</span> p_cor_facets, <span class="at">G =</span> <span class="fu">guide_area</span>(), <span class="at">design =</span> <span class="st">"AA</span><span class="sc">\n</span><span class="st">CG"</span>) <span class="sc">+</span></span>
+<span id="cb137-135"><a href="#cb137-135" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_layout</span>(<span class="at">heights =</span> <span class="fu">c</span>(<span class="fl">1.7</span>, <span class="dv">1</span>), <span class="at">widths =</span> <span class="fu">c</span>(<span class="fl">1.1</span>, <span class="dv">1</span>), <span class="at">guides =</span> <span class="st">"collect"</span>) <span class="sc">&amp;</span></span>
+<span id="cb137-136"><a href="#cb137-136" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"right"</span>, <span class="at">legend.direction =</span> <span class="st">"vertical"</span>, <span class="at">plot.tag =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">14</span>))</span>
+<span id="cb137-137"><a href="#cb137-137" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"../paper/figures/fig_facets.png"</span>, fig_facets, <span class="at">width =</span> <span class="fl">10.5</span>, <span class="at">height =</span> <span class="fl">11.5</span>, <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">bg =</span> <span class="st">"white"</span>)</span>
+<span id="cb137-138"><a href="#cb137-138" aria-hidden="true" tabindex="-1"></a>fig_facets</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -21196,12 +21205,8 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <span id="cb138-15"><a href="#cb138-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">cfa_lrt =</span> cfa_lrt,</span>
 <span id="cb138-16"><a href="#cb138-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">scoring_fit =</span> scoring_fit,</span>
 <span id="cb138-17"><a href="#cb138-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">scoring_agreement =</span> scoring_agreement,</span>
-<span id="cb138-18"><a href="#cb138-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">scoring_loadings =</span> scoring_loadings,</span>
-<span id="cb138-19"><a href="#cb138-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">criteria_cor =</span> <span class="fu">as_tibble</span>(<span class="fu">cor_pairs</span>(df_quality_num)),</span>
-<span id="cb138-20"><a href="#cb138-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">criteria_n_components =</span> <span class="fu">as.data.frame</span>(<span class="fu">summary</span>(rez_criteria)),</span>
-<span id="cb138-21"><a href="#cb138-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">criteria_pca =</span> <span class="fu">as_tibble</span>(<span class="fu">as.data.frame</span>(pca_criteria)) <span class="sc">|&gt;</span> <span class="fu">select</span>(Variable, PC1, PC2),</span>
-<span id="cb138-22"><a href="#cb138-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">criteria_pca_variance =</span> pca_var</span>
-<span id="cb138-23"><a href="#cb138-23" aria-hidden="true" tabindex="-1"></a>), <span class="st">"../paper/results/facets.rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb138-18"><a href="#cb138-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">scoring_loadings =</span> scoring_loadings</span>
+<span id="cb138-19"><a href="#cb138-19" aria-hidden="true" tabindex="-1"></a>), <span class="st">"../paper/results/facets.rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
@@ -21756,14 +21761,15 @@ Sum_Squares_Total | Sum_Squares_Between | Sum_Squares_Within |    R2
 <span id="cb141-42"><a href="#cb141-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster_null_fit =</span> cluster_null_fit,</span>
 <span id="cb141-43"><a href="#cb141-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_nesting =</span> profile_nesting,</span>
 <span id="cb141-44"><a href="#cb141-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_correlates =</span> <span class="fu">mutate</span>(profile_correlates, <span class="at">Name =</span> <span class="fu">as.character</span>(Name)),</span>
-<span id="cb141-45"><a href="#cb141-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_ss_stage =</span> <span class="fu">mutate</span>(profile_ss_stage, <span class="at">Name =</span> <span class="fu">as.character</span>(Name), <span class="at">Work_Career_Stage =</span> <span class="fu">as.character</span>(Work_Career_Stage)),</span>
-<span id="cb141-46"><a href="#cb141-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_mcmc =</span> <span class="fu">mcmc_info</span>(m),</span>
-<span id="cb141-47"><a href="#cb141-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_predictions =</span> <span class="fu">as.data.frame</span>(<span class="fu">estimate_relation</span>(m, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Dem_Age=c(25, 35, 45, 55, 65)"</span>, <span class="st">"Dem_Gender"</span>))) <span class="sc">|&gt;</span></span>
-<span id="cb141-48"><a href="#cb141-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Name =</span> <span class="fu">profile_name</span>(Response)),</span>
-<span id="cb141-49"><a href="#cb141-49" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_gender =</span> <span class="fu">mutate</span>(profile_gender, <span class="at">Name =</span> <span class="fu">profile_name</span>(Profile)),</span>
-<span id="cb141-50"><a href="#cb141-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_age =</span> <span class="fu">mutate</span>(profile_age, <span class="at">Name =</span> <span class="fu">profile_name</span>(Profile))</span>
-<span id="cb141-51"><a href="#cb141-51" aria-hidden="true" tabindex="-1"></a>), <span class="st">"../paper/results/profiles.rds"</span>)</span>
-<span id="cb141-52"><a href="#cb141-52" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb141-45"><a href="#cb141-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample_characteristics =</span> sample_characteristics,</span>
+<span id="cb141-46"><a href="#cb141-46" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_ss_stage =</span> <span class="fu">mutate</span>(profile_ss_stage, <span class="at">Name =</span> <span class="fu">as.character</span>(Name), <span class="at">Work_Career_Stage =</span> <span class="fu">as.character</span>(Work_Career_Stage)),</span>
+<span id="cb141-47"><a href="#cb141-47" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_mcmc =</span> <span class="fu">mcmc_info</span>(m),</span>
+<span id="cb141-48"><a href="#cb141-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_predictions =</span> <span class="fu">as.data.frame</span>(<span class="fu">estimate_relation</span>(m, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"Dem_Age=c(25, 35, 45, 55, 65)"</span>, <span class="st">"Dem_Gender"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb141-49"><a href="#cb141-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Name =</span> <span class="fu">profile_name</span>(Response)),</span>
+<span id="cb141-50"><a href="#cb141-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_gender =</span> <span class="fu">mutate</span>(profile_gender, <span class="at">Name =</span> <span class="fu">profile_name</span>(Profile)),</span>
+<span id="cb141-51"><a href="#cb141-51" aria-hidden="true" tabindex="-1"></a>  <span class="at">profile_age =</span> <span class="fu">mutate</span>(profile_age, <span class="at">Name =</span> <span class="fu">profile_name</span>(Profile))</span>
+<span id="cb141-52"><a href="#cb141-52" aria-hidden="true" tabindex="-1"></a>), <span class="st">"../paper/results/profiles.rds"</span>)</span>
+<span id="cb141-53"><a href="#cb141-53" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>

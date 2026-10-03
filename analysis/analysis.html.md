@@ -4452,9 +4452,7 @@ p_alt_clusters
 # in the Discussion (descriptive, not modelled). Uncached: the names come from
 # profile_key. Percentages are of each profile; ratings on 0-100
 pct_of <- \(x) 100 * mean(x, na.rm = TRUE)
-profile_correlates <- df |>
-  mutate(Name = factor(profile_name(df_resprac_fac$Profile), levels = profile_key$Name)) |>
-  summarise(
+characteristics <- \(d, by = NULL) summarise(d,
     N = n(),
     `Median age` = median(Dem_Age, na.rm = TRUE),
     `Women (%)` = pct_of(Dem_Gender == "Female"),
@@ -4484,11 +4482,18 @@ profile_correlates <- df |>
     `Changed research practices (green)` = 100 * mean(GS_Changes_practices, na.rm = TRUE),
     `Willing to change practices (green)` = 100 * mean(GS_Change_practices_agreeing, na.rm = TRUE),
     `Importance of team diversity` = 100 * mean(ES_Importance_research_team, na.rm = TRUE),
-    .by = Name) |>
+    .by = {{ by }})
+profile_correlates <- df |>
+  mutate(Name = factor(profile_name(df_resprac_fac$Profile), levels = profile_key$Name)) |>
+  characteristics(by = Name) |>
   arrange(Name) |>
   pivot_longer(-Name, names_to = "Characteristic", values_to = "Value")
+# The same in the whole sample: the reference of the manuscript's profile table
+sample_characteristics <- characteristics(df) |>
+  pivot_longer(everything(), names_to = "Characteristic", values_to = "Value")
 profile_correlates |>
   pivot_wider(names_from = Name, values_from = Value) |>
+  left_join(rename(sample_characteristics, `All participants` = Value), by = "Characteristic") |>
   knitr::kable(format = "pipe", digits = 0, caption = "Characteristics of the profiles (not used to define them)")
 ```
 
@@ -4497,37 +4502,37 @@ profile_correlates |>
 
 Table: Characteristics of the profiles (not used to define them)
 
-|Characteristic                                    | Idealists| Aspirants| Stewards| Purists| Traditionalists|
-|:-------------------------------------------------|---------:|---------:|--------:|-------:|---------------:|
-|N                                                 |       195|       144|      130|     103|             100|
-|Median age                                        |        33|        31|       40|      38|              40|
-|Women (%)                                         |        66|        62|       54|      37|              59|
-|Men (%)                                           |        32|        35|       46|      62|              40|
-|PhD / Student (%)                                 |        31|        44|       21|      19|              27|
-|Permanent (%)                                     |        37|        29|       62|      49|              51|
-|No publication (%)                                |        15|        22|       10|      11|              18|
-|Social sciences (%)                               |        70|        54|       28|      55|              23|
-|Life sciences (%)                                 |        26|        38|       35|      30|              37|
-|Physical sciences (%)                             |         5|         8|       36|      15|              40|
-|France (%)                                        |        64|        62|       93|      59|              93|
-|OS training (%)                                   |        75|        54|       37|      59|              23|
-|SS training (%)                                   |        12|         1|        5|       4|               0|
-|Not familiar with slow science (%)                |         1|        72|        8|      39|              64|
-|Preregistration used (%)                          |        69|        47|        2|      50|               5|
-|Preregistration planned (%)                       |        25|        35|       15|      21|               7|
-|Registered reports planned (%)                    |        55|        53|       11|      39|               7|
-|Preregistration or registered reports unknown (%) |         7|        23|       73|      20|              84|
-|Lever: support from seniors (%)                   |        35|        49|       26|      28|              33|
-|Lever: training (%)                               |        24|        31|       27|      21|              37|
-|Criterion: high impact factor (%)                 |         5|         6|        4|       9|              17|
-|Criterion: originality (%)                        |        30|        42|       46|      48|              51|
-|Criterion: significance (%)                       |        35|        32|       38|      51|              53|
-|Criterion: environmental impact (%)               |         6|         6|       16|       2|               3|
-|Limiting publications not feasible (%)            |        22|        26|       15|      44|              28|
-|One publication per year not feasible (%)         |        22|        28|       20|      44|              34|
-|Changed research practices (green)                |        36|        37|       55|      13|              35|
-|Willing to change practices (green)               |        79|        80|       86|      39|              67|
-|Importance of team diversity                      |        79|        77|       76|      45|              62|
+|Characteristic                                    | Idealists| Aspirants| Stewards| Purists| Traditionalists| All participants|
+|:-------------------------------------------------|---------:|---------:|--------:|-------:|---------------:|----------------:|
+|N                                                 |       195|       144|      130|     103|             100|              672|
+|Median age                                        |        33|        31|       40|      38|              40|               35|
+|Women (%)                                         |        66|        62|       54|      37|              59|               57|
+|Men (%)                                           |        32|        35|       46|      62|              40|               41|
+|PhD / Student (%)                                 |        31|        44|       21|      19|              27|               30|
+|Permanent (%)                                     |        37|        29|       62|      49|              51|               44|
+|No publication (%)                                |        15|        22|       10|      11|              18|               15|
+|Social sciences (%)                               |        70|        54|       28|      55|              23|               49|
+|Life sciences (%)                                 |        26|        38|       35|      30|              37|               33|
+|Physical sciences (%)                             |         5|         8|       36|      15|              40|               18|
+|France (%)                                        |        64|        62|       93|      59|              93|               73|
+|OS training (%)                                   |        75|        54|       37|      59|              23|               53|
+|SS training (%)                                   |        12|         1|        5|       4|               0|                5|
+|Not familiar with slow science (%)                |         1|        72|        8|      39|              64|               33|
+|Preregistration used (%)                          |        69|        47|        2|      50|               5|               39|
+|Preregistration planned (%)                       |        25|        35|       15|      21|               7|               22|
+|Registered reports planned (%)                    |        55|        53|       11|      39|               7|               36|
+|Preregistration or registered reports unknown (%) |         7|        23|       73|      20|              84|               37|
+|Lever: support from seniors (%)                   |        35|        49|       26|      28|              33|               35|
+|Lever: training (%)                               |        24|        31|       27|      21|              37|               28|
+|Criterion: high impact factor (%)                 |         5|         6|        4|       9|              17|                7|
+|Criterion: originality (%)                        |        30|        42|       46|      48|              51|               42|
+|Criterion: significance (%)                       |        35|        32|       38|      51|              53|               40|
+|Criterion: environmental impact (%)               |         6|         6|       16|       2|               3|                7|
+|Limiting publications not feasible (%)            |        22|        26|       15|      44|              28|               26|
+|One publication per year not feasible (%)         |        22|        28|       20|      44|              34|               28|
+|Changed research practices (green)                |        36|        37|       55|      13|              35|               36|
+|Willing to change practices (green)               |        79|        80|       86|      39|              67|               73|
+|Importance of team diversity                      |        79|        77|       76|      45|              62|               70|
 
 
 :::
@@ -7604,7 +7609,8 @@ fig_landscape
 
 ```{.r .cell-code}
 # Figure "facets" of the manuscript: EFA loadings next to the item correlations
-# (same item order), facet correlations (CFA) and structure of quality criteria
+# (same item order), and facet correlations (CFA). The structure of the quality
+# criteria (PCA) is left to its own section
 movement_colors <- c("Open Science" = "#2196F3", "Slow Science" = "#FF9800",
                      "Green Science" = "#4CAF50", "Ethical Science" = "#9C27B0")
 facet_colors <- c("Open Science" = "#2196F3", "Rigorous Science" = "#3F51B5", "Slow Science" = "#FF9800",
@@ -7732,41 +7738,13 @@ p_cor_facets <- cfa_cor |>
   labs(tag = "C", title = "Correlations between Facets",
        subtitle = "Latent correlations (CFA) whose 95% CI excludes 0")
 
-# Quality criteria: loadings on the two principal components
-pca_var <- as.data.frame(summary(pca_criteria)) |> filter(Parameter == "Variance") |> select(-Parameter) |> unlist()
-p_pca_criteria <- as.data.frame(pca_criteria) |>
-  select(Variable, PC1, PC2) |>
-  left_join(p_criteria$data, by = c("Variable" = "Criterion")) |>
-  # Labels beside their point, on the side with room (neighbours on the other)
-  mutate(side = case_when(Variable %in% c("Originality / Innovation", "High Impact Factor Journal", "Replication") ~ "left",
-                          Variable == "Significance / Impact" ~ "below",
-                          .default = "right"),
-         offset = 0.04 + 0.08 * sqrt(pct),
-         label_x = PC1 + case_when(side == "left" ~ -offset, side == "right" ~ offset, .default = 0),
-         label_y = PC2 - ifelse(side == "below", offset, 0),
-         hjust = case_when(side == "left" ~ 1, side == "right" ~ 0, .default = 0.5)) |>
-  ggplot(aes(x = PC1, y = PC2)) +
-  geom_hline(yintercept = 0, color = "grey80") +
-  geom_vline(xintercept = 0, color = "grey80") +
-  geom_point(aes(size = pct), color = "#546E7A", alpha = 0.8) +
-  geom_text(aes(x = label_x, y = label_y, label = Variable, hjust = hjust), size = 2.9, color = "grey20") +
-  scale_size_area(max_size = 9, guide = "none") +
-  scale_x_continuous(limits = c(-0.8, 0.9), breaks = c(-0.5, 0, 0.5)) +
-  scale_y_continuous(limits = c(-0.7, 0.7)) +
-  theme_minimal(base_size = 10) +
-  theme(panel.grid.minor = element_blank(), plot.title = element_text(face = "bold", size = 11),
-        plot.subtitle = element_text(color = "grey40", size = 9), plot.title.position = "plot",
-        axis.title = element_text(size = 8.5)) +
-  labs(tag = "D", title = "Structure of Quality Criteria",
-       subtitle = "Loadings on the principal components (point size: % selecting)",
-       x = sprintf("PC1 (%.0f%%): rigour and transparency (−) vs. novelty and impact (+)", 100 * pca_var[1]),
-       y = sprintf("PC2 (%.0f%%): transparency and inclusivity (−) vs. rigour and innovation (+)", 100 * pca_var[2]))
-
-fig_facets <- ((p_strip | p_loadings | p_cor_items) + plot_layout(widths = c(0.35, 5, 19))) /
-  ((p_cor_facets | p_pca_criteria) + plot_layout(widths = c(1, 1.25))) +
-  plot_layout(heights = c(1.55, 1), guides = "collect") &
-  theme(legend.position = "bottom", plot.tag = element_text(face = "bold", size = 14))
-ggsave("../paper/figures/fig_facets.png", fig_facets, width = 10.5, height = 12.5, dpi = 300, bg = "white")
+# The legends fill the space beside C (a guide area collects them only at the
+# top level of the layout)
+fig_facets <- wrap_plots(A = (p_strip | p_loadings | p_cor_items) + plot_layout(widths = c(0.35, 5, 19)),
+                         C = p_cor_facets, G = guide_area(), design = "AA\nCG") +
+  plot_layout(heights = c(1.7, 1), widths = c(1.1, 1), guides = "collect") &
+  theme(legend.position = "right", legend.direction = "vertical", plot.tag = element_text(face = "bold", size = 14))
+ggsave("../paper/figures/fig_facets.png", fig_facets, width = 10.5, height = 11.5, dpi = 300, bg = "white")
 fig_facets
 ```
 
@@ -7797,11 +7775,7 @@ saveRDS(list(
   cfa_lrt = cfa_lrt,
   scoring_fit = scoring_fit,
   scoring_agreement = scoring_agreement,
-  scoring_loadings = scoring_loadings,
-  criteria_cor = as_tibble(cor_pairs(df_quality_num)),
-  criteria_n_components = as.data.frame(summary(rez_criteria)),
-  criteria_pca = as_tibble(as.data.frame(pca_criteria)) |> select(Variable, PC1, PC2),
-  criteria_pca_variance = pca_var
+  scoring_loadings = scoring_loadings
 ), "../paper/results/facets.rds")
 ```
 :::
@@ -8118,6 +8092,7 @@ saveRDS(list(
   cluster_null_fit = cluster_null_fit,
   profile_nesting = profile_nesting,
   profile_correlates = mutate(profile_correlates, Name = as.character(Name)),
+  sample_characteristics = sample_characteristics,
   profile_ss_stage = mutate(profile_ss_stage, Name = as.character(Name), Work_Career_Stage = as.character(Work_Career_Stage)),
   profile_mcmc = mcmc_info(m),
   profile_predictions = as.data.frame(estimate_relation(m, by = c("Dem_Age=c(25, 35, 45, 55, 65)", "Dem_Gender"))) |>
