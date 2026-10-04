@@ -1,12 +1,12 @@
 ---
-title: "Open, Slow, Green and Inclusive Science: Adoption and Barriers to New Research Practices [TENTATIVE TITLE]"
+title: "Open, Slow, Green and Inclusive Science: Adoption and Barriers to New Research Practices"
 shorttitle: "Reform-Oriented Research Practices"
-# TO CONFIRM: corresponding author, and ORCIDs, emails and CRediT roles of all authors
+# TO CONFIRM: CRediT roles of all authors. ORCIDs from the public ORCID registry
+# (2026-10-03); Axel Garnier's is registered as "Axel Garnier-Allain"
 author:
   - name: Dominique Makowski
     orcid: 0000-0001-5375-9967
     email: D.Makowski@sussex.ac.uk
-    corresponding: true
     affiliations:
       - id: "sussex"
         name: "University of Sussex"
@@ -14,34 +14,46 @@ author:
         city: "Brighton"
         country: "UK"
   - name: Julia Ayache
+    orcid: 0000-0002-8587-5628
     affiliations:
       - id: "incc"
         name: "Université Paris Cité"
         department: "INCC"
+        city: "Paris"
         country: "France"
   - name: Axel Garnier
+    orcid: 0000-0001-8296-5225
     affiliations:
       - name: "Inserm UMR1322"
         department: "LINC – Laboratoire de recherches Intégratives en Neurosciences et psychologie Cognitive"
         city: "Besançon"
         country: "France"
   - name: Louise Kirsch
+    orcid: 0000-0002-8418-776X
     affiliations:
       - ref: "incc"
   - name: Marco Sperduti
+    orcid: 0000-0002-0974-8811
     affiliations:
       - name: "University of Rome Tor Vergata"
+        city: "Rome"
         country: "Italy"
       - name: "Université Paris Cité"
         department: "LMC2 (Laboratoire Mémoire, Cerveau et Cognition)"
+        city: "Paris"
         country: "France"
   - name: Klara Kovarski
+    orcid: 0000-0002-3926-5087
+    email: klara.kovarski@sorbonne-universite.fr
+    corresponding: true
     affiliations:
       - name: "CNRS & Université Paris Cité"
         department: "LaPsyDé"
+        city: "Paris"
         country: "France"
       - name: "Sorbonne Université"
         department: "Faculté de Lettres, INSPE"
+        city: "Paris"
         country: "France"
 abstract: |
   Open science is one of several movements calling for a reform of research practices, alongside slow, sustainable, and ethical and inclusive science. Whether researchers endorse them as one project is unknown. We surveyed 672 researchers working in Europe, mostly in France, at all career stages, on their knowledge, attitudes and adoption of the practices these movements promote. Attitudes and practices formed five facets in two nearly independent sides: an epistemic side, which separated the sharing of research outputs from the reform of procedures such as preregistration, and a societal side, which merged environmental and ethical concerns. Slow science bridged the two sides, although its link with the epistemic side mostly reflected familiarity with the movement. Career stage shaped which reforms researchers carried more than how much they endorsed reform: PhD students shared fewer outputs, preregistration was more common before than after obtaining a permanent position, and every stage asked for structural levers, such as career recognition, rather than information. Women scored higher than men on the societal facets, increasingly with age. Five profiles summarised how researchers combine the two sides. Reform agendas need to link the reliability and the responsibility of research rather than assume this link.
