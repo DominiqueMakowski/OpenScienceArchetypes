@@ -30,6 +30,7 @@ Researchers working in Europe (N = 672, after excluding the 10 respondents worki
 *Robustness checks and additional analyses (2026-09-30, section "Career Stage, Training, Discipline and Country" and the sensitivity subsections of the CFA). Integrated in the manuscript on 2026-09-30 (chunk `export_career` feeds its numbers): H1-H4, training, discipline, precariousness, well-being and France in the Results, the slow science sensitivity in the "bridge" subsection, the criteria validity check and the two/three-cluster solutions as one sentence each, invariance in the Limitations. Left in the notebook only: the ordinal CFA (one pointer sentence in the Methods).*
 
 - **The facet structure is not an artefact of the ordinal practice items or of ceiling effects.** On polychoric/polyserial correlations, the EFA puts every open science item on the same facet as with Pearson correlations (loadings slightly higher). Declaring the practice items ordinal (WLSMV) fits a little worse (CFI = .89 vs. .92, RMSEA .055 vs. .054), moves no latent correlation by more than .06, and gives facet scores correlating ≥ .97 with the retained ones. Three sliders have a third of answers at the ceiling (societal consequences 33%, open science importance 32%, willingness to change 22%).
+- **The facet structure cross-validates (2026-11-23, chunk `cfa_splithalf`).** The EFA and the CFA were fitted on the same data. Over 100 random splits, the five-factor EFA of one half recovers the full-sample factors (Tucker congruence ≥ .85 for all five in 98% of splits, ≥ .95 in 89%; lowest, Ethical Science: .97 [.89, .99]), with every item on the same facet in ≥ 98% of splits except open peer review (47%: it loads weakly everywhere), open science importance (83%) and the two green beliefs (74% and 59%, shared between Green and Ethical Science as their cross-loadings imply). The exploratory half puts both green beliefs on Ethical Science (≥ .30) in 85% of splits, and the held-out half then favours these cross-loadings in all of them (likelihood ratio test vs. the movement-based model: p < .05 in 100% of splits). In the held-out half, the retained CFA fits as in the full sample (CFI .918 [.897, .944], ≥ .90 in 95% of splits; movement-based .889 [.865, .913], ≥ .90 in 23%), and its latent correlations are unchanged (medians within .01 of the full-sample values). In 14-27% of held-out halves (depending on the model), a slow science item (nearly always importance) gets a slightly negative residual variance (Heywood case of the two-indicator Slow Science; full-sample residual variance .014 [-.007, .034]); in the 71 splits where all three CFAs are admissible, the conclusions are the same. The number of factors is less stable: five is (jointly) the most supported in 64% of halves, two in 31%, four in 30%.
 - **Slow Science is partly knowledge, and this matters for its "bridge".** With the importance rating of unfamiliar participants set to missing, its correlations with Open (.35) and Green Science (.21) barely move, and those with Rigorous (.17) and Ethical Science (.34) change by at most .09. Among the 453 participants familiar with the movement, however, its link with Rigorous Science vanishes (.01 vs. .20) and with Open Science halves (.16 vs. .34), whereas its links with Ethical (.31) and Green Science (.14) hold. The bridge towards the epistemic side is thus mostly exposure to meta-science debates; the link with the societal side is endorsement. *(2026-10-03, chunks `slow_science_ratings` and `slow_science_profiles`)* The importance ratings of the unfamiliar participants are not judgements: 89.5% are exactly 0 and 5% exactly 50, vs. 10% exact zeros among the familiar and 1-8% on the other attitude sliders. Among the familiar, importance is *M* = 64.3. The facet is kept as is and read as engagement (knowing and valuing): with these ratings missing, unfamiliar participants still score low (-0.79 vs. -1.07 SD), scores correlate .92, CFI drops (.902 vs. .920), and the profiles change little (ARI .74; 87% of the Aspirants stay together). Without Slow Science, 61% of the Aspirants join the Idealists (four clusters, bootstrap ARI .66 vs. .86).
 - **Two clusters split the sample into more and less reform-minded (399 vs. 273); three clusters recover the two sides.** Cluster A (296, 62% women) is high on everything, most on Slow, Green and Ethical Science (Idealists + most of the Stewards); B (193, 46% women) is high on Rigorous and Open Science and low on Green and Ethical (Purists + part of the Aspirants); C (183, 61% women) is low on Open and Rigorous Science and average on the societal facets (Traditionalists + part of the Stewards and of the Aspirants). The three-cluster solution is thus "all-round reformers", "procedural reformers who set the societal side aside" and "non-adopters" (the cluster letters follow size and change with the data).
 - **H1, knowledge and training by career stage: training differs, familiarity does not.** Familiarity with open science is the same at every stage (.73-.74), its importance slightly higher among PhD students (+0.05 vs. permanent). Training is graded: 64% of PhD students, 56% of non-permanent and 44% of permanent researchers (permanent - PhD: -0.20 [-0.28, -0.11]). Familiarity with slow science is instead higher among permanent staff (+0.10 [0.04, 0.16] vs. PhD students).
@@ -3074,6 +3075,365 @@ Table: Likelihood ratio tests against the cross-loadings model
 |:------------------------|----------:|-------:|--:|
 |Movement-based           |    100.514|       2|  0|
 |Green beliefs on Ethical |     28.929|       2|  0|
+
+
+:::
+:::
+
+
+#### Split-Half Cross-Validation
+
+
+::: {.cell}
+
+```{.r .cell-code}
+# The EFA and the CFAs above are fitted on the same data, and the retained CFA
+# takes its cross-loadings from that EFA, so its fit describes the structure
+# rather than testing it. Split-half cross-validation over 100 random splits
+# into two halves of 336: the exploratory steps (number of factors, five-factor
+# EFA) on one half, the CFAs of cfa_alternatives on the other.
+# (1) Does the EFA of a half recover the full-sample factors (`f`)? Tucker
+#     congruence of the loadings, factors matched by the permutation with the
+#     highest total congruence (.85-.94: fair similarity, >= .95: equal;
+#     Lorenzo-Seva & ten Berge, 2006); the factor each item loads most on; the
+#     loadings of the two green beliefs on Ethical Science (the cross-loadings
+#     the retained CFA adds)
+# (2) Do the n_factors() methods favour five factors in a half?
+# (3) In the other half: fit of the three CFAs, likelihood ratio tests of the
+#     cross-loadings, and latent correlations of the retained CFA
+# Intervals are the 2.5-97.5% range over splits: split-to-split variability, not
+# confidence intervals (the halves of different splits overlap)
+facet_labels <- str_replace_all(names(efa_ids), "\n", " ")
+efa_ref <- as.data.frame(f) |> select(Variable, starts_with("MR"))
+L_ref <- as.matrix(efa_ref[, unname(efa_ids)]) |> `dimnames<-`(list(efa_ref$Variable, facet_labels))
+perms <- as.matrix(expand.grid(rep(list(seq_along(facet_labels)), length(facet_labels))))
+perms <- perms[apply(perms, 1, \(p) !anyDuplicated(p)), ]
+congruence <- \(x, y) crossprod(x, y) / sqrt(outer(colSums(x^2), colSums(y^2)))
+# Loadings of a half-sample EFA, columns matched (and signed) to the full-sample facets
+match_factors <- function(efa) {
+  l <- as.data.frame(efa) |> select(Variable, starts_with("MR"))
+  L <- as.matrix(l[match(rownames(L_ref), l$Variable), -1])
+  sh_cong <- congruence(L, L_ref)
+  p <- perms[which.max(apply(perms, 1, \(p) sum(abs(sh_cong[cbind(p, seq_along(p))])))), ]
+  matched <- sh_cong[cbind(p, seq_along(p))]
+  list(congruence = setNames(abs(matched), facet_labels),
+       loadings = sweep(L[, p, drop = FALSE], 2, sign(matched), `*`) |> `dimnames<-`(dimnames(L_ref)))
+}
+main_ref <- facet_labels[apply(abs(L_ref), 1, which.max)]
+sh_belief_items <- c("Green Science - Belief Relation", "Green Science - Change Willingness")
+cv_models <- names(cfa_models)
+
+set.seed(123)
+sh_splits <- replicate(100, sample(nrow(df), nrow(df) %/% 2), simplify = FALSE)
+splithalf <- map(sh_splits, \(half) {
+  # Exploratory half
+  nf <- as.data.frame(summary(n_factors(df_resprac[half, ])))
+  m <- match_factors(factor_analysis(df_resprac[half, ], n = 5, rotation = "oblimin"))
+  # Held-out half
+  fits <- map(cfa_models, \(model) cfa(model, data = df[-half, ], std.lv = TRUE))
+  lv <- lavInspect(fits[["Cross-loadings (used)"]], "cor.lv")
+  list(
+    best = nf$n_Factors[nf$n_Methods == max(nf$n_Methods)],
+    support5 = sum(nf$n_Methods[nf$n_Factors == 5]),
+    congruence = m$congruence,
+    same_main = facet_labels[apply(abs(m$loadings), 1, which.max)] == main_ref,
+    beliefs = m$loadings[sh_belief_items, c("Ethical Science", "Green Science")],
+    fit = imap_dfr(fits, \(fit, name) tibble(
+      Model = name, converged = lavInspect(fit, "converged"),
+      ok = converged && suppressWarnings(lavInspect(fit, "post.check")),
+      negative = paste(filter(parameterEstimates(fit), op == "~~", lhs == rhs, est < 0)$lhs, collapse = ", "),
+      !!!as.list(unclass(fitMeasures(fit, c("cfi", "tli", "rmsea", "srmr")))))),
+    lrt = map_dfr(cv_models[1:2], \(name) {
+      lrt <- lavTestLRT(fits[[name]], fits[["Cross-loadings (used)"]])
+      tibble(Model = name, Chisq_diff = lrt$`Chisq diff`[2], Df_diff = lrt$`Df diff`[2], p = lrt$`Pr(>Chisq)`[2])
+    }),
+    cor = lv[upper.tri(lv)] |> setNames(outer(rownames(lv), colnames(lv), paste, sep = " - ")[upper.tri(lv)])
+  )
+})
+sh_n_splits <- length(sh_splits)
+sh_pct <- \(x) 100 * mean(x)  # % of splits
+
+# (1) EFA of one half vs. the full-sample EFA
+sh_cong <- do.call(rbind, map(splithalf, "congruence"))
+sh_congruence <- bind_rows(
+  tibble(Facet = facet_labels, Median = apply(sh_cong, 2, median), Low = apply(sh_cong, 2, quantile, .025),
+         High = apply(sh_cong, 2, quantile, .975), `>= .85 (%)` = apply(sh_cong >= .85, 2, sh_pct),
+         `>= .95 (%)` = apply(sh_cong >= .95, 2, sh_pct)),
+  tibble(Facet = "All five (lowest)", Median = median(apply(sh_cong, 1, min)), Low = quantile(apply(sh_cong, 1, min), .025),
+         High = quantile(apply(sh_cong, 1, min), .975), `>= .85 (%)` = sh_pct(apply(sh_cong, 1, min) >= .85),
+         `>= .95 (%)` = sh_pct(apply(sh_cong, 1, min) >= .95))
+)
+knitr::kable(transmute(sh_congruence, Facet, `Congruence, median [2.5%, 97.5%]` = format_estimate(Median, Low, High),
+                       `>= .85 (%)`, `>= .95 (%)`),
+             format = "pipe", digits = 0, caption = "Tucker congruence of the EFA of one half with the full-sample EFA")
+```
+
+::: {.cell-output-display}
+
+
+Table: Tucker congruence of the EFA of one half with the full-sample EFA
+
+|Facet             |Congruence, median [2.5%, 97.5%] | >= .85 (%)| >= .95 (%)|
+|:-----------------|:--------------------------------|----------:|----------:|
+|Green Science     |0.99 [0.96, 1.00]                |        100|         98|
+|Ethical Science   |0.97 [0.89, 0.99]                |         98|         89|
+|Open Science      |0.99 [0.96, 0.99]                |        100|        100|
+|Rigorous Science  |0.99 [0.97, 1.00]                |        100|        100|
+|Slow Science      |0.99 [0.98, 1.00]                |        100|        100|
+|All five (lowest) |0.97 [0.89, 0.99]                |         98|         89|
+
+
+:::
+
+```{.r .cell-code}
+same_main <- do.call(rbind, map(splithalf, "same_main"))
+sh_items <- tibble(Item = rownames(L_ref), `Full-sample facet` = main_ref,
+                   `Same facet in the half (%)` = apply(same_main, 2, sh_pct)) |>
+  arrange(`Same facet in the half (%)`)
+knitr::kable(sh_items, format = "pipe", digits = 0,
+             caption = "Items loading most on the same facet in the half-sample EFA as in the full-sample EFA")
+```
+
+::: {.cell-output-display}
+
+
+Table: Items loading most on the same facet in the half-sample EFA as in the full-sample EFA
+
+|Item                                    |Full-sample facet | Same facet in the half (%)|
+|:---------------------------------------|:-----------------|--------------------------:|
+|Endorsement - Open Peer Review          |Rigorous Science  |                         47|
+|Green Science - Change Willingness      |Green Science     |                         59|
+|Green Science - Belief Relation         |Ethical Science   |                         74|
+|Open Science - Importance               |Open Science      |                         83|
+|Ethical Science - Team Diversity        |Ethical Science   |                         98|
+|Ethical Science - Societal Consequences |Ethical Science   |                         98|
+|Endorsement - Preregistration           |Rigorous Science  |                        100|
+|Endorsement - Registered Reports        |Rigorous Science  |                        100|
+|Endorsement - Open Materials            |Open Science      |                        100|
+|Endorsement - Open Data                 |Open Science      |                        100|
+|Endorsement - Open Access               |Open Science      |                        100|
+|Endorsement - Replication Studies       |Rigorous Science  |                        100|
+|Endorsement - Participatory Research    |Rigorous Science  |                        100|
+|Green Science - Ecofriendly Practices   |Green Science     |                        100|
+|Green Science - Ecofriendly Topics      |Green Science     |                        100|
+|Green Science - Changed Practices       |Green Science     |                        100|
+|Green Science - Changed Communication   |Green Science     |                        100|
+|Slow Science - Importance               |Slow Science      |                        100|
+|Slow Science - Familiarity              |Slow Science      |                        100|
+
+
+:::
+
+```{.r .cell-code}
+sh_beliefs <- expand_grid(Item = sh_belief_items, Facet = c("Ethical Science", "Green Science")) |>
+  mutate(Full = map2_dbl(Item, Facet, \(i, j) L_ref[i, j]),
+         x = map2(Item, Facet, \(i, j) map_dbl(splithalf, \(s) s$beliefs[i, j])),
+         Median = map_dbl(x, median), Low = map_dbl(x, quantile, .025), High = map_dbl(x, quantile, .975),
+         `>= .30 (%)` = map_dbl(x, \(v) sh_pct(v >= .30))) |>
+  select(-x)
+knitr::kable(transmute(sh_beliefs, Item, Facet, Full, `Half, median [2.5%, 97.5%]` = format_estimate(Median, Low, High), `>= .30 (%)`),
+             format = "pipe", digits = 2, caption = "Loadings of the two green beliefs in the half-sample EFA")
+```
+
+::: {.cell-output-display}
+
+
+Table: Loadings of the two green beliefs in the half-sample EFA
+
+|Item                               |Facet           | Full|Half, median [2.5%, 97.5%] | >= .30 (%)|
+|:----------------------------------|:---------------|----:|:--------------------------|----------:|
+|Green Science - Belief Relation    |Ethical Science | 0.43|0.42 [0.23, 0.55]          |         95|
+|Green Science - Belief Relation    |Green Science   | 0.30|0.30 [0.15, 0.54]          |         52|
+|Green Science - Change Willingness |Ethical Science | 0.41|0.39 [0.19, 0.59]          |         87|
+|Green Science - Change Willingness |Green Science   | 0.43|0.45 [0.25, 0.67]          |         95|
+
+
+:::
+
+```{.r .cell-code}
+# (2) Number of factors favoured in a half (ties count for each number)
+nf_full <- as.data.frame(summary(rez_resprac))
+sh_nfactors <- tibble(Factors = unlist(map(splithalf, "best"))) |>
+  count(Factors, name = "Splits") |>
+  mutate(`Most supported (% of splits)` = 100 * Splits / sh_n_splits) |>
+  select(-Splits)
+knitr::kable(sh_nfactors, format = "pipe", digits = 0,
+             caption = paste0("Number of factors supported by the most methods in one half (full sample: 5, by ",
+                              nf_full$n_Methods[nf_full$n_Factors == 5], " of ", sum(nf_full$n_Methods), " methods; methods supporting 5 in a half: median ",
+                              median(map_dbl(splithalf, "support5")), ")"))
+```
+
+::: {.cell-output-display}
+
+
+Table: Number of factors supported by the most methods in one half (full sample: 5, by 5 of 19 methods; methods supporting 5 in a half: median 5)
+
+| Factors| Most supported (% of splits)|
+|-------:|----------------------------:|
+|       2|                           31|
+|       3|                            5|
+|       4|                           30|
+|       5|                           64|
+|       6|                            3|
+|      18|                            2|
+
+
+:::
+
+```{.r .cell-code}
+# (3) CFAs in the held-out half
+sh_fit_long <- map_dfr(splithalf, "fit", .id = "Split") |>
+  pivot_longer(c(cfi, tli, rmsea, srmr), names_to = "Index", values_to = "Value")
+sh_fit <- sh_fit_long |>
+  summarise(Median = median(Value), Low = quantile(Value, .025), High = quantile(Value, .975),
+            `Converged and admissible (%)` = sh_pct(ok), .by = c(Model, Index)) |>
+  left_join(pivot_longer(select(cfa_comparison, Model, cfi, tli, rmsea, srmr), -Model, names_to = "Index", values_to = "Full"),
+            by = c("Model", "Index")) |>
+  mutate(Model = factor(Model, levels = cv_models), Index = toupper(Index)) |>
+  arrange(Model)
+sh_cfi90 <- sh_fit_long |> filter(Index == "cfi") |> summarise(`CFI >= .90 (%)` = sh_pct(Value >= .90), .by = Model)
+sh_fit |>
+  transmute(Model, Index, Full, `Held-out half, median [2.5%, 97.5%]` = sprintf("%.3f [%.3f, %.3f]", Median, Low, High)) |>
+  pivot_wider(names_from = Index, values_from = c(Full, `Held-out half, median [2.5%, 97.5%]`), names_glue = "{Index}: {.value}") |>
+  left_join(sh_cfi90, by = "Model") |>
+  select(Model, starts_with("CFI"), starts_with("TLI"), starts_with("RMSEA"), starts_with("SRMR")) |>
+  knitr::kable(format = "pipe", digits = 3,
+               caption = "Fit of the three CFAs in the held-out half (Full: full sample; admissibility in the next tables)")
+```
+
+::: {.cell-output-display}
+
+
+Table: Fit of the three CFAs in the held-out half (Full: full sample; admissibility in the next tables)
+
+|Model                    | CFI: Full|CFI: Held-out half, median [2.5%, 97.5%] | CFI >= .90 (%)| TLI: Full|TLI: Held-out half, median [2.5%, 97.5%] | RMSEA: Full|RMSEA: Held-out half, median [2.5%, 97.5%] | SRMR: Full|SRMR: Held-out half, median [2.5%, 97.5%] |
+|:------------------------|---------:|:----------------------------------------|--------------:|---------:|:----------------------------------------|-----------:|:------------------------------------------|----------:|:-----------------------------------------|
+|Movement-based           |     0.891|0.889 [0.865, 0.913]                     |             23|     0.869|0.866 [0.837, 0.896]                     |       0.063|0.064 [0.056, 0.071]                       |      0.057|0.063 [0.057, 0.070]                      |
+|Green beliefs on Ethical |     0.912|0.909 [0.888, 0.935]                     |             73|     0.894|0.890 [0.865, 0.921]                     |       0.057|0.058 [0.050, 0.065]                       |      0.055|0.062 [0.054, 0.067]                      |
+|Cross-loadings (used)    |     0.920|0.918 [0.897, 0.944]                     |             95|     0.902|0.900 [0.875, 0.931]                     |       0.054|0.055 [0.046, 0.062]                       |      0.053|0.060 [0.053, 0.065]                      |
+
+
+:::
+
+```{.r .cell-code}
+# Admissibility: inadmissible fits have a negative residual variance (Heywood
+# case), here of the slow science importance item: Slow Science has two
+# indicators correlating .79, and this residual variance is already near 0 in the
+# full sample
+ss_resid <- filter(parameterEstimates(fit_cfa), op == "~~", lhs == "SS_Importance", rhs == "SS_Importance")
+fit_flags <- map_dfr(splithalf, "fit", .id = "Split")
+neg_items <- \(x) {
+  v <- unlist(str_split(x[x != ""], ", "))
+  if (!length(v)) return("None")
+  paste0(names(table(v)), " (", round(100 * as.vector(table(v)) / length(x)), "%)", collapse = ", ")
+}
+sh_admissible <- fit_flags |>
+  summarise(`Converged (%)` = sh_pct(converged), `Admissible (%)` = sh_pct(ok),
+            `Negative residual variances (% of splits)` = neg_items(negative), .by = Model)
+knitr::kable(sh_admissible, format = "pipe", digits = 0,
+             caption = paste0("Admissibility of the CFAs in the held-out half (full-sample residual variance of the slow science importance item: ",
+                              sprintf("%.3f [%.3f, %.3f]", ss_resid$est, ss_resid$ci.lower, ss_resid$ci.upper), ")"))
+```
+
+::: {.cell-output-display}
+
+
+Table: Admissibility of the CFAs in the held-out half (full-sample residual variance of the slow science importance item: 0.014 [-0.007, 0.034])
+
+|Model                    | Converged (%)| Admissible (%)|Negative residual variances (% of splits) |
+|:------------------------|-------------:|--------------:|:-----------------------------------------|
+|Movement-based           |           100|             86|SS_Familiar (1%), SS_Importance (13%)     |
+|Green beliefs on Ethical |           100|             79|SS_Importance (21%)                       |
+|Cross-loadings (used)    |           100|             73|SS_Importance (27%)                       |
+
+
+:::
+
+```{.r .cell-code}
+lrt_all <- map_dfr(splithalf, "lrt", .id = "Split")
+suggested <- map_lgl(splithalf, \(s) all(s$beliefs[, "Ethical Science"] >= .30))
+confirmed <- filter(lrt_all, Model == "Movement-based")$p < .05
+sh_lrt <- lrt_all |>
+  summarise(Median = median(Chisq_diff), Low = quantile(Chisq_diff, .025), High = quantile(Chisq_diff, .975),
+            Df = first(Df_diff), `p < .05 (%)` = sh_pct(p < .05), .by = Model) |>
+  left_join(select(cfa_lrt, Model, Full = Chisq_diff), by = "Model")
+knitr::kable(transmute(sh_lrt, `Nested model` = Model, Df, `Full: Chisq diff` = Full,
+                       `Held-out half: Chisq diff, median [2.5%, 97.5%]` = format_estimate(Median, Low, High), `p < .05 (%)`),
+             format = "pipe", digits = 1,
+             caption = paste0("Likelihood ratio tests against the cross-loadings model in the held-out half. ",
+                              "The EFA of the exploratory half puts both green beliefs on Ethical Science (>= .30) in ",
+                              round(sh_pct(suggested)), "% of splits; the held-out half then favours the cross-loadings in ",
+                              round(sh_pct(confirmed[suggested])), "% of these"))
+```
+
+::: {.cell-output-display}
+
+
+Table: Likelihood ratio tests against the cross-loadings model in the held-out half. The EFA of the exploratory half puts both green beliefs on Ethical Science (>= .30) in 85% of splits; the held-out half then favours the cross-loadings in 100% of these
+
+|Nested model             | Df| Full: Chisq diff|Held-out half: Chisq diff, median [2.5%, 97.5%] | p < .05 (%)|
+|:------------------------|--:|----------------:|:-----------------------------------------------|-----------:|
+|Movement-based           |  2|            100.5|51.79 [28.68, 72.97]                            |         100|
+|Green beliefs on Ethical |  2|             28.9|14.85 [4.78, 27.27]                             |          93|
+
+
+:::
+
+```{.r .cell-code}
+# Do the conclusions depend on the inadmissible fits? Restricted to the splits in
+# which all three CFAs are admissible
+sh_keep <- fit_flags |> summarise(all_ok = all(ok), .by = Split) |> filter(all_ok) |> pull(Split)
+sh_admissible_only <- fit_flags |>
+  filter(Split %in% sh_keep) |>
+  summarise(`CFI, median [2.5%, 97.5%]` = sprintf("%.3f [%.3f, %.3f]", median(cfi), quantile(cfi, .025), quantile(cfi, .975)),
+            `CFI >= .90 (%)` = sh_pct(cfi >= .90), .by = Model) |>
+  left_join(lrt_all |> filter(Split %in% sh_keep) |> summarise(`LRT p < .05 (%)` = sh_pct(p < .05), .by = Model), by = "Model")
+knitr::kable(sh_admissible_only, format = "pipe", digits = 0,
+             caption = paste0("CFAs in the held-out half, restricted to the ", length(sh_keep),
+                              " splits in which all three are admissible (LRT: against the cross-loadings model)"))
+```
+
+::: {.cell-output-display}
+
+
+Table: CFAs in the held-out half, restricted to the 71 splits in which all three are admissible (LRT: against the cross-loadings model)
+
+|Model                    |CFI, median [2.5%, 97.5%] | CFI >= .90 (%)| LRT p < .05 (%)|
+|:------------------------|:-------------------------|--------------:|---------------:|
+|Movement-based           |0.889 [0.866, 0.915]      |             24|             100|
+|Green beliefs on Ethical |0.909 [0.885, 0.934]      |             68|              93|
+|Cross-loadings (used)    |0.915 [0.895, 0.943]      |             94|              NA|
+
+
+:::
+
+```{.r .cell-code}
+lv_full <- lavInspect(fit_cfa, "cor.lv")
+cors <- do.call(rbind, map(splithalf, "cor"))
+sh_cor <- tibble(Pair = str_replace_all(colnames(cors), "_", " "),
+                 Full = lv_full[upper.tri(lv_full)],
+                 Median = apply(cors, 2, median), Low = apply(cors, 2, quantile, .025), High = apply(cors, 2, quantile, .975))
+knitr::kable(transmute(sh_cor, Pair, Full, `Held-out half, median [2.5%, 97.5%]` = format_estimate(Median, Low, High)),
+             format = "pipe", digits = 2, caption = "Latent correlations of the retained CFA in the held-out half")
+```
+
+::: {.cell-output-display}
+
+
+Table: Latent correlations of the retained CFA in the held-out half
+
+|Pair                               |  Full|Held-out half, median [2.5%, 97.5%] |
+|:----------------------------------|-----:|:-----------------------------------|
+|Open Science - Rigorous Science    |  0.53|0.53 [0.45, 0.63]                   |
+|Open Science - Green Science       |  0.05|0.06 [-0.04, 0.14]                  |
+|Rigorous Science - Green Science   | -0.12|-0.12 [-0.22, -0.03]                |
+|Open Science - Slow Science        |  0.34|0.33 [0.16, 0.43]                   |
+|Rigorous Science - Slow Science    |  0.20|0.19 [0.07, 0.29]                   |
+|Green Science - Slow Science       |  0.18|0.18 [0.09, 0.26]                   |
+|Open Science - Ethical Science     |  0.06|0.06 [-0.07, 0.23]                  |
+|Rigorous Science - Ethical Science |  0.06|0.05 [-0.07, 0.16]                  |
+|Green Science - Ethical Science    |  0.52|0.51 [0.41, 0.67]                   |
+|Slow Science - Ethical Science     |  0.25|0.24 [0.11, 0.34]                   |
 
 
 :::
@@ -7775,7 +8135,13 @@ saveRDS(list(
   cfa_lrt = cfa_lrt,
   scoring_fit = scoring_fit,
   scoring_agreement = scoring_agreement,
-  scoring_loadings = scoring_loadings
+  scoring_loadings = scoring_loadings,
+  # Split-half cross-validation (chunk cfa_splithalf)
+  splithalf = list(n_splits = sh_n_splits, congruence = sh_congruence, items = sh_items, beliefs = sh_beliefs,
+                   n_factors = sh_nfactors, support5 = map_dbl(splithalf, "support5"),
+                   fit = sh_fit, cfi90 = sh_cfi90, lrt = sh_lrt, admissible = sh_admissible,
+                   admissible_only = sh_admissible_only,
+                   suggested = sh_pct(suggested), confirmed = sh_pct(confirmed[suggested]), cor = sh_cor)
 ), "../paper/results/facets.rds")
 ```
 :::
